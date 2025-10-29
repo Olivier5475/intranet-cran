@@ -6,6 +6,9 @@ use App\Interface\DocumentsServiceInterface;
 use App\Interface\FoldersServiceInterface;
 use App\repositories\FolderRepository;
 use App\repositories\interfaces\FolderRepositoryInterface;
+use App\repositories\interfaces\UserRepositoryInterface;
+use App\repositories\UserRepository;
+use App\Services\AuthService;
 use App\Services\DocumentService;
 use App\Services\FoldersService;
 use Illuminate\Support\ServiceProvider;
@@ -30,6 +33,16 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(
             FolderRepositoryInterface::class,
             FolderRepository::class
+        );
+
+        $this->app->bind(
+            UserRepositoryInterface::class,
+            UserRepository::class
+        );
+
+        $this->app->bind(
+            UserServiceInterface::class,
+            AuthService::class
         );
     }
 
