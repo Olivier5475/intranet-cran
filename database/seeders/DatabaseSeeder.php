@@ -18,9 +18,21 @@ class DatabaseSeeder extends Seeder
     {
         // 1. Crée un utilisateur de test principal
         $user = User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-            'password' => Hash::make('password'), // mdp: password
+            'nom' => 'Test1',
+            'prenom' => 'User1',
+            'email' => 'test@univ-lorraine.fr',
+            "role" => "admin",
+            'verified_member_role' => true,
+            "newsletter_role" => false
+        ]);
+
+        User::factory()->create([
+            'nom' => 'Test2',
+            'prenom' => 'User2',
+            'email' => 'test2@univ-lorraine.fr',
+            "role" => "user",
+            'verified_member_role' => true,
+            "newsletter_role" => false
         ]);
 
         // 2. Crée 3 Dossiers Racines pour cet utilisateur
