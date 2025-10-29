@@ -13,6 +13,13 @@ class User extends Authenticatable
     use HasFactory, Notifiable; // ... (traits existants)
 
     // ... ($fillable, $hidden, $casts)
+    protected $fillable = [
+        "email",
+        "nom",
+        "prenom",
+        "verified_member_role",
+        "newsletter_role"
+    ];
 
     /**
      * Récupère tous les dossiers racines de l'utilisateur
