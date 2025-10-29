@@ -2,14 +2,14 @@
 
 namespace App\Services;
 
-use App\Models\User;
+use App\DTO\AuthDTO;
 use App\repositories\interfaces\UserRepositoryInterface;
 use Illuminate\Support\Facades\Http;
 
 class AuthService implements Interface\UserServiceInterface {
     public function __construct(
-        private readonly UserRepositoryInterface $userRepository,
-        private readonly string                  $lang = "fr"
+        private UserRepositoryInterface $userRepository,
+        private string $lang = "fr"
     ) {}
 
     public function handleUserInDatabase(array $data): void {
@@ -39,23 +39,12 @@ class AuthService implements Interface\UserServiceInterface {
 
     }
 
-    public function getUserIdByEmail(string $email) : int {
-        $user = $this->userRepository->getUserByEmail($email);
-        return $user->id;
-    }
-
-    public function getUserRoleByEmail(string $email) : string {
-        $user = $this->userRepository->getUserByEmail($email);
-        return $user->role;
-    }
-
-    public function getUserCranMemberByEmail(string $email) {
-        $user = $this->userRepository->getUserByEmail($email);
-        return $user->verified_member_role ?? 0;
-    }
-
-    public function getUserNewsletterCreatorByEmail(string $email) {
-        $user = $this->userRepository->getUserByEmail($email);
-        return $user->newsletter_role ?? 0;
+    public function getUserByEmail(string $string) : AuthDTO {
+        $user = $this->userRepository->getUserByEmail($string);
+        return new AuthDTO(
+            email : $user->email,
+            nom : $user->nom,
+            prenom: $user->prenom
+        );
     }
 }
