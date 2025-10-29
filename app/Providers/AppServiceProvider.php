@@ -4,6 +4,8 @@ namespace App\Providers;
 
 use App\Interface\DocumentsServiceInterface;
 use App\Interface\FoldersServiceInterface;
+use App\repositories\FolderRepository;
+use App\repositories\interfaces\FolderRepositoryInterface;
 use App\Services\DocumentService;
 use App\Services\FoldersService;
 use Illuminate\Support\ServiceProvider;
@@ -23,6 +25,11 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(
             DocumentsServiceInterface::class,
             DocumentService::class
+        );
+
+        $this->app->bind(
+            FolderRepositoryInterface::class,
+            FolderRepository::class
         );
     }
 
