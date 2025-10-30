@@ -2,7 +2,7 @@
 
 namespace App\Http\Middleware;
 
-use App\Interface\FoldersServiceInterface;
+use App\Services\Interface\FoldersServiceInterface;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
 use Inertia\Middleware;

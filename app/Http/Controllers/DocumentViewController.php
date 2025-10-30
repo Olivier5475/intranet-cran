@@ -2,7 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Interface\DocumentsServiceInterface;
+
+use App\Services\Interface\DocumentsServiceInterface;
 
 class DocumentViewController {
     public function __invoke($id, DocumentsServiceInterface $documentsService) : \Inertia\Response {

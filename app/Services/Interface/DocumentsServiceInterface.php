@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Interface;
+namespace App\Services\Interface;
 use App\DTO\DocumentViewDTO;
 
 interface DocumentsServiceInterface {

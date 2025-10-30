@@ -4,8 +4,8 @@ namespace App\Services;
 
 use App\DTO\AttachmentDTO;
 use App\DTO\DocumentViewDTO;
-use App\Interface\DocumentsServiceInterface;
 use App\Models\Document;
+use App\Services\Interface\DocumentsServiceInterface;
 
 class DocumentService implements DocumentsServiceInterface {
     public function getDocumentView($id) : DocumentViewDTO {

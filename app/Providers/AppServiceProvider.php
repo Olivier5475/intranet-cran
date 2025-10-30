@@ -11,6 +11,8 @@ use App\repositories\UserRepository;
 use App\Services\AuthService;
 use App\Services\DocumentService;
 use App\Services\FoldersService;
+use App\Services\Interface\DocumentsServiceInterface;
+use App\Services\Interface\FoldersServiceInterface;
 use App\Services\Interface\UserServiceInterface;
 use Illuminate\Support\ServiceProvider;
 

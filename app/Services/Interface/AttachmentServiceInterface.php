@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Interface;
+namespace App\Services\Interface;
 
 interface AttachmentServiceInterface {
 

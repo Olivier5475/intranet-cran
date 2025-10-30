@@ -5,8 +5,8 @@ namespace App\Services;
 use App\DTO\DocumentDTO;
 use App\DTO\FileDTO;
 use App\DTO\FolderDTO;
-use App\Interface\FoldersServiceInterface;
 use App\Models\Folder;
+use App\Services\Interface\FoldersServiceInterface;
 
 class FoldersService implements FoldersServiceInterface {
 
