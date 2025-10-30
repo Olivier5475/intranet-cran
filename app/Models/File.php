@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class File extends Model
 {
@@ -17,6 +18,7 @@ class File extends Model
         'storage_path',
         'mimetype',
         'size',
+        'department_id',
     ];
 
     /**
@@ -34,4 +36,9 @@ class File extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function departements(): BelongsToMany {
+        return $this->belongsToMany(Departement::class);
+    }
+
 }

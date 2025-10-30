@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -18,7 +19,8 @@ class User extends Authenticatable
         "nom",
         "prenom",
         "verified_member_role",
-        "newsletter_role"
+        "newsletter_role",
+        "department_id",
     ];
 
     /**
@@ -49,8 +51,11 @@ class User extends Authenticatable
     /**
      * Récupère tous les "Documents" de l'utilisateur
      */
-    public function documents(): HasMany
-    {
+    public function documents(): HasMany {
         return $this->hasMany(Document::class);
+    }
+
+    public function departement(): belongsTo {
+        return $this->belongsTo(Departement::class);
     }
 }
