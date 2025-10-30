@@ -51,7 +51,7 @@ if(props.child.type === "file") {
 </script>
 
 <template>
-    <div class="w-1/6 transition-all duration-150 hover:bg-blue-400 hover:bg-opacity-50">
+    <div :class="`w-[12.5%] transition-all duration-150 hover:bg-blue-400 hover:bg-opacity-50`">
         <Link
             v-if="child.type !== 'file'"
             :href=href
