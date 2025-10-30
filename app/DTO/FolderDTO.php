@@ -8,5 +8,6 @@ readonly class FolderDTO {
         public string $name,
         public string $type = "folder",
         public ?array $children = null,
+        public ?string $created_at = null
     ) {}
 }

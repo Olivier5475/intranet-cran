@@ -7,5 +7,7 @@ readonly class DocumentDTO {
         public int $id,
         public string $name,
         public string $type = "document",
+        public array $departements,
+        public string $created_at
     ) {}
 }
