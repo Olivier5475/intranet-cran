@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('files', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->foreignId('user_id');
+            $table->foreignId('user_id')->constrained('folders')->onDelete('cascade');
 
             // Où se trouve ce fichier ?
             $table->foreignId('folder_id')->constrained('folders')->onDelete('cascade');
@@ -22,6 +22,8 @@ return new class extends Migration
             // Infos de stockage
             $table->string('storage_path'); // Chemin dans Storage::disk()
             $table->string('mimetype');      // "image/jpeg", "application/pdf"
+            $table->boolean('is_actu')->default(false);
+            $table->foreignId('departement_id')->nullable()->constrained('departements')->onDelete('cascade');
             $table->unsignedBigInteger('size'); // En bytes
 
             $table->timestamps();

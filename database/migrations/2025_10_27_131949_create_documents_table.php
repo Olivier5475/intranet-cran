@@ -14,13 +14,13 @@ return new class extends Migration
         Schema::create('documents', function (Blueprint $table) {
             $table->id();
 
-            $table->string('title'); // Le titre de ton document
-            $table->text('content')->nullable(); // Le contenu texte
-            $table->foreignId('user_id');
+            $table->string('title');
+            $table->text('content')->nullable();
+            $table->foreignId('user_id')->constrained('folders')->onDelete('cascade');
 
-            // Où se trouve ce "Document" ?
             $table->foreignId('folder_id')->constrained('folders')->onDelete('cascade');
-
+            $table->boolean('is_actu')->default(false);
+            $table->foreignId('departement_id')->nullable()->constrained('departements')->onDelete('cascade');
             $table->timestamps();
         });
     }
