@@ -2,20 +2,28 @@
 
 namespace App\Http\Controllers;
 
-
 use App\Services\Interface\FoldersServiceInterface;
+use Illuminate\Http\Request;
 
-class NavigationController extends Controller {
-    function __invoke(int $folder_id, FoldersServiceInterface $foldersService): \Inertia\Response {
-        // on récupère le chemin d'accès du dossier courrant
-        $parents = $foldersService->getBreadcrumbs($folder_id);
+class NavigationController extends Controller
+{
+    public function __construct(
+        private readonly FoldersServiceInterface $foldersService,
+    ) {}
 
-        // on récupère les enfants (dossier, fichiers et documents) à partir du dossier courant
-        $children = $foldersService->getChildren($folder_id);
+    function __invoke(int $folder_id, Request $request, FoldersServiceInterface $foldersService): \Inertia\Response {
+        $searchQuery = $request->input('q');
+
+        // UN SEUL APPEL au service pour le contenu
+        $items = $this->foldersService->getFolderContents($folder_id, $searchQuery);
+
+        // Un appel pour le fil d'ariane
+        $breadcrumbs = $this->foldersService->getBreadcrumbs($folder_id);
 
         return \Inertia\Inertia::render('Navigation', [
-            "parents" => $parents,
-            "children" => $children
+            "parents" => $breadcrumbs,
+            "children" => $items,
+            "currentSearch" => $searchQuery,
         ]);
     }
 }
