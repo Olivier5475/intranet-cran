@@ -29,7 +29,7 @@ class UserFactory extends Factory
             'verified_member_role' => fake()->boolean(),
             'newsletter_role' => fake()->boolean(),
             'role' => fake()->randomElement(['admin', 'user']),
-            'email' => fake()->unique()->safeEmail(),
+            'email' => fake()->unique()->userName() . '@univ-lorraine.fr',
             'email_verified_at' => now(),
             'remember_token' => Str::random(10),
         ];

@@ -11,6 +11,8 @@ class FileFactory extends Factory
         // On simule des types de fichiers courants
         $mimetypes = [
             'jpg' => 'image/jpeg',
+            'jpeg' => 'image/jpeg',
+            'png' => 'image/png',
             'pdf' => 'application/pdf',
             'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
             'mp4' => 'video/mp4',
@@ -27,6 +29,7 @@ class FileFactory extends Factory
             'storage_path' => 'user_files/' . fake()->uuid() . '.' . $ext,
             'mimetype' => $mimetypes[$ext],
             'size' => fake()->numberBetween(1024, 10000000), // de 1KB à 10MB
+            'is_actu' => fake()->boolean(30),
         ];
     }
 }

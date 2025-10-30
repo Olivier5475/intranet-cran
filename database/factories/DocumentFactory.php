@@ -15,6 +15,7 @@ class DocumentFactory extends Factory
             'content' => fake()->paragraphs(3, true),
             'user_id' => \App\Models\User::factory(),
             'folder_id' => \App\Models\Folder::factory(),
+            'is_actu' => fake()->boolean(30),
         ];
     }
 
