@@ -2,14 +2,17 @@
 
 namespace App\Http\Middleware;
 
+use App\Services\Interface\DepartementsServiceInterface;
 use App\Services\Interface\FoldersServiceInterface;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
 class HandleInertiaRequests extends Middleware {
+
     public function __construct(
         private readonly FoldersServiceInterface $foldersService,
+        private readonly DepartementsServiceInterface $departementsService
     ) {}
 
     /**
@@ -53,6 +56,7 @@ class HandleInertiaRequests extends Middleware {
                 'success' => $request->session()->get('success'),
             ],
             'racineChildren' => $this->foldersService->getRacineChildren(),
+            'departements' => $this->departementsService->getDepartements(),
         ];
     }
 }
