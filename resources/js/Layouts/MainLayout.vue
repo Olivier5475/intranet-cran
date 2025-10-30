@@ -4,6 +4,16 @@ import MainNav from '@/Components/MainNav.vue';
 import FilterWidget from '@/Components/FilterWidget.vue';
 import FlashMessage from '@/Components/FlashMessage.vue';
 import LogoWidget from '@/Components/LogoWidget.vue';
+import { provide, readonly, ref } from 'vue';
+
+const activeFilters = ref({});
+
+function handleFilterChange(newFilters) {
+    activeFilters.value = newFilters;
+    console.log('MainLayout a reçu les filtres :', newFilters);
+}
+
+provide('activeFilters', readonly(activeFilters));
 
 // --- Données pour les Widgets ---
 const modificationsRecentes = [
@@ -12,31 +22,34 @@ const modificationsRecentes = [
 ];
 
 const actualites = [
-    { href: '#', text: 'Titre de l\'actu', date: '03/04/2023', icon: 'News' },
+    { href: '#', text: "Titre de l'actu", date: '03/04/2023', icon: 'News' },
     { href: '#', text: 'Cloud CRAN', date: '22/09/2021', icon: 'News' },
 ];
 
 defineProps<{
-    racineChildren : Array<{
-        id : number,
-        name : string,
-    }>
+    racineChildren: Array<{
+        id: number;
+        name: string;
+    }>;
+    departements: Array<{
+        id: number;
+        name: string;
+        initials: string;
+    }>;
 }>();
-
 </script>
 
 <template>
     <FlashMessage />
 
     <header>
-        <MainNav :racineChildren=racineChildren />
+        <MainNav :racineChildren="racineChildren" />
     </header>
 
     <div class="bg-gray-100 dark:bg-slate-600 min-h-screen">
-        <div class="lg:grid-cols-5 gap-6 p-4 grid grid-cols-1 mx-auto w-11/12">
-
+        <div class="lg:grid-cols-5 gap-6 p-4 mx-auto grid w-11/12 grid-cols-1">
             <aside class="lg:col-span-1 space-y-6">
-                <FilterWidget />
+                <FilterWidget :departements=departements @filters-updated=handleFilterChange />
                 <SidebarWidget title="Modifications récentes" :items="modificationsRecentes" footerLink="#" footerText="Toutes les modifications…" />
             </aside>
 
@@ -48,9 +61,8 @@ defineProps<{
                 <SidebarWidget title="Actualités" :items="actualites" footerLink="#" footerText="Plus d'actualités…" />
             </aside>
         </div>
-        <footer class="py-10 flex justify-between items-center bg-white dark:bg-slate-900 shadow-sm">
-            <LogoWidget/>
+        <footer class="py-10 bg-white dark:bg-slate-900 shadow-sm flex items-center justify-between">
+            <LogoWidget />
         </footer>
     </div>
-
 </template>

@@ -1,25 +1,33 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, reactive, watch } from 'vue';
 // Icônes
 import { AdjustmentsHorizontalIcon, CalendarIcon, DocumentIcon } from '@heroicons/vue/24/outline';
 
-// --- L'état de nos filtres ---
-const departements = ref({
-    cid: false,
-    iset: false,
-    sbs: false,
-});
-const startDate = ref(null);
-const endDate = ref(null);
-const fileType = ref('all');
-const sortByDate = ref('newest'); // 'newest' ou 'oldest'
+const emit = defineEmits(['filters-updated']);
 
-// --- Données pour les listes ---
-const departementList = [
-    { id: 'cid', name: 'Département CID' },
-    { id: 'iset', name: 'Département ISET' },
-    { id: 'sbs', name: 'Département SBS' },
-];
+// --- L'état de nos filtres ---
+defineProps<{
+    departements : Array<{
+        id: number;
+        name: string;
+        initials: string,
+    }>
+}>()
+
+const filters = reactive({
+    startDate: null,
+    endDate: null,
+    fileType: 'all',
+    sortBy: 'newest',
+    selectedDepartments: [] as number[] // La variable qui manquait pour vos checkboxes
+});
+
+const sortPossibilities = ref({
+    pertinence : "Pertinence",
+    newest :  "Le plus recent",
+    oldest : "Le plus ancien",
+    name : "Par nom",
+});
 
 const fileTypeList = [
     { id: 'all', name: 'Tous les types' },
@@ -29,6 +37,11 @@ const fileTypeList = [
     { id: 'video', name: 'Vidéo' },
     { id: 'pdf', name: 'PDF' },
 ];
+
+watch(filters, (newFilterValues) => {
+    // Émet l'événement vers le parent avec les nouvelles valeurs
+    emit('filters-updated', newFilterValues);
+}, { deep: true }); // surveil l'intérieur de l'array departement
 </script>
 
 <template>
@@ -39,22 +52,23 @@ const fileTypeList = [
         </h2>
 
         <form class="p-4 space-y-6 dark:bg-zinc-700 dark:text-gray-300">
-
+<!--            DEPARTEMENTS FILTRE INPUT            -->
             <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Départements</label>
                 <div class="space-y-2">
-                    <div v-for="dep in departementList" :key="dep.id" class="flex items-center">
+                    <div v-for="dep in departements" :key="dep.id" class="flex items-center">
                         <input
-                            :id="dep.id"
-                            v-model="departements[dep.id]"
+                            :id=dep.id.toString()
                             type="checkbox"
                             class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 dark:text-gray-300 dark:bg-gray-900"
                         >
-                        <label :for="dep.id" class="ml-3 text-sm text-gray-600 dark:text-gray-300">{{ dep.name }}</label>
+                        <label :for=dep.id.toString() class="ml-3 text-sm text-gray-600 dark:text-gray-300">{{ dep.initials }}</label>
                     </div>
                 </div>
             </div>
+<!--            DEPARTEMENTS FILTRE INPUT            -->
 
+<!--            DATE FILTRE INPUT            -->
             <div>
                 <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Filtrer par date</label>
                 <div class="space-y-2">
@@ -67,7 +81,7 @@ const fileTypeList = [
                             <input
                                 type="date"
                                 id="startDate"
-                                v-model="startDate"
+                                v-model=filters.startDate
                                 class="block w-full rounded-md border-gray-300 pl-10 focus:border-blue-500 focus:ring-blue-500 sm:text-sm dark:bg-gray-900"
                             >
                         </div>
@@ -81,14 +95,16 @@ const fileTypeList = [
                                 <input
                                     type="date"
                                     id="endDate"
-                                    v-model="endDate"
+                                    v-model=filters.endDate
                                     class="block w-full rounded-md border-gray-300 pl-10 focus:border-blue-500 focus:ring-blue-500 sm:text-sm dark:bg-gray-900"
                                 >
                             </div>
                     </div>
                 </div>
             </div>
+<!--            DATE FILTRE INPUT            -->
 
+<!--            FILE TYPE FILTRE INPUT            -->
             <div>
                 <label for="fileType" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Type de fichier</label>
                 <div class="relative mt-1 rounded-md shadow-sm">
@@ -97,7 +113,7 @@ const fileTypeList = [
                     </div>
                     <select
                         id="fileType"
-                        v-model="fileType"
+                        v-model=filters.fileType
                         class="block w-full rounded-md border-gray-300 pl-10 pr-8 focus:border-blue-500 focus:ring-blue-500 sm:text-sm dark:bg-gray-900"
                     >
                         <option v-for="type in fileTypeList" :key="type.id" :value="type.id">
@@ -106,43 +122,25 @@ const fileTypeList = [
                     </select>
                 </div>
             </div>
+<!--            FILE TYPE INPUT            -->
 
+<!--            SORT INPUT            -->
             <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Trier par date</label>
                 <div class="space-y-2">
-                    <div class="flex items-center">
+                    <div v-for="(key, value) in sortPossibilities" :key=key class="flex items-center">
                         <input
-                            id="sortNewest"
-                            value="newest"
-                            v-model="sortByDate"
+                            :id=value
+                            :value=value
+                            v-model=filters.sortBy
                             type="radio"
                             class="h-4 w-4 border-gray-300 text-blue-600 focus:ring-blue-500 dark:bg-gray-900"
                         >
-                        <label for="sortNewest" class="ml-3 text-sm text-gray-600 dark:text-gray-300">Plus récent d'abord</label>
-                    </div>
-                    <div class="flex items-center">
-                        <input
-                            id="sortOldest"
-                            value="oldest"
-                            v-model="sortByDate"
-                            type="radio"
-                            class="h-4 w-4 border-gray-300 text-blue-600 focus:ring-blue-500 dark:bg-gray-900 "
-                        >
-                        <label for="sortOldest" class="ml-3 text-sm text-gray-600 dark:text-gray-300">Plus ancien d'abord</label>
+                        <label :for=value class="ml-3 text-sm text-gray-600 dark:text-gray-300">{{key}}</label>
                     </div>
                 </div>
             </div>
-
-            <div class="pt-4 border-t border-gray-200">
-                <button
-                    type="submit"
-                    @click.prevent=""
-                    class="w-full flex justify-center items-center gap-x-2 rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
-                >
-                    <AdjustmentsHorizontalIcon class="h-5 w-5" />
-                    Appliquer les filtres
-                </button>
-            </div>
+<!--            SORT INPUT            -->
 
         </form>
     </section>
