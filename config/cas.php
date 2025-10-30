@@ -7,4 +7,5 @@ return [
     'uri' => env('CAS_URI', ''),
     'ca_cert_path' => env('CAS_CA_CERT_PATH', false), // Mettez le chemin '/path/to/cacert.pem'
     'debug' => env('CAS_DEBUG', false),
+    'url' => env('CAS_URL', ''),
 ];

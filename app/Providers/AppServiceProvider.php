@@ -2,15 +2,15 @@
 
 namespace App\Providers;
 
-use App\Interface\DocumentsServiceInterface;
-use App\Interface\FoldersServiceInterface;
 use App\repositories\FolderRepository;
 use App\repositories\interfaces\FolderRepositoryInterface;
 use App\repositories\interfaces\UserRepositoryInterface;
 use App\repositories\UserRepository;
 use App\Services\AuthService;
+use App\Services\DecodageService;
 use App\Services\DocumentService;
 use App\Services\FoldersService;
+use App\Services\Interface\DecodageServiceInterface;
 use App\Services\Interface\DocumentsServiceInterface;
 use App\Services\Interface\FoldersServiceInterface;
 use App\Services\Interface\UserServiceInterface;
@@ -46,6 +46,11 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(
             UserServiceInterface::class,
             AuthService::class
+        );
+
+        $this->app->bind(
+            DecodageServiceInterface::class,
+            DecodageService::class
         );
     }
 

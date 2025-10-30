@@ -4,11 +4,13 @@ namespace App\Services;
 
 use App\DTO\AuthDTO;
 use App\repositories\interfaces\UserRepositoryInterface;
+use App\Services\Interface\DecodageServiceInterface;
 use Illuminate\Support\Facades\Http;
 
 class AuthService implements Interface\UserServiceInterface {
     public function __construct(
         private UserRepositoryInterface $userRepository,
+        private DecodageServiceInterface $decodageService,
         private string $lang = "fr"
     ) {}
 
@@ -16,15 +18,14 @@ class AuthService implements Interface\UserServiceInterface {
         $user = $this->userRepository->getUserByEmail($data['email']);
 
         if (!$user) {
-            $url = 	(new Constants())->url;
             $tab_post = array('appel' => "form_rech", 'codelangue' => $this->lang, 'page' => 'listeindividupublic', 'pas_de_session' => 'oui');
 
-            $response = Http::withoutVerifying()->post($url, $tab_post);
+            $response = Http::post(config("cas.url"), $tab_post);
 
             $resultat = $response->body();
             $tab_annuaire=json_decode($resultat,true);
 
-            $tab_annuaire = (new Constants())->decode_utf8_recursive($tab_annuaire);
+            $tab_annuaire = $this->decodageService->decode_utf8_recursive($tab_annuaire);
 
             $isCranMember = 0;
             foreach ($tab_annuaire as $value) {
@@ -33,7 +34,7 @@ class AuthService implements Interface\UserServiceInterface {
                     break;
                 }
             }
-            $data["isCranMember"] = $isCranMember;
+            $data["verified_member_role"] = $isCranMember;
             $this->userRepository->createUser($data);
         }
 
