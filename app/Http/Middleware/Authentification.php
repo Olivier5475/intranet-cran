@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Services\Interface\UserServiceInterface;
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
 use phpCAS;
 use Symfony\Component\HttpFoundation\Response;
@@ -21,6 +22,20 @@ class Authentification {
      * @param Closure(Request): (Response) $next
      */
     public function handle(Request $request, Closure $next): Response {
+        // SI ON EST EN LOCAL ALORS ON DEMANDE PAS D'AUTHENTIFICATION
+        if (App::environment('local')) {
+            if (!Auth::check()) {
+                $localDevUser = User::find(1);
+                if ($localDevUser) {
+                    Auth::login($localDevUser);
+                } else {
+                    abort(500, "Utilisateur de dev local (ID 1) non trouvé.
+                           Veuillez exécuter vos seeders ou en créer un.");
+                }
+            }
+            return $next($request);
+        }
+
         phpCAS::forceAuthentication();
         if (Auth::check()) {
             return $next($request);
