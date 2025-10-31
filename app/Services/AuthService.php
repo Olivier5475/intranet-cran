@@ -2,12 +2,10 @@
 
 namespace App\Services;
 
-use App\DTO\AuthDTO;
 use App\repositories\interfaces\UserRepositoryInterface;
 use App\Services\Interface\DecodageServiceInterface;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Http\Client\ConnectionException;
-use Illuminate\Support\Facades\Http;
 
 class AuthService implements Interface\UserServiceInterface {
     public function __construct(

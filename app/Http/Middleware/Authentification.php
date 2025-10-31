@@ -54,8 +54,11 @@ class Authentification {
             ]);
             $user = $this->userService->getUserByEmail($casUser . '@univ-lorraine.fr');
         }
-
-        Auth::login($user);
+        if($user) {
+            Auth::login($user);
+        } else {
+            var_dump($user);
+        }
         return $next($request);
     }
 }
