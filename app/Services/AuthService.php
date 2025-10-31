@@ -40,8 +40,9 @@ class AuthService implements Interface\UserServiceInterface {
 
     }
 
-    public function getUserByEmail(string $string) : AuthDTO {
+    public function getUserByEmail(string $string) : ?AuthDTO {
         $user = $this->userRepository->getUserByEmail($string);
+        if(!$user) { return null; }
         return new AuthDTO(
             email : $user->email,
             nom : $user->nom,
