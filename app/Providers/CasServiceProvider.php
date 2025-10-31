@@ -32,5 +32,8 @@ class CasServiceProvider extends ServiceProvider
             config('cas.uri'),
             config('app.url'),
         );
+
+        // todo : enlever ca de la prod
+        phpCAS::setNoCasServerValidation();
     }
 }
