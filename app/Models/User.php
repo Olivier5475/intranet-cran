@@ -18,6 +18,7 @@ class User extends Authenticatable
         "email",
         "nom",
         "prenom",
+        "role",
         "verified_member_role",
         "newsletter_role",
         "department_id",
