@@ -57,7 +57,7 @@ class Authentification {
         if($user) {
             Auth::login($user);
         } else {
-            var_dump($user);
+            var_dump(Auth::check());
         }
         return $next($request);
     }
