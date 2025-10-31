@@ -10,7 +10,8 @@ class UserRepository implements UserRepositoryInterface {
         return User::where('email', $email)->first();
     }
     public function createUser(array $data) {
-        if(!$data["role"]) { $data['role'] = 'user'; }
+        if(!isset($data["role"])) { $data['role'] = 'user'; }
+        if(is_null($data['role'])) { $data['role'] = 'user'; }
         User::create($data);
     }
     public function updateUser(int $id, array $data) {
