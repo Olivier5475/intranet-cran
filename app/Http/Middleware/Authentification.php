@@ -20,6 +20,7 @@ class Authentification {
      * Handle an incoming request.
      *
      * @param Closure(Request): (Response) $next
+     * @throws \Exception
      */
     public function handle(Request $request, Closure $next): Response {
         // SI ON EST EN LOCAL ALORS ON DEMANDE PAS D'AUTHENTIFICATION
@@ -41,24 +42,32 @@ class Authentification {
             return $next($request);
         }
         $casUser = phpCAS::getUser();
+        $attributes = phpCAS::getAttributes();
+        $user = $this->userService->getUserByEmail($attributes['mail']);
 
-        $user = $this->userService->getUserByEmail($casUser . '@univ-lorraine.fr');
-
-        if (!$user)  {
-            $attributes = phpCAS::getAttributes();
-
-            $this->userService->handleUserInDatabase([
-                 'nom' => $attributes['sn'] ?? 'Unknown',
-                 'prenom' => $attributes['givenname'] ?? $casUser ,
-                 'email' => $attributes['mail'] ?? ($casUser . '@univ-lorraine.fr'), // si vous récupérez des attributs
-            ]);
+        if(!$user) {
             $user = $this->userService->getUserByEmail($casUser . '@univ-lorraine.fr');
         }
-        if($user) {
-            Auth::login($user);
-        } else {
-            var_dump(Auth::check());
+
+        if (!$user)  {
+            try {
+                $this->userService->handleUserInDatabase([
+                    'nom' => $attributes['sn'] ?? 'Unknown',
+                    'prenom' => $attributes['givenname'] ?? $casUser ,
+                    'email' => $attributes['mail'] ?? ($casUser . '@univ-lorraine.fr'), // si vous récupérez des attributs
+                ]);
+            } catch (\Exception) {
+                throw new \Exception("Server Error", 500);
+            }
+
+            $user = $this->userService->getUserByEmail($attributes['mail']);
+
+            if(!$user) {
+                $user = $this->userService->getUserByEmail($casUser . '@univ-lorraine.fr');
+            }
         }
+
+        Auth::login($user);
         return $next($request);
     }
 }

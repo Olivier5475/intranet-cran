@@ -12,7 +12,11 @@ class UserRepository implements UserRepositoryInterface {
     public function createUser(array $data) {
         if(!isset($data["role"])) { $data['role'] = 'user'; }
         if(is_null($data['role'])) { $data['role'] = 'user'; }
-        User::create($data);
+        try {
+            User::create($data);
+        } catch (\Exception) {
+            throw new \Exception("Error creating user");
+        }
     }
     public function updateUser(int $id, array $data) {
         User::update($data);
