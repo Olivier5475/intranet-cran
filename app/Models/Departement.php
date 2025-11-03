@@ -31,7 +31,7 @@ class Departement extends Model
         return $this->belongsToMany(Document::class);
     }
 
-    public function users() : HasMany {
-        return $this->hasMany(User::class);
+    public function users() : belongsToMany {
+        return $this->belongsToMany(User::class);
     }
 }

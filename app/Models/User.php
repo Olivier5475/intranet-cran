@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -18,10 +19,7 @@ class User extends Authenticatable
         "email",
         "nom",
         "prenom",
-        "role",
-        "verified_member_role",
         "newsletter_role",
-        "department_id",
     ];
 
     /**
@@ -30,7 +28,7 @@ class User extends Authenticatable
     public function folders(): HasMany
     {
         // On ne retourne que les dossiers à la racine par défaut
-        return $this->hasMany(Folder::class)->whereNull('parent_id');
+        return $this->hasMany(Folder::class);
     }
 
     /**
@@ -56,7 +54,7 @@ class User extends Authenticatable
         return $this->hasMany(Document::class);
     }
 
-    public function departement(): belongsTo {
-        return $this->belongsTo(Departement::class);
+    public function departement() : BelongsToMany {
+        return $this->belongsToMany(Departement::class);
     }
 }
