@@ -19,7 +19,7 @@ class File extends Model
         'storage_path',
         'mimetype',
         'size',
-        'department_id',
+        'departements',
     ];
 
     /**
