@@ -10,10 +10,14 @@ class UserRepository implements UserRepositoryInterface {
         return User::where('email', $email)->first();
     }
     public function createUser(array $data) {
-        if(!isset($data["role"])) { $data['role'] = 'user'; }
-        if(is_null($data['role'])) { $data['role'] = 'user'; }
+        if(empty($data["role"])) { $data['role'] = 'user'; }
         try {
-            User::create($data);
+            $user = new User();
+            $user->email = $data['email'];
+            $user->nom = $data['nom'];
+            $user->prenom = $data['prenom'];
+            $user->role = $data['role'];
+            $user->save();
         } catch (\Exception) {
             throw new \Exception("Error creating user");
         }
