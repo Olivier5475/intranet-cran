@@ -43,8 +43,6 @@ class DatabaseSeeder extends Seeder
             'prenom' => 'User1',
             'email' => 'test@univ-lorraine.fr',
             "role" => "admin",
-            'verified_member_role' => true,
-            "newsletter_role" => false
         ]);
 
         $mainUser2 = User::factory()->create([
@@ -52,8 +50,6 @@ class DatabaseSeeder extends Seeder
             'prenom' => 'User2',
             'email' => 'test2@univ-lorraine.fr',
             "role" => "user",
-            'verified_member_role' => true,
-            "newsletter_role" => false
         ]);
 
         $mainUsers = collect([$mainUser1, $mainUser2]);
@@ -153,8 +149,6 @@ class DatabaseSeeder extends Seeder
         // Utile pour tester l'affichage d'un compte vide, la pagination, etc.
         User::factory(10)->create([
             "role" => "user",
-            'verified_member_role' => true,
-            "newsletter_role" => false,
         ]);
     }
 }
