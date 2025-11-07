@@ -3,7 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Models\User;
-use App\Services\Interface\UserServiceInterface;
+use App\Services\Interfaces\UserServiceInterface;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;

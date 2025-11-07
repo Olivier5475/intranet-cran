@@ -2,17 +2,15 @@
 
 namespace App\Services;
 
-use App\repositories\interfaces\UserRepositoryInterface;
-use App\Services\Interface\DecodageServiceInterface;
+use App\Repositories\Interfaces\UserRepositoryInterface;
 use Exception;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Support\Facades\Auth;
 
-class AuthService implements Interface\UserServiceInterface {
+readonly class AuthService implements Interfaces\UserServiceInterface {
     public function __construct(
         private UserRepositoryInterface $userRepository,
-        private DecodageServiceInterface $decodageService,
-        private string $lang = "fr"
     ) {}
 
     /**
@@ -35,5 +33,9 @@ class AuthService implements Interface\UserServiceInterface {
 
     public function getUserByEmail(string $string) : ?Authenticatable {
         return $this->userRepository->getUserByEmail($string);
+    }
+
+    public function getCurrentUserId() : int {
+        return Auth::id();
     }
 }
