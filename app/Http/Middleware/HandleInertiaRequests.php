@@ -2,8 +2,7 @@
 
 namespace App\Http\Middleware;
 
-use App\Services\Interface\DepartementsServiceInterface;
-use App\Services\Interface\FoldersServiceInterface;
+use App\Services\Interfaces\DepartementsServiceInterface;
 use App\Services\Interfaces\FoldersServiceInterface;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;

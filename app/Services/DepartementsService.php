@@ -4,9 +4,9 @@ namespace App\Services;
 
 use App\DTO\DepartementDTO;
 use App\Models\Departement;
-use App\Services\Interface\DepartementsServiceInterface;
+use App\Services\Interfaces\DepartementsServiceInterface;
 
-class DepartementsService implements Interface\DepartementsServiceInterface
+readonly class DepartementsService implements Interfaces\DepartementsServiceInterface
 {
 
     public function getDepartements(): array {
