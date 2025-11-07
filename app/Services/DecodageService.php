@@ -2,9 +2,8 @@
 
 namespace App\Services;
 
-use App\Services\Interface\DecodageServiceInterface;
 
-class DecodageService implements DecodageServiceInterface {
+class DecodageService implements Interfaces\DecodageServiceInterface {
     public function __construct(public $url = "/fake-external-users") {
         $this->url = url($this->url);
     }
