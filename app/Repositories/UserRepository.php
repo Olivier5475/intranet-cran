@@ -1,11 +1,10 @@
 <?php
 
-namespace App\repositories;
+namespace App\Repositories;
 
 use App\Models\User;
-use App\repositories\interfaces\UserRepositoryInterface;
 
-class UserRepository implements UserRepositoryInterface {
+class UserRepository implements Interfaces\UserRepositoryInterface {
     public function getUserByEmail(string $email) : ?User {
         return User::where('email', $email)->first();
     }
