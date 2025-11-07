@@ -16,10 +16,10 @@ return new class extends Migration
 
             $table->string('title');
             $table->text('content')->nullable();
+            $table->text('color')->nullable();
             $table->foreignId('user_id')->constrained('folders')->onDelete('cascade');
 
             $table->foreignId('folder_id')->constrained('folders')->onDelete('cascade');
-            $table->boolean('is_actu')->default(false);
             $table->foreignId('departement_id')->nullable()->constrained('departements')->onDelete('cascade');
             $table->timestamps();
         });
