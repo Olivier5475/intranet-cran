@@ -1,0 +1,96 @@
+<script setup lang="ts">
+import { Head, useForm } from '@inertiajs/vue3';
+import { computed } from 'vue';
+
+const props = defineProps<{
+    folder_id: number;
+    file?: {
+        id: number;
+        name: string;
+    };
+}>();
+
+let form;
+if (props.file) {
+    form = useForm({
+        name: props.file.name,
+        files: [] as File[],
+    });
+} else {
+    form = useForm({
+        name: '',
+        files: [] as File[],
+    });
+}
+
+// La fonction 'route' est utilisée directement ici, car elle est globale.
+const submitUrl = computed(() => {
+    if (props.file) {
+        return `/navigation/${props.folder_id}/admin/files/store/${props.file.id}`;
+    }
+    return `/navigation/${props.folder_id}/admin/files/store`; // Route de création
+});
+
+const handleNewFileUpload = (event: Event) => {
+    const target = event.target as HTMLInputElement;
+    form.files = Array.from(target.files || []) as File[];
+};
+
+
+const submit = () => {
+    const method = props.file ? 'patch' : 'post';
+
+    form.post(submitUrl.value, {
+        method: method,
+    });
+};
+</script>
+
+<template>
+    <Head :title="file ? `Modifier le fichier ${file.name}` : 'Créer un nouveau fichier'" />
+    <h1 class="text-3xl m-4 text-center first-letter:uppercase">
+        {{ file ? "Modification d'un fichier" : "Creation d'un nouveau fichier" }}</h1>
+    <hr class="mx-auto w-11/12" />
+    <form @submit.prevent="submit" class="pt-4 mx-auto w-11/12">
+        <div class="flex justify-between">
+            <input type="text" name="title" placeholder="Nom du fichier" v-model="form.name" class="mr-10 rounded-md text-black block grow" />
+            <div v-if="form.errors.name" class="text-red-500">{{ form.errors.name }}</div>
+        </div>
+
+        <div class="my-6 mx-auto w-full">
+            <label for="file_input" class="font-semibold mb-2 block"> Ajouter un fichier 📁 </label>
+
+            <label
+                for="files_input"
+                class="p-4 border-indigo-300 rounded-lg bg-indigo-50 hover:bg-indigo-100 ease-in-out shadow-sm hover:shadow-md flex cursor-pointer items-center justify-center border-2 border-dashed transition duration-300"
+            >
+                <svg class="w-6 h-6 text-indigo-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
+                    ></path>
+                </svg>
+
+                <span class="text-indigo-700 font-semibold text-base"> Cliquez ou glissez-déposez ici pour uploader </span>
+
+                <input id="files_input" type="file" name="files[]" @change="handleNewFileUpload" class="sr-only" />
+            </label>
+
+            <div v-if="form.errors.files" class="text-red-500 text-sm mt-2">
+                {{ form.errors.files }}
+            </div>
+
+            <div v-if="form.files.length" class="text-sm text-green-600 mt-2">
+                {{ form.files.length }} fichier(s) sélectionné(s).
+            </div>
+        </div>
+
+        <button type="submit" :disabled="form.processing" class="py-2 bg-indigo-600 text-white rounded w-full">
+            {{ file ? 'Mettre à Jour' : 'Créer' }}
+        </button>
+    </form>
+</template>
+
+<style scoped></style>

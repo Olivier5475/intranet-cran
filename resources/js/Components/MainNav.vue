@@ -23,42 +23,6 @@ defineProps<{
     }>
 }>();
 
-// const navLinks = [
-//     { href: '/', text: 'Accueil' },
-//     {
-//         text: 'Fonctionnement CRAN',
-//         children: [
-//             { href: '/navigation?path=Fonctionnement CRAN/Projet A', text: 'Projet A' },
-//             { href: '#', text: 'Projet B' },
-//             { href: '#', text: 'Projet C' },
-//         ],
-//     },
-//     {
-//         text: 'Activités scientifiques CRAN',
-//         children: [
-//             { href: '#', text: 'Projet A' },
-//             { href: '#', text: 'Projet B' },
-//             { href: '#', text: 'Projet C' },
-//         ],
-//     },
-//
-//     {
-//         text: 'Appels d’offres - emplois',
-//         children: [
-//             { href: '#', text: 'Projet A' },
-//             { href: '#', text: 'Projet B' },
-//             { href: '#', text: 'Projet C' },
-//         ],
-//     },
-//     {
-//         text: 'Espaces collaboratifs', // C'est maintenant un "parent"
-//         children: [
-//             { href: '#', text: 'Projet A' },
-//             { href: '#', text: 'Projet B' },
-//             { href: '#', text: 'Projet C' },
-//         ],
-//     },
-// ];
 </script>
 
 <template>
@@ -108,6 +72,10 @@ defineProps<{
 <!--                    </div>-->
 <!--                </div>-->
 
+            </li>
+
+            <li>
+                <a class="rounded-full text-lg font-extrabold px-3 py-1 bg-gray-400 dark:bg-slate-600 dark:text-slate-400" href="/navigation/0/admin/folders/create">+</a>
             </li>
         </ul>
 

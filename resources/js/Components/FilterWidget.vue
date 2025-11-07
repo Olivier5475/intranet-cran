@@ -42,16 +42,22 @@ watch(filters, (newFilterValues) => {
     // Émet l'événement vers le parent avec les nouvelles valeurs
     emit('filters-updated', newFilterValues);
 }, { deep: true }); // surveil l'intérieur de l'array departement
+
+const isActive = ref(!window.matchMedia('(orientation: portrait)').matches);
+
+const toggle = function() {
+  isActive.value = !isActive.value;
+};
 </script>
 
 <template>
     <section class="bg-white shadow rounded-lg overflow-hidden">
-        <h2 class="font-bold text-lg p-4 border-b flex items-center space-x-2 bg-slate-300 dark:bg-slate-800 dark:text-gray-300">
+        <h2 @click=toggle class="hover:cursor-pointer font-bold text-lg p-4 border-b flex items-center space-x-2 bg-slate-300 dark:bg-slate-800 dark:text-gray-300">
             <AdjustmentsHorizontalIcon class="h-6 w-6 text-gray-500 dark:text-gray-300" />
             <span>Filtres</span>
         </h2>
 
-        <form class="p-4 space-y-6 dark:bg-zinc-700 dark:text-gray-300">
+        <form v-if=isActive class="p-4 space-y-6 dark:bg-zinc-700 dark:text-gray-300">
 <!--            DEPARTEMENTS FILTRE INPUT            -->
             <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Départements</label>

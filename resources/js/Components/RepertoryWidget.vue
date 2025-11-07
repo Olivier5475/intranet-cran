@@ -11,7 +11,7 @@ defineProps<{
 </script>
 
 <template>
-    <nav class="text-base font-medium text-gray-500 flex items-center dark:text-white ">
+    <nav class="text-base font-medium text-gray-500 flex items-center dark:text-white p-2">
         <Link href="/" class="hover:text-gray-700 hover:dark:text-gray-400">
             <HomeIcon class="h-5 w-5 shrink-0" />
         </Link>
