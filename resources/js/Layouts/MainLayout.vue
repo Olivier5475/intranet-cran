@@ -49,8 +49,7 @@ defineProps<{
     <div class="bg-gray-100 dark:bg-slate-600 min-h-screen">
         <div class="lg:grid-cols-5 gap-6 p-4 mx-auto grid w-11/12 grid-cols-1">
             <aside class="lg:col-span-1 space-y-6">
-                <FilterWidget :departements=departements @filters-updated=handleFilterChange />
-                <SidebarWidget title="Modifications récentes" :items="modificationsRecentes" footerLink="#" footerText="Toutes les modifications…" />
+                <SidebarWidget title="Modifications récentes" />
             </aside>
 
             <main class="lg:col-span-3 bg-white dark:bg-slate-800 dark:text-white shadow-lg rounded-lg overflow-hidden">
@@ -58,7 +57,7 @@ defineProps<{
             </main>
 
             <aside class="lg:col-span-1 space-y-6">
-                <SidebarWidget title="Actualités" :items="actualites" footerLink="#" footerText="Plus d'actualités…" />
+                <FilterWidget :departements=departements @filters-updated=handleFilterChange />
             </aside>
         </div>
         <footer class="py-10 bg-white dark:bg-slate-900 shadow-sm flex items-center justify-between">
