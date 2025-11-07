@@ -7,13 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Folder extends Model
-{
+class Folder extends Model {
     use HasFactory;
 
     protected $fillable = [
         'name',
         'user_id',
+        'color',
         'parent_id',
     ];
 

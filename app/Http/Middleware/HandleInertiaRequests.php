@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use App\Services\Interface\DepartementsServiceInterface;
 use App\Services\Interface\FoldersServiceInterface;
+use App\Services\Interfaces\FoldersServiceInterface;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
@@ -41,8 +42,7 @@ class HandleInertiaRequests extends Middleware {
      *
      * @return array<string, mixed>
      */
-    public function share(Request $request): array
-    {
+    public function share(Request $request): array {
         [$message, $author] = str(Inspiring::quotes()->random())->explode('-');
 
         return [
