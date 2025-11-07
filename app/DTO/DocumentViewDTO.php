@@ -8,6 +8,7 @@ readonly class DocumentViewDTO {
         public string $title,
         public string $content,
         public array $attachments,
-        public string $created_at
+        public string $created_at,
+        public string $updated_at
     ) {}
 }

@@ -17,7 +17,8 @@ class Document extends Model {
         'content',
         'user_id',
         'folder_id',
-        'departements'
+        'departements',
+        'color',
     ];
 
     /**

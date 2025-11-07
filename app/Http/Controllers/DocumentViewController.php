@@ -3,14 +3,26 @@
 namespace App\Http\Controllers;
 
 
-use App\Services\Interface\DocumentsServiceInterface;
+use App\Exception\DocumentNotFoundException;
+use App\Services\Interfaces\DocumentsServiceInterface;
+use Illuminate\Contracts\Filesystem\FileNotFoundException;
 
 class DocumentViewController {
-    public function __invoke($id, DocumentsServiceInterface $documentsService) : \Inertia\Response {
-        $document = $documentsService->getDocumentView($id);
-        return \Inertia\Inertia::render('DocumentView', [
-            "document" => $document
-        ]);
+
+    public function __invoke(DocumentsServiceInterface $documentsService, $folder_id, $id){
+        try {
+            $document = $documentsService->read($id);
+        } catch (FileNotFoundException|DocumentNotFoundException $e) {
+            return redirect("/navigation/".$folder_id)->with("error", "Document not found");
+        }
+
+        try {
+            return \Inertia\Inertia::render('DocumentView', [
+                "document" => $document
+            ]);
+        } catch (\Throwable $e) {
+            return redirect("/navigation/".$folder_id)->with("error", "Document not found. " .  $e->getMessage());
+        }
     }
 
 }
