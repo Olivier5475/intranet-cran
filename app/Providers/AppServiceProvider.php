@@ -2,20 +2,8 @@
 
 namespace App\Providers;
 
-use App\repositories\FolderRepository;
-use App\repositories\interfaces\FolderRepositoryInterface;
-use App\repositories\interfaces\UserRepositoryInterface;
-use App\repositories\UserRepository;
-use App\Services\AuthService;
-use App\Services\DecodageService;
-use App\Services\DepartementsService;
-use App\Services\DocumentService;
-use App\Services\FoldersService;
-use App\Services\Interface\DecodageServiceInterface;
-use App\Services\Interface\DepartementsServiceInterface;
-use App\Services\Interface\DocumentsServiceInterface;
-use App\Services\Interface\FoldersServiceInterface;
-use App\Services\Interface\UserServiceInterface;
+use App\Repositories;
+use App\Services;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -23,41 +11,67 @@ class AppServiceProvider extends ServiceProvider
     /**
      * Register any application services.
      */
-    public function register(): void
-    {
+    public function register(): void {
+//        SERVICES BINDING
         $this->app->bind(
-            FoldersServiceInterface::class,
-            FoldersService::class
+            Services\Interfaces\FoldersServiceInterface::class,
+            Services\FoldersService::class
         );
 
         $this->app->bind(
-            DocumentsServiceInterface::class,
-            DocumentService::class
+            Services\Interfaces\DocumentsServiceInterface::class,
+            Services\DocumentService::class
         );
 
         $this->app->bind(
-            FolderRepositoryInterface::class,
-            FolderRepository::class
+            Services\Interfaces\FilesServiceInterface::class,
+            Services\FilesService::class
         );
 
         $this->app->bind(
-            UserRepositoryInterface::class,
-            UserRepository::class
+            Services\Interfaces\UserServiceInterface::class,
+            Services\AuthService::class
         );
 
         $this->app->bind(
-            UserServiceInterface::class,
-            AuthService::class
+            Services\Interfaces\DecodageServiceInterface::class,
+            Services\DecodageService::class
         );
 
         $this->app->bind(
-            DecodageServiceInterface::class,
-            DecodageService::class
+            Services\Interfaces\DepartementsServiceInterface::class,
+            Services\DepartementsService::class
         );
 
         $this->app->bind(
-            DepartementsServiceInterface::class,
-            DepartementsService::class
+            Services\Interfaces\AttachmentServiceInterface::class,
+            Services\AttachmentService::class
+        );
+
+//        REPOSITORY BINDING
+        $this->app->bind(
+            Repositories\Interfaces\FolderRepositoryInterface::class,
+            Repositories\FolderRepository::class
+        );
+
+        $this->app->bind(
+            Repositories\Interfaces\UserRepositoryInterface::class,
+            Repositories\UserRepository::class
+        );
+
+        $this->app->bind(
+            Repositories\Interfaces\DocumentRepositoryInterface::class,
+            Repositories\DocumentRepository::class
+        );
+
+        $this->app->bind(
+            Repositories\Interfaces\AttachmentRepositoryInterface::class,
+            Repositories\AttachmentRepository::class
+        );
+
+        $this->app->bind(
+            Repositories\Interfaces\FilesRepositoryInterface::class,
+            Repositories\FilesRepository::class
         );
     }
 
