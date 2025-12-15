@@ -7,5 +7,7 @@ readonly class AuthDTO {
         public string $email,
         public string $nom,
         public string $prenom,
+        public ?string $role,
+        public ?int $id,
     ) {}
 }
