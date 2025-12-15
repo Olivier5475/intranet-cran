@@ -15,16 +15,6 @@ function handleFilterChange(newFilters) {
 
 provide('activeFilters', readonly(activeFilters));
 
-// --- Données pour les Widgets ---
-const modificationsRecentes = [
-    { href: '#', text: "présentation projet d'intégration Andrea Witz", date: '20/10/2025' },
-    { href: '#', text: 'présentation projet communication MS Nourdin', date: '20/10/2025' },
-];
-
-const actualites = [
-    { href: '#', text: "Titre de l'actu", date: '03/04/2023', icon: 'News' },
-    { href: '#', text: 'Cloud CRAN', date: '22/09/2021', icon: 'News' },
-];
 
 defineProps<{
     racineChildren: Array<{

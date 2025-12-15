@@ -3,6 +3,8 @@ import RepertoryWidget from '@/Components/RepertoryWidget.vue';
 import SearchBarWidget from '@/Components/SearchBarWidget.vue';
 import DocumentWidget from '@/Components/DocumentWidget.vue';
 import CreationWidget from '@/Components/CreationWidget.vue';
+import DisplayModWidget from '@/Components/DisplayModWidget.vue';
+
 import { computed, DeepReadonly, inject, Ref, toRef } from 'vue';
 import { useFilteredChildren } from '@/lib/filtres';
 
@@ -51,10 +53,11 @@ const filteredChildren = useFilteredChildren(
 <template>
     <div class="flex justify-between">
         <RepertoryWidget :parents="parents" />
+        <DisplayModWidget />
         <CreationWidget :folder_id="folder_id" />
     </div>
-    <SearchBarWidget :currentSearch="currentSearch" />
-    <div class="flex w-full flex-wrap">
+    <SearchBarWidget class="mt-2" :currentSearch="currentSearch" />
+    <div class="flex w-full flex-wrap mt-4">
         <DocumentWidget v-for="child in filteredChildren" :key="child.name" :child=child :folder_id=folder_id />
     </div>
 </template>

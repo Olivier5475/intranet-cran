@@ -1,7 +1,7 @@
 <script setup lang="ts">
     import { Link, usePage } from '@inertiajs/vue3';
     import { Menu, MenuButton, MenuItems, MenuItem } from '@headlessui/vue';
-    import { ChevronDownIcon, UserCircleIcon, Cog6ToothIcon, ArrowRightStartOnRectangleIcon } from '@heroicons/vue/20/solid';
+    import { ChevronDownIcon, UserCircleIcon, Cog6ToothIcon } from '@heroicons/vue/20/solid';
     import { computed } from 'vue';
 
     const page = usePage();
