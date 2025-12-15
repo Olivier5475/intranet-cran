@@ -10,7 +10,6 @@ Route::get("/download/file/{id}", [Controllers\DownloadController::class, "file"
 
 Route::prefix('/navigation/{folder_id}')->group(function () {
     Route::get('/', Controllers\NavigationController::class)->name('navigation');
-
     Route::get("/documents/{id}", Controllers\DocumentViewController::class)->name('document');
 
     Route::prefix("admin")->group(function () {
@@ -52,4 +51,21 @@ Route::prefix('/navigation/{folder_id}')->group(function () {
     });
 });
 
+Route::prefix("admin")->group(function () {
+    Route::prefix("users")->group(function () {
+        // GET
+        Route::get("", [Controllers\Admin\UsersController::class, "readAll"])->name("admin.users");
+        Route::get("/{id}/update", [Controllers\Admin\UsersController::class, "update"])->name("admin.user.update");
+        Route::get("/create", [Controllers\Admin\UsersController::class, "create"])->name("admin.user.update");
+
+        // POST
+        Route::post("/", [Controllers\Admin\UsersController::class, "store"])->name("admin.user.update");
+
+        // PATCH
+        Route::patch("/{id}", [Controllers\Admin\UsersController::class, "store"])->name("admin.user.update");
+
+        // DELETE
+        Route::delete("/{id}", [Controllers\Admin\UsersController::class, "delete"])->name("admin.user.update");
+    });
+});
 
