@@ -33,6 +33,9 @@ const getHref = (id: number) => {
 }
 
 const lastIndex = ref(props.users.length);
+const updateLastIndex = function () {
+    lastIndex.value -= 1;
+}
 </script>
 
 <template>
@@ -74,7 +77,7 @@ const lastIndex = ref(props.users.length);
                         {{ user.role }}
                     </p>
 
-                    <Link :href="getHref(user.id)" method="delete" class="col-span-2 sm:col-span-2 text-right end font-semibold">
+                    <Link :href="getHref(user.id)" method="delete" @click="updateLastIndex()" class="col-span-2 sm:col-span-2 text-right end font-semibold">
                         <UserMinusIcon class="w-8 ml-auto text-red-600"></UserMinusIcon>
                     </Link>
                 </Link>
