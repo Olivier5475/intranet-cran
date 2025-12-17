@@ -1,26 +1,13 @@
 <script setup lang="ts">
-import { ref } from 'vue'; // On importe 'ref' pour gérer l'état (menu ouvert/fermé)
-import { Link, usePage } from '@inertiajs/vue3';
+import { Link } from '@inertiajs/vue3';
 import { UserGroupIcon } from '@heroicons/vue/20/solid';
 import UserMenu from '@/Components/UserMenu.vue'; // Une icône pour le dropdown
-
-const page = usePage();
-
-// --- Préparation pour le dropdown ---
-// On crée une variable qui stockera le nom du menu ouvert (null si aucun)
-const activeDropdown = ref(null);
-
-const toggleDropdown = (name) => {
-    activeDropdown.value = activeDropdown.value === name ? null : name;
-};
-
-// ------------------------------------
 
 defineProps<{
     racineChildren : Array<{
         id : number,
         name : string,
-    }>
+    }> | null;
 }>();
 
 </script>
@@ -42,7 +29,7 @@ defineProps<{
             </li>
 
             <li>
-                <a class="rounded-full text-lg font-extrabold px-3 py-1 bg-gray-400 dark:bg-slate-600 dark:text-slate-400" href="/navigation/0/admin/folders/create">+</a>
+                <Link class="rounded-full text-lg font-extrabold px-3 py-1 bg-gray-400 dark:bg-slate-600 dark:text-slate-400" href="/navigation/0/admin/folders/create">+</Link>
             </li>
         </ul>
         <div class="items-end">

@@ -8,24 +8,28 @@ import { provide, readonly, ref } from 'vue';
 
 const activeFilters = ref({});
 
-function handleFilterChange(newFilters) {
+function handleFilterChange(newFilters : any) {
     activeFilters.value = newFilters;
-    console.log('MainLayout a reçu les filtres :', newFilters);
+    console.log(newFilters);
 }
 
 provide('activeFilters', readonly(activeFilters));
 
+interface Child {
+    id: number;
+    name: string;
+    children: Array<Child> | null;
+}
+
+interface Departement {
+    id: number;
+    name: string;
+    initials: string;
+}
 
 defineProps<{
-    racineChildren: Array<{
-        id: number;
-        name: string;
-    }>;
-    departements: Array<{
-        id: number;
-        name: string;
-        initials: string;
-    }>;
+    racineChildren: Array<Child> | null;
+    departements: Array<Departement> | null;
 }>();
 </script>
 
@@ -39,10 +43,10 @@ defineProps<{
     <div class="bg-gray-100 dark:bg-slate-600 min-h-screen">
         <div class="lg:grid-cols-5 gap-6 p-4 mx-auto grid w-11/12 grid-cols-1">
             <aside class="lg:col-span-1 space-y-6">
-                <SidebarWidget title="Modifications récentes" />
+                <SidebarWidget title="Navigation" :children="racineChildren" />
             </aside>
 
-            <main class="lg:col-span-3 bg-white dark:bg-slate-800 dark:text-white shadow-lg rounded-lg overflow-hidden">
+            <main class="lg:col-span-3 bg-white dark:bg-slate-800 dark:text-white shadow-lg rounded-lg overflow-hidden pb-12 pt-2 px-2 min-h-[77vh]">
                 <slot />
             </main>
 

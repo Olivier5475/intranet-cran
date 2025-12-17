@@ -1,26 +1,38 @@
 <script setup lang="ts">
-
 import { ref } from 'vue';
+import TreeViewItem from '@/Components/TreeViewItem.vue';
+import { Link } from '@inertiajs/vue3'; // 🎯 Importez le nouveau composant récursif
+
+interface Child {
+    id: number;
+    name: string;
+    children: Array<Child> | null;
+}
 
 defineProps<{
-    title: string,
+    title: string;
+    children: Array<Child> | null;
 }>();
 
-const isActive = ref(!window.matchMedia('(orientation: portrait)').matches);
-const toggle = function() {
-    isActive.value = !isActive.value;
-};
-
+const isActive = ref(true); // État de la section principale
 </script>
 
 <template>
     <section class="bg-white shadow rounded-lg overflow-hidden">
-        <h2 @click=toggle class="font-bold text-lg p-4 border-b flex items-center space-x-2 bg-slate-300 dark:bg-slate-800 dark:text-gray-300 hover:cursor-pointer">
+        <h2
+            @click="isActive = !isActive"
+            class="font-bold text-lg p-4 space-x-2 bg-slate-300 dark:bg-slate-800 dark:text-gray-300 flex h-[6vh] items-center border-b hover:cursor-pointer"
+        >
             {{ title }}
         </h2>
 
-        <ul v-if="isActive" class="divide-y divide-gray-200 dark:bg-zinc-700 dark:text-gray-300 h-screen">
-
+        <ul v-if="isActive" class="divide-gray-200 dark:bg-zinc-700 dark:text-gray-300 min-h-[71vh] p-2">
+            <TreeViewItem
+                v-for="child in children"
+                :key="child.id"
+                :child="child"
+            />
+            <Link class="rounded-full text-lg font-extrabold px-5 bg-gray-400 dark:bg-slate-600 dark:text-slate-400" :href="`/navigation/0/admin/folders/create`">Nouveau dossier +</Link>
         </ul>
     </section>
 </template>

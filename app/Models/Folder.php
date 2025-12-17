@@ -33,6 +33,11 @@ class Folder extends Model {
         return $this->hasMany(Folder::class, 'parent_id');
     }
 
+    public function allChildren(): HasMany
+    {
+        // Utilise la même relation children mais est nommé différemment pour le chargement récursif
+        return $this->children()->with('allChildren');
+    }
     /**
      * Les fichiers simples dans ce dossier
      */

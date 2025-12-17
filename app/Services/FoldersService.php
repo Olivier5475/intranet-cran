@@ -101,24 +101,20 @@ readonly class FoldersService implements Interfaces\FoldersServiceInterface {
         return $breadcrumbs;
     }
 
+    /**
+     * @throws FolderNotFoundException
+     */
     public function getRacineChildren() : array {
-        $folders = Folder::where('parent_id', '=', null)->get();
+        try {
+            $folders = $this->folderRepository->getRacineChildren();
+        } catch (FolderNotFoundException $e) {
+            Log::warning("Folder not found in getRacineChildren" , []);
+            throw $e;
+        }
+
         $res = [];
         foreach ($folders as $folder) {
-            $children = [];
-            foreach($folder->children as $child) {
-                $children[] = new FolderDTO(
-                    id: $child->id,
-                    name: $child->name,
-                    color: $child->color,
-                );
-            }
-            $res[] = new FolderDTO(
-                id: $folder->id,
-                name: $folder->name,
-                color: $folder->color,
-                children: $children,
-            );
+            $res[] = $this->mapFolderToDTO($folder);
         }
         return $res;
     }
@@ -131,6 +127,37 @@ readonly class FoldersService implements Interfaces\FoldersServiceInterface {
 
         // MODE NAVIGATION
         return $this->getRegularContents($folderId);
+    }
+
+    /**
+     * Convertit un modèle Folder (avec ses relations) en FolderDTO récursivement.
+     */
+    private function mapFolderToDTO(Folder $folder): FolderDTO {
+
+        // Vérifie s'il existe une relation 'allChildren' chargée
+        if ($folder->relationLoaded('allChildren') && $folder->allChildren->isNotEmpty()) {
+            $childrenDTOs = [];
+
+            // La récursion : on appelle mapFolderToDTO pour chaque enfant
+            foreach ($folder->allChildren as $child) {
+                $childrenDTOs[] = $this->mapFolderToDTO($child);
+            }
+            $children = $childrenDTOs;
+        } else {
+            // Si la relation n'est pas chargée (ou vide), on n'envoie pas d'enfants
+            $children = [];
+        }
+
+        // Retourne le DTO pour le niveau actuel
+        return new FolderDTO(
+            id: $folder->id,
+            name: $folder->name,
+            color: $folder->color,
+            // Si vous avez besoin d'autres propriétés (comme le parent_id si c'est nécessaire)
+
+            // Passe les DTOs enfants (ou un tableau vide)
+            children: $children,
+        );
     }
 
     /*

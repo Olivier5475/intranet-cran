@@ -5,6 +5,7 @@ namespace App\Repositories;
 use App\Exception\FolderNotFoundException;
 use App\Exception\PersistenceException;
 use App\Models\Folder;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -93,6 +94,18 @@ class FolderRepository implements Interfaces\FolderRepositoryInterface{
             ]);
 
             throw new PersistenceException(message : "Could not delete folder with ID $id.", previous:$e);
+        }
+    }
+
+    public function getRacineChildren(): Collection {
+        try {
+            return Folder::where('parent_id', '=', null)
+                ->with('allChildren') // Charge tous les enfants
+                ->get();
+        }
+        catch (\Throwable $e) {
+            Log::error('Folder getRacineChildren error', ["message" => $e->getMessage()]);
+            throw new FolderNotFoundException();
         }
     }
 }
