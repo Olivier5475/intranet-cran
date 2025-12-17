@@ -19,9 +19,9 @@ const props = defineProps<{
 const getRoleColor = (role: string) => {
     switch (role.toLowerCase()) {
         case 'admin':
-            return 'text-red-500 font-bold';
-        case 'editor':
-            return 'text-yellow-500 font-semibold';
+            return 'text-red-500';
+        case 'editeur':
+            return 'text-yellow-500';
         case 'user':
         default:
             return 'text-green-500';
@@ -48,7 +48,7 @@ const updateLastIndex = function () {
                 <p class="col-span-4 sm:col-span-4">Nom Prénom</p>
                 <p class="col-span-4 sm:col-span-4 truncate">Email</p>
                 <p class="col-span-2 sm:col-span-2 text-right">Rôle</p>
-                <p class="col-span-2 sm:col-span-2 text-right">Action</p>
+                <p class="col-span-2 sm:col-span-2 text-right">Actions</p>
             </div>
 
             <!-- Lignes de données -->
