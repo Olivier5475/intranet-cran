@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers as Controllers;
+use Illuminate\Foundation\Configuration\Middleware;
 
 Route::get('/', Controllers\MainController::class)->name('home');
 
@@ -12,7 +13,9 @@ Route::prefix('/navigation/{folder_id}')->group(function () {
     Route::get('/', Controllers\NavigationController::class)->name('navigation');
     Route::get("/documents/{id}", Controllers\DocumentViewController::class)->name('document');
 
-    Route::prefix("admin")->group(function () {
+    Route::prefix("admin")
+        ->middleware(\App\Http\Middleware\IsEditeur::class)
+        ->group(function () {
         Route::prefix("folders")->group(function () {
             // GET (form)
             Route::get("create", [Controllers\Admin\FolderController::class, "create"])->name("folder.create");
@@ -51,7 +54,9 @@ Route::prefix('/navigation/{folder_id}')->group(function () {
     });
 });
 
-Route::prefix("admin")->group(function () {
+Route::prefix("admin")
+    ->middleware(\App\Http\Middleware\IsAdmin::class)
+    ->group(function () {
     Route::prefix("users")->group(function () {
         // GET
         Route::get("", [Controllers\Admin\UsersController::class, "readAll"])->name("admin.users");
