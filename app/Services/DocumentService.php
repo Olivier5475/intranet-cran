@@ -9,22 +9,28 @@ use App\Exception\DocumentNotFoundException;
 use App\Exception\FolderNotFoundException;
 use App\Exception\PersistenceException;
 use App\Models\Document;
+use App\Models\Folder;
 use App\Services\Interfaces\AttachmentServiceInterface;
 use App\Repositories\Interfaces\DocumentRepositoryInterface;
+use App\Services\Interfaces\DecodageServiceInterface;
 use App\Services\Interfaces\UserServiceInterface;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Purifier;
+use Parsedown;
 use Symfony\Component\CssSelector\Exception\InternalErrorException;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Illuminate\Contracts\Filesystem;
 use Throwable;
 
 readonly class DocumentService implements Interfaces\DocumentsServiceInterface {
+
     public function __construct(
         private DocumentRepositoryInterface $documentRepository,
         private AttachmentServiceInterface $attachmentService,
         private UserServiceInterface $userService,
+        private DecodageServiceInterface $decodageService,
     ){}
 
     public function read($id) : DocumentViewDTO {
@@ -138,7 +144,9 @@ readonly class DocumentService implements Interfaces\DocumentsServiceInterface {
             $data["user_id"] = $this->userService->getCurrentUserId();
 
             DB::beginTransaction();
-
+            if(is_string($data["folder_id"])) {
+                $data['folder_id'] = intval($data["folder_id"]);
+            }
             $document = $this->documentRepository->create($data);
             if($document instanceof Document && !empty($new_attachments)) {
                 foreach ($new_attachments as $uploadedFile) {
@@ -204,10 +212,20 @@ readonly class DocumentService implements Interfaces\DocumentsServiceInterface {
             }
         }
 
+        // 1. Initialiser Parsedown
+        $parsedown = new Parsedown();
+
+        // 2. Convertir le Markdown du contenu
+        $renderedHtml = $parsedown->text($document->content);
+
+        // 3. Sanitariser le HTML (Sécurité !)
+        // Assurez-vous d'avoir bien importé la façade Purifier si vous l'utilisez
+        $cleanHtml = Purifier::clean($renderedHtml);
+
         return new DocumentViewDTO(
             id : $document->id,
             title: $document->title,
-            content: $document->content,
+            content: $cleanHtml,
             attachments: $attachments,
             created_at: $document->created_at,
             updated_at: $document->updated_at,

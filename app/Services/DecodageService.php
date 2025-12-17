@@ -1,7 +1,8 @@
 <?php
 
 namespace App\Services;
-
+use HTMLPurifier;
+use HTMLPurifier_Config;
 
 class DecodageService implements Interfaces\DecodageServiceInterface {
     public function __construct(public $url = "/fake-external-users") {
@@ -19,5 +20,14 @@ class DecodageService implements Interfaces\DecodageServiceInterface {
             }
         }
         return $data;
+    }
+
+    public function getSanitizedContentAttribute($content){
+        $config = HTMLPurifier_Config::createDefault();
+        // Configurez ici les balises et attributs que vous autorisez.
+        $purifier = new HTMLPurifier($config);
+
+        // Nettoyer le contenu brut avant de l'afficher
+        return $purifier->purify($content);
     }
 }

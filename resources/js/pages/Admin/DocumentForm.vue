@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Head, useForm } from '@inertiajs/vue3';
 import { computed } from 'vue';
+import CKEditor5Widget from '@/Components/CKEditor5Widget.vue';
 
 const props = defineProps<{
     folder_id: number;
@@ -55,12 +56,17 @@ const removeExistingAttachment = (index: number) => {
 };
 
 const submit = () => {
-    const method = props.document ? 'patch' : 'post';
-
-    form.post(submitUrl.value, {
-        method: method,
-    });
+    if(props.document) {
+        form.patch(submitUrl.value, {
+            method: "patch",
+        });
+    } else {
+        form.post(submitUrl.value, {
+            method: "post",
+        });
+    }
 };
+
 </script>
 
 <template>
@@ -76,7 +82,8 @@ const submit = () => {
             <div v-if="form.errors.color" class="text-red-500">{{ form.errors.color }}</div>
         </div>
 
-        <textarea name="content" placeholder="Contenu du document" v-model="form.content" class="m-2 rounded-md text-black mx-auto block w-full" />
+        <CKEditor5Widget name="content"  v-model="form.content" class="mt-4 rounded-md text-black mx-auto block max-w-full"></CKEditor5Widget>
+<!--        <textarea name="content" placeholder="Contenu du document" v-model="form.content" class="m-2 rounded-md text-black mx-auto block w-full" />-->
         <div v-if="form.errors.content" class="text-red-500">{{ form.errors.content }}</div>
 
         <div v-if="form.existing_attachments.length > 0">
@@ -134,6 +141,7 @@ const submit = () => {
             {{ document ? 'Mettre à Jour' : 'Créer' }}
         </button>
     </form>
+
 </template>
 
 <style scoped></style>

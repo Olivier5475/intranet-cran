@@ -24,9 +24,8 @@ defineProps<{
     </h1>
     <hr class="" />
     <!--    AFFICHAGE TEXTE   -->
-    <p class="text-xl p-4 text-justify">
-        {{ document.content }}
-    </p>
+    <div class="text-xl p-4 text-justify">
+        <div v-html="document.content" class="ckeditor-content-render"></div>    </div>
 
     <!--    AFFICHAGE FICHIER INTEGRER  -->
 

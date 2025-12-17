@@ -18,7 +18,14 @@ class DocumentRepository implements Interfaces\DocumentRepositoryInterface {
      */
     public function create(array $data): Document {
         try {
-            return Document::create($data);
+          $document = new Document();
+          $document->title = $data['title'];
+          $document->content = $data['content'];
+          $document->color = $data['color'];
+          $document->folder_id = $data['folder_id'];
+          $document->user_id = $data['user_id'];
+          $document->save();
+          return $document;
         } catch (\Throwable $e) {
             Log::error('Document creation error', [
                 'error' => $e->getMessage(),
