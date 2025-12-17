@@ -1,12 +1,8 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, computed, watch } from 'vue';
 import { ChevronRightIcon, ChevronDownIcon } from '@heroicons/vue/20/solid';
-
-// Le composant doit s'auto-référencer pour la récursivité.
-// On utilise une importation dynamique pour éviter les problèmes de dépendance circulaire.
-// Le nom sera utilisé dans le template.
 import TreeViewItem from './TreeViewItem.vue';
-import { Link } from '@inertiajs/vue3';
+import { Link, usePage } from '@inertiajs/vue3';
 
 interface Child {
     id: number;
@@ -15,43 +11,67 @@ interface Child {
 }
 
 const props = defineProps<{
-    child: Child; // On passe un seul enfant (le nœud actuel)
+    child: Child;
 }>();
 
-// État pour savoir si ce nœud est ouvert ou non
-const isExpanded = ref(false);
+const page = usePage();
 
-// Vérifie si le nœud a des enfants à afficher
-const hasChildren = props.child.children && props.child.children.length > 0;
+// 1. Extraire le folder_id de l'URL (/navigation/{id}/...)
+const currentFolderId = computed(() => {
+    const parts = page.url.split('/');
+    const navIndex = parts.indexOf('navigation');
+    return navIndex !== -1 ? parseInt(parts[navIndex + 1]) : null;
+});
 
-const href = (id : number) => {
-    return "/navigation/" + id;
-}
+// 2. Fonction récursive pour vérifier si ce nœud ou un descendant est actif
+const checkShouldExpand = (item: Child, targetId: number | null): boolean => {
+    if (!targetId) return false;
+    if (item.id === targetId) return true;
+    if (item.children) {
+        return item.children.some((sub) => checkShouldExpand(sub, targetId));
+    }
+    return false;
+};
+
+// 3. État initial : true si le dossier actuel (ou un enfant) est détecté
+const isExpanded = ref(checkShouldExpand(props.child, currentFolderId.value));
+
+watch(currentFolderId, (newId) => {
+    isExpanded.value = checkShouldExpand(props.child, newId);
+});
+
+const href = (id: number) => `/navigation/${id}`;
 </script>
 
 <template>
     <li :id="child.id.toString()">
+        <div class="space-x-1 p-1 rounded flex items-center">
+            <ChevronRightIcon
+                @click="isExpanded = !isExpanded"
+                v-if="!isExpanded"
+                class="w-5 h-5 hover:bg-slate-200 dark:hover:bg-zinc-600 flex-shrink-0 rounded-full hover:cursor-pointer"
+            />
+            <ChevronDownIcon
+                @click="isExpanded = !isExpanded"
+                v-else
+                class="w-5 h-5 hover:bg-slate-200 dark:hover:bg-zinc-600 flex-shrink-0 rounded-full hover:cursor-pointer"
+            />
 
-        <div
-            class="flex items-center space-x-1 p-1 rounded "
-        >
-            <template v-if="hasChildren">
-                <ChevronRightIcon @click="isExpanded = !isExpanded" v-if="!isExpanded" class="w-5 h-5 flex-shrink-0 rounded-full hover:bg-slate-200 dark:hover:bg-zinc-600 hover:cursor-pointer" />
-                <ChevronDownIcon @click="isExpanded = !isExpanded" v-else class="w-5 h-5 flex-shrink-0 rounded-full hover:bg-slate-200 dark:hover:bg-zinc-600 hover:cursor-pointer" />
-            </template>
-            <div v-else class="w-5 h-5"></div>
-
-            <Link :href="href(child.id)" class="truncate hover:text-sky-300">{{ child.name }}</Link>
+            <Link :href="href(child.id)" class="hover:text-sky-300" :class="child.id === currentFolderId ? `text-sky-500 font-bold` : ``">{{
+                child.name
+            }}</Link>
         </div>
 
-        <ul v-if="hasChildren && isExpanded" class="pl-6 border-l border-gray-300 dark:border-zinc-500 ml-2">
-            <TreeViewItem
-                v-for="subChild in child.children"
-                :key="subChild.id"
-                :child="subChild"
-            />
-            <Link class="rounded-full text-lg font-extrabold px-5 bg-gray-400 dark:bg-slate-600 dark:text-slate-400" :href="`/navigation/`+ child.id + `/admin/folders/create`">Nouveau dossier +</Link>
+        <ul v-if="isExpanded" class="pl-3 border-gray-300 dark:border-zinc-500 ml-2 border-l">
+            <TreeViewItem v-for="subChild in child.children" :key="subChild.id" :child="subChild" />
+            <Link
+                class="text-lg font-extrabold bg-gray-400 dark:bg-slate-600 dark:text-slate-400 h-10 px-3 inline-flex min-w-[40px] items-center overflow-hidden rounded-full transition-all duration-300"
+                :href="`/navigation/` + child.id + `/admin/folders/create`"
+            >
+                <span class="mr-1 min-w-0 flex-1 flex-shrink text-ellipsis whitespace-nowrap"> Nouveau dossier </span>
 
+                <span class="flex-none">+</span>
+            </Link>
         </ul>
     </li>
 </template>
