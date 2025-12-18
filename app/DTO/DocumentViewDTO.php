@@ -9,6 +9,7 @@ readonly class DocumentViewDTO {
         public string $content,
         public array $attachments,
         public string $created_at,
-        public string $updated_at
+        public string $updated_at,
+        public ?string $color = null,
     ) {}
 }

@@ -15,6 +15,7 @@ const props = defineProps<{
             name: string;
         }>;
     };
+    role : string;
 }>();
 
 let form;
@@ -22,19 +23,17 @@ if (props.document) {
     form = useForm({
         title: props.document.title,
         content: props.document.content,
-        color: props.document.color,
         existing_attachments: props.document.attachments || [],
-
         new_attachments: [] as File[],
+        ...(props.role === 'admin' && { color: props.document.color })
     });
 } else {
     form = useForm({
         title: '',
         content: '',
-        color: '#894f00',
         existing_attachments: [],
-
         new_attachments: [] as File[],
+        ...(props.role === 'admin' && { color: '#ffffff' })
     });
 }
 
@@ -75,10 +74,15 @@ const submit = () => {
     <hr class="mx-auto w-11/12" />
     <form @submit.prevent="submit" class="pt-4 mx-auto w-11/12">
         <div class="flex justify-between">
-            <input type="text" name="title" placeholder="Titre du document" v-model="form.title" class="mr-10 rounded-md text-black block grow" />
+            <label for="title"  class="rounded-md text-black dark:text-white block grow"> Titre </label>
+            <label v-if="role == 'admin'" type="color" for="color" class="rounded-md text-black dark:text-white block  w-1/6" > Couleur </label>
+        </div>
+        <div class="flex justify-between">
+            <input type="text" name="title" placeholder="Titre du document" v-model="form.title" class="rounded-md text-black block grow" />
+            <input v-if="role == 'admin'" type="color" name="color" v-model="form.color" class="rounded-md text-black block h-auto w-1/6" />
+        </div>
+        <div class="flex justify-between">
             <div v-if="form.errors.title" class="text-red-500">{{ form.errors.title }}</div>
-
-            <input type="color" name="color" v-model="form.color" class="rounded-md text-black block h-auto w-1/6" />
             <div v-if="form.errors.color" class="text-red-500">{{ form.errors.color }}</div>
         </div>
 

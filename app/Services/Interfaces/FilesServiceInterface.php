@@ -51,7 +51,7 @@ interface FilesServiceInterface {
      * @throws Filesystem\FileNotFoundException
      * @throws DiskWriteException si une erreur survient lors de l'écriture du fichier
      */
-    public function delete(int $id) : bool;
+    public function delete(int $folder_id, int $id) : bool;
 
     /**
      * Lance le telechargement d'un attachment

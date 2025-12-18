@@ -8,6 +8,7 @@ use App\Exception\DocumentNotFoundException;
 use App\Exception\PersistenceException;
 use App\Http\Controllers\Controller;
 use App\Services\Interfaces\DocumentsServiceInterface;
+use App\Services\Interfaces\UserServiceInterface;
 use Illuminate\Contracts\Filesystem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -17,6 +18,7 @@ use Throwable;
 class DocumentController extends Controller {
     public function __construct(
         private readonly DocumentsServiceInterface $documentsService,
+        private readonly UserServiceInterface $userService,
     ){}
 
     public function store(Request $request, $folder_id, $id = null) {
@@ -24,7 +26,7 @@ class DocumentController extends Controller {
         $validatedData = $request->validate([
             'title' => ['required', 'string', 'max:255'],
             'content' => ['required', 'string'],
-            'color' => ['required', 'string', 'max:16'],
+            'color' => ['string', 'max:16'],
 
             // NOUVEAU CHAMP : Tableau des objets d'attachements existants
             'existing_attachments' => ['sometimes', 'array'],
@@ -42,10 +44,16 @@ class DocumentController extends Controller {
             'new_attachments.*' => ['file', 'max:51200'],
         ]);
         // 2. Préparation des données pour le Service
+        if(empty($validatedData['color'])) {
+            if(empty($id)) {
+                $validatedData['color'] = '#ffffff';
+            } else {
+                $validatedData['color'] = null;
+            }
+        }
         $data = [
             "title" => $validatedData["title"],
             "content" => $validatedData["content"],
-            "color" => $validatedData["color"],
 
             // Liste des objets {id, name} à CONSERVER et mettre à jour
             "existing_attachments" => $validatedData["existing_attachments"] ?? [],
@@ -53,6 +61,10 @@ class DocumentController extends Controller {
             // Objets UploadedFile pour la CRÉATION
             "new_attachments" => $request->file('new_attachments') ?? [],
         ];
+        if(empty($data['color']) && !empty($validatedData['color'])) {
+            $data['color'] = $validatedData["color"];
+        }
+
         if(!empty($folder_id)) {
             $data["folder_id"] = $folder_id;
         }
@@ -89,14 +101,16 @@ class DocumentController extends Controller {
 
     public function create($folder_id) {
         return \Inertia\Inertia::render('Admin/DocumentForm', [
-            "folder_id" => $folder_id
+            "folder_id" => $folder_id,
+            "role" => $this->userService->getRole(),
         ]);
     }
     public function update($folder_id, $id) {
         try {
             return \Inertia\Inertia::render('Admin/DocumentForm', [
                 "document" => $this->documentsService->read($id),
-                "folder_id" => $folder_id
+                "folder_id" => $folder_id,
+                "role" => $this->userService->getRole(),
             ]);
         } catch (BadRequestException $e) {
             // 400 Bad Request (pour une erreur d'argument si non gérée par la validation)
@@ -107,9 +121,9 @@ class DocumentController extends Controller {
         }
     }
 
-    public function delete($id) {
+    public function delete($folder_id, $id) {
         try {
-            $this->documentsService->delete($id);
+            $this->documentsService->delete($folder_id, $id);
             return redirect()->back()->with("success", "Document deleted successfully");
         } catch (BadRequestException) {
             // 400 Bad Request (pour une erreur d'argument si non gérée par la validation)

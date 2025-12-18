@@ -10,14 +10,11 @@ use App\Exception\FolderNotFoundException;
 use App\Exception\PersistenceException;
 use App\Exception\ServerException;
 use App\Models\Document;
-use App\Models\Folder;
 use App\Services\Interfaces\AttachmentServiceInterface;
 use App\Repositories\Interfaces\DocumentRepositoryInterface;
-use App\Services\Interfaces\DecodageServiceInterface;
 use App\Services\Interfaces\UserServiceInterface;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage;
 use Purifier;
 use Parsedown;
 use Symfony\Component\CssSelector\Exception\InternalErrorException;
@@ -31,7 +28,6 @@ readonly class DocumentService implements Interfaces\DocumentsServiceInterface {
         private DocumentRepositoryInterface $documentRepository,
         private AttachmentServiceInterface $attachmentService,
         private UserServiceInterface $userService,
-        private DecodageServiceInterface $decodageService,
     ){}
 
     public function read($id) : DocumentViewDTO {
@@ -116,9 +112,13 @@ readonly class DocumentService implements Interfaces\DocumentsServiceInterface {
         }
     }
 
-    public function delete(int $id): bool {
+    public function delete(int $folder_id, int $id): bool {
         try {
-            foreach ($this->documentRepository->read($id)->attachments() as $attachment) {
+            $document = $this->documentRepository->read($id);
+            if($document->folder_id != $folder_id) {
+                throw new BadRequestException("Document does not belong to this folder");
+            }
+            foreach ($document->attachments() as $attachment) {
                 $this->attachmentService->delete($attachment->id);
             }
             return $this->documentRepository->delete($id);
@@ -230,6 +230,7 @@ readonly class DocumentService implements Interfaces\DocumentsServiceInterface {
             attachments: $attachments,
             created_at: $document->created_at,
             updated_at: $document->updated_at,
+            color: $document->color
         );
     }
 

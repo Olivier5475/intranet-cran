@@ -162,13 +162,16 @@ readonly class FilesService implements Interfaces\FilesServiceInterface {
         }
     }
 
-    public function delete(int $id): bool {
+    public function delete(int $folder_id, int $id): bool {
         if(empty($id)) {
             throw new BadRequestException("Missing argument", 400);
         }
 
         try {
             $file = $this->filesRepository->read($id);
+            if($file->folder_id != $folder_id) {
+                throw new FileNotFoundException();
+            }
             $storage_path = $file->storage_path;
 
             DB::beginTransaction();

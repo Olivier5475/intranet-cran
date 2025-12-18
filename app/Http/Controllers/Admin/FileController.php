@@ -84,9 +84,9 @@ class FileController extends Controller {
         }
     }
 
-    public function delete($id) {
+    public function delete($folder_id, $id) {
         try {
-            $this->filesService->delete($id);
+            $this->filesService->delete($folder_id, $id);
             return redirect()->back()->with("success", "Document deleted successfully");
         } catch (BadRequestException) {
             // 400 Bad Request (pour une erreur d'argument si non gérée par la validation)
