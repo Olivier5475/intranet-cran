@@ -25,6 +25,11 @@ class UserRepository implements Interfaces\UserRepositoryInterface {
             $user->prenom = $data['prenom'];
             $user->role = $data['role'];
             $user->save();
+
+            if (!empty($data['departements'])) {
+                $user->departements()->attach($data['departements']);
+            }
+
             return $user;
         } catch (\Exception) {
             throw new PersistenceException("Error creating user");
@@ -42,6 +47,7 @@ class UserRepository implements Interfaces\UserRepositoryInterface {
             $user->email = $data['email'];
             $user->role = $data['role'];
             $user->save();
+            $user->departements()->sync($data['departements']);
         } catch (\Throwable) {
             throw new PersistenceException("Erreur lors de la mise à jour de l'utilisateur.");
         }

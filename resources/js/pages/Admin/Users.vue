@@ -10,7 +10,6 @@ interface User {
     id: number;
 }
 
-// Correction du typage : 'users' doit être un tableau d'objets User
 const props = defineProps<{
     users: User[];
 }>();

@@ -1,8 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers as Controllers;
-use Illuminate\Foundation\Configuration\Middleware;
+use App\Http\Controllers;
+use App\Http\Middleware;
 
 Route::get('/', Controllers\MainController::class)->name('home');
 
@@ -14,7 +14,7 @@ Route::prefix('/navigation/{folder_id}')->group(function () {
     Route::get("/documents/{id}", Controllers\DocumentViewController::class)->name('document');
 
     Route::prefix("admin")
-        ->middleware(\App\Http\Middleware\IsEditeur::class)
+        ->middleware(Middleware\IsEditeur::class)
         ->group(function () {
         Route::prefix("folders")->group(function () {
             // GET (form)
@@ -55,13 +55,13 @@ Route::prefix('/navigation/{folder_id}')->group(function () {
 });
 
 Route::prefix("admin")
-    ->middleware(\App\Http\Middleware\IsAdmin::class)
+    ->middleware(Middleware\IsAdmin::class)
     ->group(function () {
     Route::prefix("users")->group(function () {
         // GET
         Route::get("", [Controllers\Admin\UsersController::class, "readAll"])->name("admin.users");
-        Route::get("/{id}/update", [Controllers\Admin\UsersController::class, "update"])->name("admin.user.update");
         Route::get("/create", [Controllers\Admin\UsersController::class, "create"])->name("admin.user.update");
+        Route::get("/{id}", [Controllers\Admin\UsersController::class, "update"])->name("admin.user.update");
 
         // POST
         Route::post("/", [Controllers\Admin\UsersController::class, "store"])->name("admin.user.update");

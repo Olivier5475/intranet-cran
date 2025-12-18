@@ -33,16 +33,16 @@ class UsersController extends Controller {
             'prenom' => ['required', 'string', 'max:255'],
             'role' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'max:255'],
+            'departements' => ['array'],
         ]);
-
         try {
             if($id) {
                 $this->usersService->update($id, $validatedData);
-                return redirect()->route("home")
+                return redirect()->route("admin.users")
                     ->with("success", "Utilisateur mis à jour avec success");
             } else {
                 $this->usersService->handleUserInDatabase($validatedData);
-                return redirect()->route("home")
+                return redirect()->route("admin.users")
                     ->with("success", "Utilisateur créé avec success");
             }
 
@@ -57,8 +57,7 @@ class UsersController extends Controller {
         } catch (Throwable $t) {
             // Erreur imprévue (la transaction a été rollback dans le service)
             Log::critical('Fatal Error', [
-                'error' => $t,
-                'id' => $id,
+                'error' => $t, 'id' => $id,
                 'nom' => $validatedData['nom'],
                 'prenom' => $validatedData['prenom'],
                 'role' => $validatedData['role'],

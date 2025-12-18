@@ -12,7 +12,6 @@ interface UserRepositoryInterface {
     /**
      * @param string $email
      * @return User|null
-     * @throws UserNotFoundException
      */
     public function getUserByEmail(string $email) : ?User;
 

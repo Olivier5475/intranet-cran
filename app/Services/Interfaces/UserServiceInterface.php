@@ -4,6 +4,7 @@ namespace App\Services\Interfaces;
 
 use App\DTO\AuthDTO;
 use App\Exception\PersistenceException;
+use App\Exception\UserNotFoundException;
 
 interface UserServiceInterface {
 
@@ -21,13 +22,17 @@ interface UserServiceInterface {
      */
     public function getCurrentUserId() : int;
 
-    public function update(mixed $id, array $data);
-
-
+    /**
+     * @param int $id
+     * @param array $data
+     * @return void
+     * @throws UserNotFoundException
+     * @throws PersistenceException
+     */
+    public function update(int $id, array $data) : void;
     public function readById($id) : AuthDTO ;
-
     public function delete(int $id);
-
     public function readAll();
+    public function getRole();
 
 }

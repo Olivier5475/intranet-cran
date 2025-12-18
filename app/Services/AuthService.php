@@ -4,10 +4,9 @@ namespace App\Services;
 
 use App\DTO\AuthDTO;
 use App\Exception\PersistenceException;
+use App\Exception\UserNotFoundException;
 use App\Repositories\Interfaces\UserRepositoryInterface;
-use Exception;
 use Illuminate\Contracts\Auth\Authenticatable;
-use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
@@ -28,7 +27,6 @@ readonly class AuthService implements Interfaces\UserServiceInterface {
                 throw $e;
             }
         }
-
     }
 
     public function getUserByEmail(string $string) : ?Authenticatable {
@@ -47,8 +45,9 @@ readonly class AuthService implements Interfaces\UserServiceInterface {
                 email: $user->email,
                 nom: $user->nom,
                 prenom: $user->prenom,
+                departements: $this->departementsIDs($user->departements),
                 role: $user->role,
-                id : $user->id
+                id: $user->id
             );
         }
         return $res;
@@ -69,12 +68,32 @@ readonly class AuthService implements Interfaces\UserServiceInterface {
             email: $user->email,
             nom: $user->nom,
             prenom: $user->prenom,
+            departements: $this->departementsIDs($user->departements),
             role: $user->role,
-            id: $user->id,
+            id: $user->id
         );
     }
 
-    public function update(mixed $id, array $data) {
+    public function update(int $id, array $data) : void {
+        try {
+            $this->userRepository->updateUser($id, $data);
+        } catch(PersistenceException|UserNotFoundException $e) {
+            Log::error($e->getMessage());
+            throw $e;
+        }
+    }
 
+    public function getRole() : string {
+        $user_id = $this->getCurrentUserId();
+        $user = $this->userRepository->getUserById($user_id);
+        return $user->role;
+    }
+
+    private function departementsIDs($departements) : array {
+        $res = [];
+        foreach ($departements as $departement) {
+            $res[] = $departement->id;
+        }
+        return $res;
     }
 }
