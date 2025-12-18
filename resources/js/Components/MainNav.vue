@@ -29,11 +29,11 @@ defineProps<{
             </li>
 
             <li>
-                <Link class="rounded-full text-lg font-extrabold px-3 py-1 bg-gray-400 dark:bg-slate-600 dark:text-slate-400" href="/navigation/0/admin/folders/create">+</Link>
+                <Link class="rounded-full text-lg font-extrabold px-3 py-1 bg-gray-400 dark:bg-slate-600 dark:text-slate-400" :href="`/navigation/0/admin/folders/create`">+</Link>
             </li>
         </ul>
         <div class="items-end">
-            <Link href="/admin/users" class="text-white flex gap-2 mt-4 mr-8"> <span class="text-2xl">Admin</span> <UserGroupIcon class="w-8"></UserGroupIcon> </Link>
+            <Link :href="`/admin/users`" class="text-white flex gap-2 mt-4 mr-8"> <span class="text-2xl">Admin</span> <UserGroupIcon class="w-8"></UserGroupIcon> </Link>
             <UserMenu/>
         </div>
 

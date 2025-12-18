@@ -26,7 +26,7 @@ const isActive = ref(true); // État de la section principale
             {{ title }}
         </h2>
 
-        <ul v-if="isActive" class="overflow-scroll divide-gray-200 dark:bg-zinc-700 dark:text-gray-300 min-h-[71vh] p-2">
+        <ul v-if="isActive" class="overflow-scroll divide-gray-200 dark:bg-zinc-700 dark:text-gray-300 min-h-[69svh] p-2">
             <TreeViewItem
                 v-for="child in children"
                 :key="child.id"
