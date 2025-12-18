@@ -81,7 +81,7 @@ const updateLastIndex = function () {
                         <UserMinusIcon class="w-8 ml-auto text-red-600"></UserMinusIcon>
                     </Link>
                 </Link>
-                <Link href="/admin/users/create"
+                <Link :href="`/admin/users/create`"
                       class="flex grid-cols-12 p-4 text-sm border-t transition duration-150 ease-in-out cursor-pointer dark:border-gray-700"
                       :class="lastIndex % 2 !== 0 ?
                     'bg-white dark:bg-gray-900 hover:bg-indigo-100 dark:hover:bg-indigo-900' :
