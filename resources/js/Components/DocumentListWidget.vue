@@ -55,7 +55,7 @@ const isActiveValidation = ref(false);
 </script>
 
 <template>
-    <div class="hover:bg-blue-400 hover:bg-opacity-50 w-[95%] ml-[1%] transition-all duration-150 relative grid grid-cols-12 py-1 border-t-2 border-gray-200">
+    <div class="hover:bg-blue-400 hover:bg-opacity-50 w-[95%] ml-[1%] transition-all duration-150 relative grid grid-cols-12 py-1    border-t-2 border-gray-200">
 
         <Link v-if="child.type !== 'file'" :href="href" class="flex gap-2 col-start-1 col-span-4 ">
             <FolderIcon v-if="child.type === 'folder'" class="color aspect-square w-8" />
@@ -74,9 +74,18 @@ const isActiveValidation = ref(false);
             <p class="overflow-hidden my-auto">{{ child.name }}</p>
         </a>
 
-        <p class="col-start-5 col-span-3 overflow-hidden my-auto mx-2">
-            {{child.type}}
-        </p>
+        <div class="col-start-5 col-span-3 overflow-hidden my-auto mx-2">
+            <span v-if="child.type != 'file' && child.type=='folder'">Dossier</span>
+            <span v-else-if="child.type != 'file' && child.type=='document'">Document</span>
+            <span v-else-if="child.mimetype && isImageFile(child.mimetype)"> Image </span>
+            <span v-else-if="child.mimetype && isVideoFile(child.mimetype)"> Video </span>
+            <span v-else-if="child.mimetype && isGifFile(child.mimetype)"> GIF </span>
+            <span v-else-if="child.mimetype && isPresentationFile(child.mimetype)" class="text-red-500 font-semibold"> Presentation </span>
+            <span v-else-if="child.mimetype && isDocFile(child.mimetype)" class="text-blue-500 font-semibold"> Word </span>
+            <span v-else-if="child.mimetype && child.mimetype.includes('pdf')" class="text-red-500 font-semibold"> PDF </span>
+            <span v-else-if="child.mimetype && isTabFile(child.mimetype)" class="text-green-500 font-semibold"> Tableur </span>
+            <span v-else>Fichier</span>
+        </div>
         <p class="overflow-hidden col-start-8 col-span-3 my-auto h-7">
             {{child.created_at}}
         </p>
