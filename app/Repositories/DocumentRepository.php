@@ -22,7 +22,9 @@ class DocumentRepository implements Interfaces\DocumentRepositoryInterface {
           $document->title = $data['title'];
           $document->content = $data['content'];
           $document->color = $data['color'];
-          $document->folder_id = $data['folder_id'];
+          if(!empty($data["folder_id"])) {
+              $document->folder_id = $data['folder_id'];
+          }
           $document->user_id = $data['user_id'];
           $document->save();
           return $document;
@@ -104,6 +106,19 @@ class DocumentRepository implements Interfaces\DocumentRepositoryInterface {
             ]);
 
             throw new PersistenceException(message : "Could not delete document with ID $id.", previous:$e);
+        }
+    }
+
+    public function readRacineDoc(): ?Document {
+        try {
+            $document = Document::where("folder_id", "=", null)->orderBy("created_at")->first();
+            if (!$document) {
+                return null;
+            }
+            return $document;
+        } catch (\Throwable $e) {
+            Log::error('Document read RacineDoc failed', ["message" => $e->getMessage()]);
+            throw $e;
         }
     }
 }

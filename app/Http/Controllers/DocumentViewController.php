@@ -18,6 +18,7 @@ class DocumentViewController {
 
         try {
             return \Inertia\Inertia::render('DocumentView', [
+                "folder_id" => $folder_id,
                 "document" => $document
             ]);
         } catch (\Throwable $e) {

@@ -8,6 +8,7 @@ use App\Exception\DiskWriteException;
 use App\Exception\DocumentNotFoundException;
 use App\Exception\FolderNotFoundException;
 use App\Exception\PersistenceException;
+use App\Exception\ServerException;
 use Illuminate\Contracts\Filesystem;
 use Symfony\Component\CssSelector\Exception\InternalErrorException;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
@@ -67,4 +68,11 @@ interface DocumentsServiceInterface {
      * @throws AttachmentNotFoundException si Attachment introuvable (throw par le Repository)
      */
     public function delete(int $id) : bool;
+
+    /**
+     * Fonction permettant l'obtention du premier document à la racine
+     * @return DocumentViewDTO|null
+     * @throws ServerException
+     */
+    public function readRacineDoc() : ?DocumentViewDTO;
 }

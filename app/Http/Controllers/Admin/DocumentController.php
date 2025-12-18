@@ -41,7 +41,6 @@ class DocumentController extends Controller {
             'new_attachments' => ['sometimes', 'array'],
             'new_attachments.*' => ['file', 'max:51200'],
         ]);
-
         // 2. Préparation des données pour le Service
         $data = [
             "title" => $validatedData["title"],
@@ -53,10 +52,10 @@ class DocumentController extends Controller {
 
             // Objets UploadedFile pour la CRÉATION
             "new_attachments" => $request->file('new_attachments') ?? [],
-
-            "folder_id" => $folder_id,
         ];
-
+        if(!empty($folder_id)) {
+            $data["folder_id"] = $folder_id;
+        }
 
         try {
             if($id) {

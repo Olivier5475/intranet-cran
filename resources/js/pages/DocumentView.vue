@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { isDocFile, isImageFile, isPresentationFile, isTabFile, isVideoFile } from '@/lib/documentsTypeRegex';
-
+import { PencilIcon } from "@heroicons/vue/20/solid"
+import { Link } from '@inertiajs/vue3';
 defineProps<{
+    folder_id: number;
     document : {
         id : number,
         title : string,
@@ -10,7 +12,7 @@ defineProps<{
             id           : number,
             name         : string,
             storage_path : string,
-            mime_type    : string,
+            mimetype     : string,
             size         : number
         }>
     }
@@ -19,8 +21,9 @@ defineProps<{
 
 <template>
     <!--    AFFICHAGE TITRE   -->
-    <h1 class="text-3xl p-3 dark:bg-slate-700 text-center first-letter:uppercase">
+    <h1 class="relative text-3xl p-3 dark:bg-slate-700 text-center first-letter:uppercase">
         {{ document.title }}
+        <Link :href="`/navigation/`+ folder_id +`/admin/documents/update/` + document.id"><PencilIcon class="absolute right-2 top-2 w-6" /></Link>
     </h1>
     <hr class="" />
     <!--    AFFICHAGE TEXTE   -->
@@ -34,7 +37,7 @@ defineProps<{
         <iframe v-if="attachment.name.endsWith('pdf')" :src='"/download/attachment/"+attachment.id' height="700px" class="mx-auto w-10/12" />
 
         <!--        IMAGE       -->
-        <img v-else-if="isImageFile(attachment.name)" :src='"/download/attachment/"+attachment.id' :alt=attachment.name class="mx-auto w-8/12" />
+        <img v-else-if="isImageFile(attachment.mimetype)" :src='"/download/attachment/"+attachment.id' :alt=attachment.name class="mx-auto w-11/12" />
 
         <!--        VIDEO       -->
         <video v-else-if="isVideoFile(attachment.name)" :src='"/download/attachment/"+attachment.id' class="mx-auto w-8/12" />

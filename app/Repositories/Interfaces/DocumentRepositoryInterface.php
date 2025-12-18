@@ -42,4 +42,10 @@ interface DocumentRepositoryInterface {
      * @throws PersistenceException En cas d'erreur de base de données.
      */
     public function delete(int $id) : bool;
+
+    /**
+     * @return Document|null null, si le document n'existe pas
+     * @throws \Throwable erreur inattendue
+     */
+    public function readRacineDoc() : ?Document;
 }

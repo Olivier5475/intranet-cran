@@ -8,6 +8,7 @@ use App\Exception\DiskWriteException;
 use App\Exception\DocumentNotFoundException;
 use App\Exception\FolderNotFoundException;
 use App\Exception\PersistenceException;
+use App\Exception\ServerException;
 use App\Models\Document;
 use App\Models\Folder;
 use App\Services\Interfaces\AttachmentServiceInterface;
@@ -144,7 +145,7 @@ readonly class DocumentService implements Interfaces\DocumentsServiceInterface {
             $data["user_id"] = $this->userService->getCurrentUserId();
 
             DB::beginTransaction();
-            if(is_string($data["folder_id"])) {
+            if(!empty($data["folder_id"]) && is_string($data["folder_id"])) {
                 $data['folder_id'] = intval($data["folder_id"]);
             }
             $document = $this->documentRepository->create($data);
@@ -230,5 +231,18 @@ readonly class DocumentService implements Interfaces\DocumentsServiceInterface {
             created_at: $document->created_at,
             updated_at: $document->updated_at,
         );
+    }
+
+    public function readRacineDoc(): ?DocumentViewDTO {
+        try {
+            $document = $this->documentRepository->readRacineDoc();
+            if(!empty($document)) {
+                return $this->makeDocumentViewDto($document);
+            }
+            return null;
+        } catch (Throwable $e) {
+            Log::warning("Document attempted to read RacineDoc.");
+            throw new ServerException("Erreur lors de la lecture du document racine");
+        }
     }
 }
