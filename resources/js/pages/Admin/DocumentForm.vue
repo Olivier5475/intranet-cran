@@ -2,40 +2,35 @@
 import { Head, useForm } from '@inertiajs/vue3';
 import { computed } from 'vue';
 import CKEditor5Widget from '@/Components/CKEditor5Widget.vue';
+import { Departement } from '@/departements'
 
+interface Attachment {
+    id: number;
+    name: string;
+}
+interface Document {
+    id: number;
+    title: string;
+    content: string;
+    color: string;
+    attachments: Attachment[];
+    departements: number[];
+}
 const props = defineProps<{
     folder_id: number;
-    document?: {
-        id: number;
-        title: string;
-        content: string;
-        color: string;
-        attachments: Array<{
-            id: number;
-            name: string;
-        }>;
-    };
+    document?: Document;
     role : string;
+    departements : Departement[];
 }>();
 
-let form;
-if (props.document) {
-    form = useForm({
-        title: props.document.title,
-        content: props.document.content,
-        existing_attachments: props.document.attachments || [],
-        new_attachments: [] as File[],
-        ...(props.role === 'admin' && { color: props.document.color })
-    });
-} else {
-    form = useForm({
-        title: '',
-        content: '',
-        existing_attachments: [],
-        new_attachments: [] as File[],
-        ...(props.role === 'admin' && { color: '#ffffff' })
-    });
-}
+const form = useForm({
+    title: props.document?.title ?? '',
+    content: props.document?.content ?? '',
+    existing_attachments: props.document?.attachments ?? [],
+    new_attachments: [] as File[],
+    departements: props.document?.departements ?? [],
+    ...(props.role === 'admin' && { color: props.document?.color ?? "#ffffff" }),
+});
 
 // La fonction 'route' est utilisée directement ici, car elle est globale.
 const submitUrl = computed(() => {
@@ -56,13 +51,11 @@ const removeExistingAttachment = (index: number) => {
 
 const submit = () => {
     if(props.document) {
-        form.patch(submitUrl.value, {
+        form.post(submitUrl.value, {
             method: "patch",
         });
     } else {
-        form.post(submitUrl.value, {
-            method: "post",
-        });
+        form.post(submitUrl.value);
     }
 };
 
@@ -101,7 +94,7 @@ const submit = () => {
                     :name="`existing_attachments.${index}.name`"
                     v-model="attachment.name"
                     placeholder="Nom du fichier"
-                    class="p-1 rounded flex-grow border"
+                    class="p-1 rounded flex-grow border text-black"
                 />
 
                 <button type="button" @click="removeExistingAttachment(index)" class="text-red-500 text-sm">Retirer</button>
@@ -141,7 +134,22 @@ const submit = () => {
             </div>
         </div>
 
-        <button type="submit" :disabled="form.processing" class="py-2 bg-indigo-600 text-white rounded w-full">
+        <div class="w-5/6 md:w-3/4 lg:w-2/3">
+            <p class="mb-1">Départements</p>
+            <div v-for="departement in departements" :key="departement.id" class="flex gap-2">
+                <input
+                    type="checkbox"
+                    :id="'dept-' + departement.id"
+                    :value="departement.id"
+                    v-model="form.departements"
+                    class="my-auto"
+                />
+                <label :for="'dept-' + departement.id">{{ departement.name }}</label>
+            </div>
+            <div v-if="form.errors.departements" class="text-red-500">{{ form.errors.departements }}</div>
+        </div>
+
+        <button type="submit" :disabled="form.processing" class="py-2 mt-4 bg-indigo-600 text-white rounded w-full">
             {{ document ? 'Mettre à Jour' : 'Créer' }}
         </button>
     </form>

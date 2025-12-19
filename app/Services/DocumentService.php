@@ -12,6 +12,7 @@ use App\Exception\ServerException;
 use App\Models\Document;
 use App\Services\Interfaces\AttachmentServiceInterface;
 use App\Repositories\Interfaces\DocumentRepositoryInterface;
+use App\Services\Interfaces\DepartementsServiceInterface;
 use App\Services\Interfaces\UserServiceInterface;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -28,6 +29,7 @@ readonly class DocumentService implements Interfaces\DocumentsServiceInterface {
         private DocumentRepositoryInterface $documentRepository,
         private AttachmentServiceInterface $attachmentService,
         private UserServiceInterface $userService,
+        private DepartementsServiceInterface $departementsService,
     ){}
 
     public function read($id) : DocumentViewDTO {
@@ -230,6 +232,7 @@ readonly class DocumentService implements Interfaces\DocumentsServiceInterface {
             attachments: $attachments,
             created_at: $document->created_at,
             updated_at: $document->updated_at,
+            departements: $this->departementsService->departementsIDs($document->departements),
             color: $document->color
         );
     }

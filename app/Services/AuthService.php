@@ -6,6 +6,7 @@ use App\DTO\AuthDTO;
 use App\Exception\PersistenceException;
 use App\Exception\UserNotFoundException;
 use App\Repositories\Interfaces\UserRepositoryInterface;
+use App\Services\Interfaces\DepartementsServiceInterface;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -13,6 +14,7 @@ use Illuminate\Support\Facades\Log;
 readonly class AuthService implements Interfaces\UserServiceInterface {
     public function __construct(
         private UserRepositoryInterface $userRepository,
+        private DepartementsServiceInterface $departementsService
     ) {}
 
     public function handleUserInDatabase(array $data): void {
@@ -45,7 +47,7 @@ readonly class AuthService implements Interfaces\UserServiceInterface {
                 email: $user->email,
                 nom: $user->nom,
                 prenom: $user->prenom,
-                departements: $this->departementsIDs($user->departements),
+                departements: $this->departementsService->departementsIDs($user->departements),
                 role: $user->role,
                 id: $user->id
             );
@@ -68,7 +70,7 @@ readonly class AuthService implements Interfaces\UserServiceInterface {
             email: $user->email,
             nom: $user->nom,
             prenom: $user->prenom,
-            departements: $this->departementsIDs($user->departements),
+            departements: $this->departementsService->departementsIDs($user->departements),
             role: $user->role,
             id: $user->id
         );
@@ -89,11 +91,4 @@ readonly class AuthService implements Interfaces\UserServiceInterface {
         return $user->role;
     }
 
-    private function departementsIDs($departements) : array {
-        $res = [];
-        foreach ($departements as $departement) {
-            $res[] = $departement->id;
-        }
-        return $res;
-    }
 }

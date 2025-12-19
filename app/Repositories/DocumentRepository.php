@@ -3,9 +3,11 @@
 namespace App\Repositories;
 ;
 
+use App\Exception\AlreadyExistsException;
 use App\Exception\DocumentNotFoundException;
 use App\Exception\PersistenceException;
 use App\Models\Document;
+use App\Models\File;
 use Illuminate\Support\Facades\Log;
 
 class DocumentRepository implements Interfaces\DocumentRepositoryInterface {
@@ -14,9 +16,12 @@ class DocumentRepository implements Interfaces\DocumentRepositoryInterface {
      * Créer un document.
      * @param array $data Les champs et leurs nouvelles valeurs (doivent être "fillable").
      * @return Document Retourne le Document créé
-     * @throws PersistenceException En cas d'erreur de base de données.
+     * @throws PersistenceException|AlreadyExistsException En cas d'erreur de base de données.
      */
     public function create(array $data): Document {
+        if($this->checkName($data['folder_id'], $data['name'])) {
+            throw new AlreadyExistsException();
+        }
         try {
           $document = new Document();
           $document->title = $data['title'];
@@ -27,6 +32,7 @@ class DocumentRepository implements Interfaces\DocumentRepositoryInterface {
           }
           $document->user_id = $data['user_id'];
           $document->save();
+          $document->departements()->attach($data['departements']);
           return $document;
         } catch (\Throwable $e) {
             Log::error('Document creation error', [
@@ -59,7 +65,7 @@ class DocumentRepository implements Interfaces\DocumentRepositoryInterface {
      * @param array $data Les champs et leurs nouvelles valeurs (doivent être "fillable").
      * @return Document|bool Retourne le Document mis à jour, ou false si la mise à jour échoue.
      * @throws DocumentNotFoundException Si le document n'est pas trouvé.
-     * @throws PersistenceException En cas d'erreur de base de données.
+     * @throws PersistenceException|AlreadyExistsException En cas d'erreur de base de données.
      */
     public function update(int $id, array $data): Document|bool {
         $document = Document::find($id);
@@ -68,9 +74,15 @@ class DocumentRepository implements Interfaces\DocumentRepositoryInterface {
             throw new DocumentNotFoundException("Document with ID $id not found.");
         }
 
+        if($this->checkName($data['folder_id'], $data['name'], $id)) {
+            throw new AlreadyExistsException();
+        }
         try {
-            $document->fill($data);
+            $document->title = $data['title'];
+            $document->content = $data['content'];
+            $document->color = $data['color'];
             $result = $document->save();
+            $document->departements()->sync($data['departements']);
 
             return $result ? $document : false;
         } catch (\Throwable $e) {
@@ -120,5 +132,16 @@ class DocumentRepository implements Interfaces\DocumentRepositoryInterface {
             Log::error('Document read RacineDoc failed', ["message" => $e->getMessage()]);
             throw $e;
         }
+    }
+
+    private function checkName(int $folder_id, string $name, ?int $id = null): bool {
+        $fileQuery = File::where('folder_id', "=", $folder_id)
+            ->where('name', "=", $name);
+
+        $docQuery = Document::where('folder_id', "=", $folder_id)
+            ->where('title', "=", $name)
+            ->when($id, fn($q) => $q->where('id', '!=', $id));
+
+        return $fileQuery->exists() || $docQuery->exists();
     }
 }

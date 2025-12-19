@@ -4,7 +4,9 @@ namespace App\Repositories;
 
 use App\Exception\FileNotFoundException;
 use App\Exception\PersistenceException;
+use App\Models\Document;
 use App\Models\File;
+use App\Exception\AlreadyExistsException;
 use Illuminate\Support\Facades\Log;
 
 class FilesRepository implements Interfaces\FilesRepositoryInterface {
@@ -12,12 +14,23 @@ class FilesRepository implements Interfaces\FilesRepositoryInterface {
     /**
      * Créer un document.
      * @param array $data Les champs et leurs nouvelles valeurs (doivent être "fillable").
-     * @return File Retourne le Document créé
-     * @throws PersistenceException En cas d'erreur de base de données.
+     * @return void
+     * @throws PersistenceException|AlreadyExistsException En cas d'erreur de base de données.
      */
-    public function create(array $data): File {
+    public function create(array $data): void {
+        if($this->checkName($data["folder_id"], $data["name"])){
+            throw new AlreadyExistsException();
+        }
         try {
-            return File::create($data);
+            $file = new File();
+            $file->name = $data['name'];
+            $file->folder_id = $data['folder_id'];
+            $file->user_id = $data['user_id'];
+            $file->storage_path = $data['storage_path'];
+            $file->mimetype = $data['mimetype'];
+            $file->size = $data['size'];
+            $file->save();
+            $file->departements()->attach($data['departements']);
         } catch (\Throwable $e) {
             Log::error('Document creation error', [
                 'error' => $e->getMessage(),
@@ -28,8 +41,14 @@ class FilesRepository implements Interfaces\FilesRepositoryInterface {
         }
     }
 
+
     public function read(int $id) : File {
-        $file = File::find($id);
+        try {
+            $file = File::find($id);
+        } catch (\Throwable $e) {
+            Log::error('File read fatal error', []);
+            throw $e;
+        }
         if(!$file) {
             throw new FileNotFoundException("Le fichier avec l'id ".$id." n'existe pas.");
         }
@@ -40,22 +59,25 @@ class FilesRepository implements Interfaces\FilesRepositoryInterface {
      * Met à jour un document existant.
      * @param int $id L'ID du document à mettre à jour.
      * @param array $data Les champs et leurs nouvelles valeurs (doivent être "fillable").
-     * @return File|bool Retourne le Document mis à jour, ou false si la mise à jour échoue.
+     * @return void
      * @throws PersistenceException En cas d'erreur de base de données.
-     * @throws FileNotFoundException si le fichier n'est pas trouvé
+     * @throws FileNotFoundException|AlreadyExistsException si le fichier n'est pas trouvé
      */
-    public function update(int $id, array $data): File|bool {
+    public function update(int $id, array $data): void {
         $file = File::find($id);
 
-        if (!$file) {
+        if (!$file || $data['folder_id'] != $file->folder_id) {
             throw new FileNotFoundException("File with ID $id not found.");
         }
 
+        if($this->checkName($data["folder_id"], $data["name"], $id)){
+            throw new AlreadyExistsException();
+        }
         try {
-            $file->fill($data);
-            $result = $file->save();
-
-            return $result ? $file : false;
+            $file->name = $data["name"];
+            $file->storage_path = $data["storage_path"];
+            $file->save();
+            $file->departements()->sync($data['departements']);
         } catch (\Throwable $e) {
             Log::error('Document update failed for ID ' . $id, [
                 'error' => $e->getMessage(),
@@ -90,5 +112,16 @@ class FilesRepository implements Interfaces\FilesRepositoryInterface {
 
             throw new PersistenceException(message : "Could not delete file with ID $id.", previous:$e);
         }
+    }
+
+    private function checkName(int $folder_id, string $name, ?int $id = null): bool {
+        $fileQuery = File::where('folder_id', "=", $folder_id)
+            ->where('name', "=", $name)
+            ->when($id, fn($q) => $q->where('id', '!=', $id));
+
+        $docQuery = Document::where('folder_id', "=", $folder_id)
+            ->where('title', "=", $name);
+
+        return $fileQuery->exists() || $docQuery->exists();
     }
 }

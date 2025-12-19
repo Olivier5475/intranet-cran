@@ -21,4 +21,12 @@ readonly class DepartementsService implements Interfaces\DepartementsServiceInte
         }
         return $dtos;
     }
+
+    public function departementsIDs($departements): array {
+        $res = [];
+        foreach ($departements as $departement) {
+            $res[] = $departement->id;
+        }
+        return $res;
+    }
 }

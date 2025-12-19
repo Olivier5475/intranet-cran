@@ -21,28 +21,32 @@ class FileController extends Controller {
     public function store(Request $request, int $folder_id, $id = null) {
         // 1. Validation de la requête
         $validatedData = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'files' => ['sometimes', 'array'],
-            'files.*' => ['file', 'max:51200'],
+            'name' => [
+                $request->hasFile('files') ? 'nullable' : 'required',
+                'string',
+                'max:255'
+            ],
+            'files' => [$id ? 'sometimes' : 'required', 'array'],
+            'files.*' => ['file', 'max:102400'],
+            'departements' => ['sometimes', 'array'],
         ]);
-
         // 2. Préparation des données pour le Service
         $data = [
             "name" => $validatedData["name"],
-            "file" => $request->file('files')[0],
+            "file" => $request->file('files')[0] ?? null,
             "folder_id" => $folder_id,
+            "departements" => $validatedData["departements"] ?? [],
         ];
 
         try {
             if($id) {
-                $this->filesService->update($id, $data);
+                $this->filesService->update($folder_id, $id, $data);
                 return redirect()->route("home")
                     ->with("success", "Fichier mis à jour avec success");
             } else {
                 $this->filesService->create($data);
                 return redirect()->route("home")
                     ->with("success", "Fichier créé avec success");
-
             }
 
         } catch (BadRequestException $e) {
@@ -72,7 +76,7 @@ class FileController extends Controller {
     public function update($folder_id, $id) {
         try {
             return \Inertia\Inertia::render('Admin/FileForm', [
-                "file_name" => $this->filesService->readName($id),
+                "file" => $this->filesService->read($folder_id, $id),
                 "folder_id" => $folder_id
             ]);
         } catch (BadRequestException $e) {

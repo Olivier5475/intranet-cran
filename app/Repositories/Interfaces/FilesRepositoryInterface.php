@@ -11,20 +11,20 @@ interface FilesRepositoryInterface {
     /**
      * Créer un document.
      * @param array $data Les champs et leurs nouvelles valeurs (doivent être "fillable").
-     * @return File Retourne le Document mis à jour
+     * @return void
      * @throws PersistenceException En cas d'erreur de base de données.
      */
-    public function create(array $data) : File;
+    public function create(array $data) : void;
 
     /**
      * Met à jour un document existant.
      * @param int $id L'ID du document à mettre à jour.
      * @param array $data Les champs et leurs nouvelles valeurs (doivent être "fillable").
-     * @return File|bool Retourne le Document mis à jour, ou false si la mise à jour échoue.
+     * @return void
      * @throws FileNotFoundException Si le document n'est pas trouvé.
      * @throws PersistenceException En cas d'erreur de base de données.
      */
-    public function update(int $id, array $data) : File|bool;
+    public function update(int $id, array $data) : void;
 
     /**
      * Supprime un document existant.
@@ -40,6 +40,7 @@ interface FilesRepositoryInterface {
      * @param int $id l'id du document à lire
      * @return File
      * @throws FileNotFoundException Si le file n'est pas trouvé.
+     * @throws \Throwable
      */
     public function read(int $id) : File ;
 }

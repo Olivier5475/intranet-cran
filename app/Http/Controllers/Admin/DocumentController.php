@@ -42,6 +42,8 @@ class DocumentController extends Controller {
             // ... validation des nouveaux fichiers inchangée
             'new_attachments' => ['sometimes', 'array'],
             'new_attachments.*' => ['file', 'max:51200'],
+
+            'departements' => ['sometimes', 'array'],
         ]);
         // 2. Préparation des données pour le Service
         if(empty($validatedData['color'])) {
@@ -60,6 +62,7 @@ class DocumentController extends Controller {
 
             // Objets UploadedFile pour la CRÉATION
             "new_attachments" => $request->file('new_attachments') ?? [],
+            "departements" => $validatedData["departements"] ?? [],
         ];
         if(empty($data['color']) && !empty($validatedData['color'])) {
             $data['color'] = $validatedData["color"];

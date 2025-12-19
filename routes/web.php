@@ -32,8 +32,8 @@ Route::prefix('/navigation/{folder_id}')->group(function () {
             Route::get("/update/{id}", [Controllers\Admin\DocumentController::class, "update"])->name('document.update');
 
             // POST (submit)
-            Route::patch("/store/{id}", [Controllers\Admin\DocumentController::class, "store"])->name('document.post.update');
             Route::post("/store", [Controllers\Admin\DocumentController::class, "store"])->name('document.post.create');
+            Route::post("/store/{id}", [Controllers\Admin\DocumentController::class, "store"])->name('document.post.update');
 
             // DELETE
             Route::delete("/delete/{id}", [Controllers\Admin\DocumentController::class, "delete"])->name('document.post.delete');
@@ -45,8 +45,8 @@ Route::prefix('/navigation/{folder_id}')->group(function () {
             Route::get("/update/{id}", [Controllers\Admin\FileController::class, "update"])->name('document.update');
 
             // POST (submit)
-            Route::patch("/store/{id}", [Controllers\Admin\FileController::class, "store"])->name('file.post.update');
             Route::post("/store", [Controllers\Admin\FileController::class, "store"])->name('file.post.create');
+            Route::post("/store/{id}", [Controllers\Admin\FileController::class, "store"])->name('file.post.update');
 
             // DELETE
             Route::delete("/delete/{id}", [Controllers\Admin\FileController::class, "delete"])->name('document.post.delete');

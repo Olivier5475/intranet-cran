@@ -1,27 +1,23 @@
 <script setup lang="ts">
 import { Head, useForm } from '@inertiajs/vue3';
 import { computed } from 'vue';
+import { Departement } from '@/departements'
 
 const props = defineProps<{
     folder_id: number;
     file?: {
         id: number;
         name: string;
+        departements: number[];
     };
+    departements?: Departement[];
 }>();
 
-let form;
-if (props.file) {
-    form = useForm({
-        name: props.file.name,
+const form = useForm({
+        name: props.file?.name ?? '',
         files: [] as File[],
+        departements: props.file?.departements ?? [],
     });
-} else {
-    form = useForm({
-        name: '',
-        files: [] as File[],
-    });
-}
 
 // La fonction 'route' est utilisée directement ici, car elle est globale.
 const submitUrl = computed(() => {
@@ -38,11 +34,13 @@ const handleNewFileUpload = (event: Event) => {
 
 
 const submit = () => {
-    const method = props.file ? 'patch' : 'post';
-
-    form.post(submitUrl.value, {
-        method: method,
-    });
+    if (props.file) {
+        form.post(submitUrl.value, {
+            method: 'patch'
+        });
+    } else {
+        form.post(submitUrl.value);
+    }
 };
 </script>
 
@@ -52,10 +50,8 @@ const submit = () => {
         {{ file ? "Modification d'un fichier" : "Creation d'un nouveau fichier" }}</h1>
     <hr class="mx-auto w-11/12" />
     <form @submit.prevent="submit" class="pt-4 mx-auto w-11/12">
-        <div class="flex justify-between">
-            <input type="text" name="title" placeholder="Nom du fichier" v-model="form.name" class="mr-10 rounded-md text-black block grow" />
+            <input type="text" name="name" placeholder="Nom du fichier" v-model="form.name" class="mr-10 rounded-md w-full text-black block grow" />
             <div v-if="form.errors.name" class="text-red-500">{{ form.errors.name }}</div>
-        </div>
 
         <div class="my-6 mx-auto w-full">
             <label for="file_input" class="font-semibold mb-2 block"> Ajouter un fichier 📁 </label>
@@ -87,7 +83,22 @@ const submit = () => {
             </div>
         </div>
 
-        <button type="submit" :disabled="form.processing" class="py-2 bg-indigo-600 text-white rounded w-full">
+        <div class="w-5/6 md:w-3/4 lg:w-2/3">
+            <p class="mb-1">Départements</p>
+            <div v-for="departement in departements" :key="departement.id" class="flex gap-2">
+                <input
+                    type="checkbox"
+                    :id="'dept-' + departement.id"
+                    :value="departement.id"
+                    v-model="form.departements"
+                    class="my-auto"
+                />
+                <label :for="'dept-' + departement.id">{{ departement.name }}</label>
+            </div>
+            <div v-if="form.errors.departements" class="text-red-500">{{ form.errors.departements }}</div>
+        </div>
+
+        <button type="submit" :disabled="form.processing" class="py-2 mt-4 bg-indigo-600 text-white rounded w-full">
             {{ file ? 'Mettre à Jour' : 'Créer' }}
         </button>
     </form>

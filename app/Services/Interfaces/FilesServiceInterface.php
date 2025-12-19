@@ -13,37 +13,37 @@ use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 interface FilesServiceInterface {
     /**
      * @param array $data
-     * @return FileDTO
+     * @return void
      * @throws FolderNotFoundException
      * @throws DiskWriteException
      * @throws PersistenceException
      */
-    public function create(array $data) : FileDTO;
+    public function create(array $data) : void;
 
     /**
      * Fonction pour obtenir le storage_path d'un fichier selon son ID
      * @param $id l'id du fichier qu'on recherche
-     * @return string|null
+     * @param $folder_id l'id du dossier
+     * @return FileDTO
      * @throws FileNotFoundException si le fichier n'est pas trouvé en BD
-     * @throws Filesystem\FileNotFoundException si le fichier n'est pas trouvé en storage
-     * @throws FolderNotFoundException si folder inexistant
      * @throws BadRequestException si pas de folder_id ou de fichier
      */
-    public function read($id) : ?string ;
+    public function read($folder_id, $id) : FileDTO ;
 
     /**
      * @param int $id
      * @param array $data
-     * @return FileDTO|bool
+     * @return void
      * @throws PersistenceException
      * @throws FileNotFoundException
      * @throws BadRequestException
      * @throws DiskWriteException si une erreur survient lors de l'écriture du fichier
      */
-    public function update(int $id, array $data) : FileDTO|bool;
+    public function update(int $folder_id, int $id, array $data) : void;
 
     /**
-     * @param int $id
+     * @param int $folder_id ID du dossier
+     * @param int $id ID du fichier
      * @return bool
      * @throws BadRequestException
      * @throws PersistenceException
@@ -60,13 +60,4 @@ interface FilesServiceInterface {
      * @throws FileNotFoundException
      */
     public function download(int $id);
-
-    /**
-     * Fonction pour obtenir le storage_path d'un fichier selon son ID
-     * @param $id l'id du fichier qu'on recherche
-     * @return string
-     * @throws FileNotFoundException si le fichier n'est pas trouvé en BD
-     * @throws BadRequestException si pas de folder_id ou de fichier
-     */
-    public function readName(int $id): string;
 }
