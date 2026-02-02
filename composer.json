@@ -18,8 +18,7 @@
         "laravel/tinker": "^2.10.1",
         "laravel/wayfinder": "^0.1.11",
         "meilisearch/meilisearch-php": "^1.16",
-        "mews/purifier": "^3.4",
-        "tightenco/ziggy": "^2.6"
+        "mews/purifier": "^3.4"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.16",
