@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import TreeViewItem from '@/Components/TreeViewItem.vue';
-import { Link } from '@inertiajs/vue3'; // 🎯 Importez le nouveau composant récursif
+import { Link } from '@inertiajs/vue3';
 
 interface Child {
     id: number;
@@ -14,7 +14,7 @@ defineProps<{
     children: Array<Child> | null;
 }>();
 
-const isActive = ref(true); // État de la section principale
+const isActive = ref(true);
 </script>
 
 <template>
@@ -33,7 +33,7 @@ const isActive = ref(true); // État de la section principale
                 :child="child"
             />
             <Link
-                class="inline-flex items-center rounded-full text-lg font-extrabold bg-gray-400 dark:bg-slate-600 dark:text-slate-400 min-w-[40px] h-10 px-3 overflow-hidden transition-all duration-300"
+                class="inline-flex items-center rounded-full font-extrabold text-yellow-600 hover:text-yellow-800 min-w-[40px] overflow-hidden transition-all duration-300"
                 :href="`/navigation/0/admin/folders/create`"
             >
                 <span class="flex-shrink flex-1 overflow-hidden whitespace-nowrap text-ellipsis mr-1 min-w-0">

@@ -65,7 +65,7 @@ const href = (id: number) => `/navigation/${id}`;
         <ul v-if="isExpanded" class="pl-3 border-gray-300 dark:border-zinc-500 ml-2 border-l">
             <TreeViewItem v-for="subChild in child.children" :key="subChild.id" :child="subChild" />
             <Link
-                class="text-lg font-extrabold bg-gray-400 dark:bg-slate-600 dark:text-slate-400 h-10 px-3 inline-flex min-w-[40px] items-center overflow-hidden rounded-full transition-all duration-300"
+                class="font-extrabold text-yellow-600 h-10 px-3 inline-flex min-w-[40px] items-center overflow-hidden rounded-full transition-all duration-300"
                 :href="`/navigation/` + child.id + `/admin/folders/create`"
             >
                 <span class="mr-1 min-w-0 flex-1 flex-shrink text-ellipsis whitespace-nowrap"> Nouveau dossier </span>
