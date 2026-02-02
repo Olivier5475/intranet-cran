@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Head, useForm } from '@inertiajs/vue3';
 import { computed } from 'vue';
-import { Departement } from '@/departements'
+import { Departement } from '@/departement'
 
 const props = defineProps<{
     folder_id: number;

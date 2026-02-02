@@ -2,7 +2,7 @@
 import { Head, useForm } from '@inertiajs/vue3';
 import { computed } from 'vue';
 import CKEditor5Widget from '@/Components/CKEditor5Widget.vue';
-import { Departement } from '@/departements'
+import { Departement } from '@/departement'
 
 interface Attachment {
     id: number;

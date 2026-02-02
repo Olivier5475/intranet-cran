@@ -19,11 +19,11 @@ Route::prefix('/navigation/{folder_id}')->group(function () {
         Route::prefix("folders")->group(function () {
             // GET (form)
             Route::get("create", [Controllers\Admin\FolderController::class, "create"])->name("folder.create");
-            Route::get("/update/{id}", [Controllers\Admin\FolderController::class, "update"])->name("folder.create");
+            Route::get("/update/{id}", [Controllers\Admin\FolderController::class, "update"])->name("folder.update");
 
             // POST (submit)
-            Route::patch("/store/{id}", [Controllers\Admin\FolderController::class, "store"])->name("folder.store");
-            Route::post("/store", [Controllers\Admin\FolderController::class, "store"])->name("folder.store");
+            Route::patch("/store/{id}", [Controllers\Admin\FolderController::class, "store"])->name("folder.post.update");
+            Route::post("/store", [Controllers\Admin\FolderController::class, "store"])->name("folder.post.create");
         });
 
         Route::prefix("documents")->group(function () {
@@ -60,17 +60,33 @@ Route::prefix("admin")
     Route::prefix("users")->group(function () {
         // GET
         Route::get("", [Controllers\Admin\UsersController::class, "readAll"])->name("admin.users");
-        Route::get("/create", [Controllers\Admin\UsersController::class, "create"])->name("admin.user.update");
+        Route::get("/create", [Controllers\Admin\UsersController::class, "create"])->name("admin.user.create");
         Route::get("/{id}", [Controllers\Admin\UsersController::class, "update"])->name("admin.user.update");
 
         // POST
-        Route::post("/", [Controllers\Admin\UsersController::class, "store"])->name("admin.user.update");
+        Route::post("/", [Controllers\Admin\UsersController::class, "store"])->name("admin.user.post.update");
 
         // PATCH
-        Route::patch("/{id}", [Controllers\Admin\UsersController::class, "store"])->name("admin.user.update");
+        Route::patch("/{id}", [Controllers\Admin\UsersController::class, "store"])->name("admin.user.post.update");
 
         // DELETE
-        Route::delete("/{id}", [Controllers\Admin\UsersController::class, "delete"])->name("admin.user.update");
+        Route::delete("/{id}", [Controllers\Admin\UsersController::class, "delete"])->name("admin.user.delete");
     });
+
+        Route::prefix("departements")->group(function () {
+            // GET
+            Route::get("", [Controllers\Admin\DepartementController::class, "readAll"])->name("admin.departements");
+            Route::get("/create", [Controllers\Admin\DepartementController::class, "create"])->name("admin.departements.create");
+            Route::get("/{id}", [Controllers\Admin\DepartementController::class, "update"])->name("admin.departements.update");
+
+            // POST
+            Route::post("/", [Controllers\Admin\DepartementController::class, "store"])->name("admin.departements.post.create");
+
+            // PATCH
+            Route::patch("/{id}", [Controllers\Admin\DepartementController::class, "store"])->name("admin.departements.post.update");
+
+            // DELETE
+            Route::delete("/{id}", [Controllers\Admin\DepartementController::class, "delete"])->name("admin.departements.delete");
+        });
 });
 
