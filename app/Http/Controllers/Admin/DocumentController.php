@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Exception\AlreadyExistsException;
 use App\Exception\AttachmentNotFoundException;
 use App\Exception\DiskWriteException;
 use App\Exception\DocumentNotFoundException;
@@ -76,29 +77,32 @@ class DocumentController extends Controller {
             if($id) {
                 $this->documentsService->update($id, $data);
                 return redirect()->route("home")
-                    ->with("success", "Document updated successfully");
+                    ->with("success", "Document mis à jour avec success");
             } else {
                 $this->documentsService->create($data);
                 return redirect()->route("home")
-                    ->with("success", "Document created successfully");
+                    ->with("success", "Document créer avec success");
             }
 
         } catch (BadRequestException $e) {
             // 400 Bad Request (pour une erreur d'argument si non gérée par la validation)
-            return redirect()->back()->with(['success' => 'Arguments manquants ou invalides.'. $e->getMessage()]);
+            return redirect()->back()->with(['error' => 'Arguments manquants ou invalides.'. $e->getMessage()]);
 
         } catch (DocumentNotFoundException|AttachmentNotFoundException|Filesystem\FileNotFoundException) {
             // 404 Not Found (Ressource à mettre à jour non trouvée)
-            return redirect()->back()->with(['success' => 'Le document ou un attachement spécifié est introuvable.']);
+            return redirect()->back()->with(['error' => 'Le document ou un attachement spécifié est introuvable.']);
 
         } catch (PersistenceException|DiskWriteException $e) {
             // 500 Internal Server Error (Erreur BD ou Disque)
-            return redirect()->back()->with(['success' => 'Erreur critique de sauvegarde des données. Veuillez réessayer. '. $e->getMessage()]);
+            return redirect()->back()->with(['error' => 'Erreur critique de sauvegarde des données. Veuillez réessayer. ']);
 
+        } catch (AlreadyExistsException $e) {
+            // 400 Internal Server Error (Erreur BD ou Disque)
+            return redirect()->back()->with(['error' => 'Document / Fichier de ce nom déjà existant']);
         } catch (Throwable $t) {
             // Erreur imprévue (la transaction a été rollback dans le service)
             Log::critical('Unhandled fatal error during document transaction.', ['error' => $t->getMessage(), 'id' => $id]);
-            return redirect()->back()->with(['success' => 'Une erreur imprévue est survenue (Code: 500).']);
+            return redirect()->back()->with(['error' => 'Une erreur imprévue est survenue, réessayez plus tard.']);
         }
     }
 
@@ -143,7 +147,7 @@ class DocumentController extends Controller {
         } catch (Throwable $t) {
             // Erreur imprévue (la transaction a été rollback dans le service)
             Log::critical('Unhandled fatal error during document transaction.', ['error' => $t->getMessage(), 'id' => $id]);
-            return redirect()->back()->with(['error' => 'Une erreur imprévue est survenue (Code: 500).']);
+            return redirect()->back()->with(['error' => 'Une erreur imprévue est survenue, merci de réessayer plus tard.']);
         }
     }
 }

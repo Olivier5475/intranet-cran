@@ -13,7 +13,7 @@ class DocumentViewController {
         try {
             $document = $documentsService->read($id);
         } catch (FileNotFoundException|DocumentNotFoundException $e) {
-            return redirect("/navigation/".$folder_id)->with("error", "Document not found");
+            return redirect("/navigation/".$folder_id)->with("error", "Document introuvable");
         }
 
         try {
@@ -22,7 +22,7 @@ class DocumentViewController {
                 "document" => $document
             ]);
         } catch (\Throwable $e) {
-            return redirect("/navigation/".$folder_id)->with("error", "Document not found. " .  $e->getMessage());
+            return redirect("/navigation/".$folder_id)->with("error", "Document introuvable. " .  $e->getMessage());
         }
     }
 

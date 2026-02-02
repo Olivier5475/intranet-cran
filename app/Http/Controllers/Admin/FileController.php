@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Exception\AlreadyExistsException;
 use App\Exception\DiskWriteException;
 use App\Exception\FileNotFoundException;
 use App\Exception\PersistenceException;
@@ -51,20 +52,24 @@ class FileController extends Controller {
 
         } catch (BadRequestException $e) {
             // 400 Bad Request (pour une erreur d'argument si non gérée par la validation)
-            return redirect()->back()->with(['success' => 'Arguments manquants ou invalides.'. $e->getMessage()]);
+            return redirect()->back()->with(['error' => 'Arguments manquants ou invalides.']);
 
         } catch (FileNotFoundException) {
             // 404 Not Found (Ressource à mettre à jour non trouvée)
-            return redirect()->back()->with(['success' => 'Le fichier spécifié est introuvable.']);
+            return redirect()->back()->with(['error' => 'Le fichier spécifié est introuvable.']);
 
         } catch (PersistenceException|DiskWriteException $e) {
             // 500 Internal Server Error (Erreur BD ou Disque)
-            return redirect()->back()->with(['success' => 'Erreur critique de sauvegarde des données. Veuillez réessayer. '. $e->getMessage()]);
+            return redirect()->back()->with(['error' => 'Erreur critique de sauvegarde des données. Veuillez réessayer.']);
+
+        } catch (AlreadyExistsException $e) {
+            // 500 Internal Server Error (Erreur BD ou Disque)
+            return redirect()->back()->with(['error' => 'Fichier / Document avec le même nom existant']);
 
         } catch (Throwable $t) {
             // Erreur imprévue (la transaction a été rollback dans le service)
             Log::critical('Unhandled fatal error during file transaction.', ['error' => $t->getMessage(), 'id' => $id]);
-            return redirect()->back()->with(['success' => 'Une erreur imprévue est survenue (Code: 500).']);
+            return redirect()->back()->with(['error' => 'Une erreur imprévue est survenue réessayer plus tard.']);
         }
     }
 
