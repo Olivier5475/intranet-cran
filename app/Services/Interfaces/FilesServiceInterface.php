@@ -3,6 +3,8 @@
 namespace App\Services\Interfaces;
 
 use App\DTO\FileDTO;
+
+use App\Exception\AlreadyExistsException;
 use App\Exception\DiskWriteException;
 use App\Exception\FileNotFoundException;
 use App\Exception\FolderNotFoundException;
@@ -14,9 +16,7 @@ interface FilesServiceInterface {
     /**
      * @param array $data
      * @return void
-     * @throws FolderNotFoundException
-     * @throws DiskWriteException
-     * @throws PersistenceException
+     * @throws FolderNotFoundException|AlreadyExistsException|DiskWriteException|PersistenceException
      */
     public function create(array $data) : void;
 
@@ -31,13 +31,11 @@ interface FilesServiceInterface {
     public function read($folder_id, $id) : FileDTO ;
 
     /**
+     * @param int $folder_id
      * @param int $id
      * @param array $data
      * @return void
-     * @throws PersistenceException
-     * @throws FileNotFoundException
-     * @throws BadRequestException
-     * @throws DiskWriteException si une erreur survient lors de l'écriture du fichier
+     * @throws PersistenceException|AlreadyExistsException|FileNotFoundException|BadRequestException|DiskWriteException
      */
     public function update(int $folder_id, int $id, array $data) : void;
 
