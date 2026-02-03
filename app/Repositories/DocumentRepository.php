@@ -24,8 +24,8 @@ class DocumentRepository implements Interfaces\DocumentRepositoryInterface {
         }
         try {
           $document = new Document();
-          $document->title = $data['title'];
-          $document->content = $data['content'];
+          $document->title = e($data['title']);
+          $document->content = clean($data['content']);
           $document->color = $data['color'];
           if(!empty($data["folder_id"])) {
               $document->folder_id = $data['folder_id'];
@@ -78,8 +78,8 @@ class DocumentRepository implements Interfaces\DocumentRepositoryInterface {
             throw new AlreadyExistsException();
         }
         try {
-            $document->title = $data['title'];
-            $document->content = $data['content'];
+            $document->title = e($data['title']);
+            $document->content = clean($data['content']);
             $document->color = $data['color'];
             $result = $document->save();
             $document->departements()->sync($data['departements']);
