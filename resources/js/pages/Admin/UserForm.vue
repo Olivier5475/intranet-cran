@@ -31,7 +31,7 @@ const form = useForm({
 
 const submit = () => {
     if (props.user) {
-        form.post(route.post.update.url(props.user.id), {
+        form.patch(route.post.update.url(props.user.id), {
             method: 'patch',
         });
     } else {

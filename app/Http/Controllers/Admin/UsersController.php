@@ -38,11 +38,11 @@ class UsersController extends Controller {
         try {
             if($id) {
                 $this->usersService->update($id, $validatedData);
-                return redirect()->route("admin.users")
+                return redirect()->route("admin.user")
                     ->with("success", "Utilisateur mis à jour avec success");
             } else {
                 $this->usersService->handleUserInDatabase($validatedData);
-                return redirect()->route("admin.users")
+                return redirect()->route("admin.user")
                     ->with("success", "Utilisateur créé avec success");
             }
 
