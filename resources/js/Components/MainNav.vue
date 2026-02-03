@@ -2,7 +2,8 @@
 import { Link } from '@inertiajs/vue3';
 import { UserGroupIcon, BuildingOfficeIcon } from '@heroicons/vue/20/solid';
 import UserMenu from '@/Components/UserMenu.vue'; // Une icône pour le dropdown
-
+import admin_routes from '@/routes/admin'
+import navigate from '@/routes/navigate'
 defineProps<{
     racineChildren : Array<{
         id : number,
@@ -19,7 +20,7 @@ defineProps<{
             <li v-for="child in racineChildren" :key=child.id>
 
                 <Link
-                    :href="'/navigation/'+child.id"
+                    :href="navigate.folder.url(child.id)"
                     class="
                         block px-3 rounded-md font-medium text-sm
                         text-white hover:text-white active:text-white
@@ -33,9 +34,8 @@ defineProps<{
             </li>
         </ul>
         <div class="items-end flex my-auto mr-10">
-
-            <Link :href="`/admin/departements`" class="text-white flex gap-2 mr-8"> <span class="text-2xl">Departements</span> <BuildingOfficeIcon class="w-8"></BuildingOfficeIcon> </Link>
-            <Link :href="`/admin/users`" class="text-white flex gap-2 mr-8"> <span class="text-2xl">Admin</span> <UserGroupIcon class="w-8"></UserGroupIcon> </Link>
+            <Link :href="admin_routes.departements.url()" class="text-white flex gap-2 mr-8"> <span class="text-2xl">Departements</span> <BuildingOfficeIcon class="w-8"></BuildingOfficeIcon> </Link>
+            <Link :href="admin_routes.user.url()" class="text-white flex gap-2 mr-8"> <span class="text-2xl">Admin</span> <UserGroupIcon class="w-8"></UserGroupIcon> </Link>
             <UserMenu/>
         </div>
 

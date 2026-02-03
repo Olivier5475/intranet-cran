@@ -3,7 +3,6 @@ import RepertoryWidget from '@/Components/RepertoryWidget.vue';
 import SearchBarWidget from '@/Components/SearchBarWidget.vue';
 import DocumentWidget from '@/Components/DocumentWidget.vue';
 import CreationWidget from '@/Components/CreationWidget.vue';
-import DisplayModWidget from '@/Components/DisplayModWidget.vue';
 import { ListBulletIcon, ViewColumnsIcon } from '@heroicons/vue/20/solid';
 
 import { computed, DeepReadonly, inject, ref, Ref, toRef } from 'vue';

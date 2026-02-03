@@ -3,7 +3,8 @@ import { ref, computed, watch } from 'vue';
 import { ChevronRightIcon, ChevronDownIcon } from '@heroicons/vue/20/solid';
 import TreeViewItem from './TreeViewItem.vue';
 import { Link, usePage } from '@inertiajs/vue3';
-
+import navigate from '@/routes/navigate';
+import folder_route from '@/routes/editor/folder';
 interface Child {
     id: number;
     name: string;
@@ -39,8 +40,6 @@ const isExpanded = ref(checkShouldExpand(props.child, currentFolderId.value));
 watch(currentFolderId, (newId) => {
     isExpanded.value = checkShouldExpand(props.child, newId);
 });
-
-const href = (id: number) => `/navigation/${id}`;
 </script>
 
 <template>
@@ -57,7 +56,7 @@ const href = (id: number) => `/navigation/${id}`;
                 class="w-5 h-5 hover:bg-slate-200 dark:hover:bg-zinc-600 flex-shrink-0 rounded-full hover:cursor-pointer"
             />
 
-            <Link :href="href(child.id)" class="hover:text-sky-300" :class="child.id === currentFolderId ? `text-sky-500 font-bold` : ``">{{
+            <Link :href="navigate.folder.url(child.id)" class="hover:text-sky-300" :class="child.id === currentFolderId ? `text-sky-500 font-bold` : ``">{{
                 child.name
             }}</Link>
         </div>
@@ -66,7 +65,7 @@ const href = (id: number) => `/navigation/${id}`;
             <TreeViewItem v-for="subChild in child.children" :key="subChild.id" :child="subChild" />
             <Link
                 class="font-extrabold text-yellow-600 h-10 px-3 inline-flex min-w-[40px] items-center overflow-hidden rounded-full transition-all duration-300"
-                :href="`/navigation/` + child.id + `/admin/folders/create`"
+                :href="folder_route.create.url(child.id)"
             >
                 <span class="mr-1 min-w-0 flex-1 flex-shrink text-ellipsis whitespace-nowrap"> Nouveau dossier </span>
 

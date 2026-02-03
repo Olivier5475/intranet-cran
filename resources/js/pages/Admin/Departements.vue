@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
 import { PlusCircleIcon, MinusCircleIcon } from '@heroicons/vue/20/solid';
+import route from '@/routes/admin/departements';
 //BuildingOfficeIcon
 import { ref, watch } from 'vue';
 interface Departement {
@@ -13,10 +14,7 @@ const props = defineProps<{
     departements: Departement[];
 }>();
 
-const getHref = (id: number) => {
-    return `/admin/departements/${id}`;
-};
-
+// System de couleur de fond alterné
 const lastIndex = ref(props.departements.length);
 watch(() => props.departements, () => {
     lastIndex.value = props.departements.length;
@@ -42,7 +40,7 @@ watch(() => props.departements, () => {
                 <Link
                     v-for="(departement, index) in departements"
                     :key="departement.id"
-                    :href="getHref(departement.id)"
+                    :href="route.update.url(departement.id)"
                     class="p-4 text-sm ease-in-out dark:border-gray-700 grid cursor-pointer grid-cols-12 border-t transition duration-150"
                     :class="{
                         'bg-gray-50 dark:bg-gray-700 hover:bg-indigo-100 dark:hover:bg-indigo-900': index % 2 === 0,
@@ -56,7 +54,7 @@ watch(() => props.departements, () => {
                     </p>
 
                     <Link
-                        :href="getHref(departement.id)"
+                        :href="route.delete.url(departement.id)"
                         method="delete"
                         class="sm:col-span-2 end font-semibold col-span-2 text-right"
                     >
@@ -64,7 +62,7 @@ watch(() => props.departements, () => {
                     </Link>
                 </Link>
                 <Link
-                    :href="`/admin/departements/create`"
+                    :href="route.create.url()"
                     class="p-4 text-sm ease-in-out dark:border-gray-700 flex cursor-pointer grid-cols-12 border-t transition duration-150"
                     :class="
                         lastIndex % 2 !== 0

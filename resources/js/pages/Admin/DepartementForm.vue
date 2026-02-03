@@ -2,7 +2,7 @@
 import { Head, useForm } from '@inertiajs/vue3';
 import { ref } from 'vue';
 import { Departement } from '@/departement';
-import departements from '@/routes/admin/departements';
+import route from '@/routes/admin/departements';
 
 const props = defineProps<{
     departement: Departement;
@@ -25,9 +25,9 @@ const updateInitials = () => {
 };
 const submit = () => {
     if (props.departement) {
-        form.patch(departements.post.update.url({ id: props.departement.id }));
+        form.patch(route.post.update.url({ id: props.departement.id }));
     } else {
-        form.post(departements.post.create.url());
+        form.post(route.post.create.url());
     }
 };
 </script>

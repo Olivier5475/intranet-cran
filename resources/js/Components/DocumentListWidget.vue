@@ -19,6 +19,9 @@ import {
 
 import { Link } from '@inertiajs/vue3';
 import { computed, ref } from 'vue';
+import download from '@/routes/download';
+import editor from '@/routes/editor';
+import navigate from '@/routes/navigate';
 
 const props = defineProps<{
     child: {
@@ -39,17 +42,21 @@ const color = computed(() => {
 });
 
 let href;
+let updateHref;
+let deleteHref;
 if (props.child.type === 'file') {
-    href = `/download/file/${props.child.id}`;
+    href = download.file.url(props.child.id);
+    updateHref = editor.file.update.url(props.child.id);
+    deleteHref = editor.file.delete(props.child.id);
 } else if (props.child.type === 'folder') {
-    href = `/navigation/${props.child.id}`;
+    href = navigate.folder.url(props.child.id);
+    updateHref = editor.folder.update(props.child.id);
+    deleteHref = null;
 } else {
-    href = `/navigation/${props.folder_id}/documents/${props.child.id}`;
+    href = navigate.document.url(props.child.id);
+    updateHref = editor.document.update(props.child.id);
+    deleteHref = editor.document.delete(props.child.id);
 }
-
-const updateHref = `/navigation/${props.folder_id}/admin/${props.child.type}s/update/${props.child.id}`;
-const deleteHref = `/navigation/${props.folder_id}/admin/${props.child.type}s/delete/${props.child.id}`;
-
 // On initialise à false pour que la modale soit cachée au début
 const isActiveValidation = ref(false);
 </script>
@@ -106,7 +113,7 @@ const isActiveValidation = ref(false);
             <p class="text-md text-gray-300 text-center mb-6">La suppression que vous êtes sur le point d'effectuer sera définitive. Êtes-vous sûr de vouloir procéder à la suppression ?</p>
             <hr class="border-b border-gray-700 mt-1" />
             <div class="flex justify-evenly mt-4">
-                <Link method="delete" :href="deleteHref" class="text-white bg-red-600 w-1/3 py-2 rounded-md hover:bg-red-700 transition duration-150 text-center font-semibold"> SUPPRIMER </Link>
+                <Link v-if="deleteHref" method="delete" :href="deleteHref" class="text-white bg-red-600 w-1/3 py-2 rounded-md hover:bg-red-700 transition duration-150 text-center font-semibold"> SUPPRIMER </Link>
                 <button @click="isActiveValidation = false" class="text-white bg-green-600 w-1/3 py-2 rounded-md hover:bg-green-700 transition duration-150 font-semibold"> ANNULER </button>
             </div>
         </div>

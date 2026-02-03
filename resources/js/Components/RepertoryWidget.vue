@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
 import { HomeIcon, ChevronRightIcon } from '@heroicons/vue/20/solid';
+import navigate from '@/routes/navigate';
 
 defineProps<{
     parents : Array<{
@@ -18,7 +19,7 @@ defineProps<{
         <div v-for="parent in parents" :key=parent.id class="flex">
             <ChevronRightIcon class="h-5 w-5 shrink-0 my-auto" />
             <Link
-                :href='"/navigation/" + parent.id'
+                :href='navigate.folder.url(parent.id)'
                 class=" hover:dark:text-gray-400"
             >
                 {{ parent.name }}

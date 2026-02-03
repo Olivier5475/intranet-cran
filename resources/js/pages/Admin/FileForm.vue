@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { Head, useForm } from '@inertiajs/vue3';
-import { computed } from 'vue';
-import { Departement } from '@/departement'
+import { Departement } from '@/departement';
+import route from '@/routes/editor/file';
 
 const props = defineProps<{
-    folder_id: number;
+    parent_id: number;
     file?: {
         id: number;
         name: string;
@@ -14,17 +14,10 @@ const props = defineProps<{
 }>();
 
 const form = useForm({
-        name: props.file?.name ?? '',
-        files: [] as File[],
-        departements: props.file?.departements ?? [],
-    });
-
-// La fonction 'route' est utilisée directement ici, car elle est globale.
-const submitUrl = computed(() => {
-    if (props.file) {
-        return `/navigation/${props.folder_id}/admin/files/store/${props.file.id}`;
-    }
-    return `/navigation/${props.folder_id}/admin/files/store`; // Route de création
+    name: props.file?.name ?? '',
+    files: [] as File[],
+    departements: props.file?.departements ?? [],
+    parent_id: props.file ? null : (props.parent_id ?? null),
 });
 
 const handleNewFileUpload = (event: Event) => {
@@ -32,14 +25,13 @@ const handleNewFileUpload = (event: Event) => {
     form.files = Array.from(target.files || []) as File[];
 };
 
-
 const submit = () => {
     if (props.file) {
-        form.post(submitUrl.value, {
-            method: 'patch'
+        form.post(route.post.update.url(props.file.id), {
+            method: 'patch',
         });
     } else {
-        form.post(submitUrl.value);
+        form.post(route.post.create.url());
     }
 };
 </script>
@@ -47,11 +39,12 @@ const submit = () => {
 <template>
     <Head :title="file ? `Modifier le fichier ${file.name}` : 'Créer un nouveau fichier'" />
     <h1 class="text-3xl m-4 text-center first-letter:uppercase">
-        {{ file ? "Modification d'un fichier" : "Creation d'un nouveau fichier" }}</h1>
+        {{ file ? "Modification d'un fichier" : "Creation d'un nouveau fichier" }}
+    </h1>
     <hr class="mx-auto w-11/12" />
     <form @submit.prevent="submit" class="pt-4 mx-auto w-11/12">
-            <input type="text" name="name" placeholder="Nom du fichier" v-model="form.name" class="mr-10 rounded-md w-full text-black block grow" />
-            <div v-if="form.errors.name" class="text-red-500">{{ form.errors.name }}</div>
+        <input type="text" name="name" placeholder="Nom du fichier" v-model="form.name" class="mr-10 rounded-md text-black block w-full grow" />
+        <div v-if="form.errors.name" class="text-red-500">{{ form.errors.name }}</div>
 
         <div class="my-6 mx-auto w-full">
             <label for="file_input" class="font-semibold mb-2 block"> Ajouter un fichier 📁 </label>
@@ -78,21 +71,13 @@ const submit = () => {
                 {{ form.errors.files }}
             </div>
 
-            <div v-if="form.files.length" class="text-sm text-green-600 mt-2">
-                {{ form.files.length }} fichier(s) sélectionné(s).
-            </div>
+            <div v-if="form.files.length" class="text-sm text-green-600 mt-2">{{ form.files.length }} fichier(s) sélectionné(s).</div>
         </div>
 
-        <div class="w-5/6 md:w-3/4 lg:w-2/3">
+        <div class="md:w-3/4 lg:w-2/3 w-5/6">
             <p class="mb-1">Départements</p>
-            <div v-for="departement in departements" :key="departement.id" class="flex gap-2">
-                <input
-                    type="checkbox"
-                    :id="'dept-' + departement.id"
-                    :value="departement.id"
-                    v-model="form.departements"
-                    class="my-auto"
-                />
+            <div v-for="departement in departements" :key="departement.id" class="gap-2 flex">
+                <input type="checkbox" :id="'dept-' + departement.id" :value="departement.id" v-model="form.departements" class="my-auto" />
                 <label :for="'dept-' + departement.id">{{ departement.name }}</label>
             </div>
             <div v-if="form.errors.departements" class="text-red-500">{{ form.errors.departements }}</div>

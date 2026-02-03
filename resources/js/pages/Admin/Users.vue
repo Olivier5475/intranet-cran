@@ -2,6 +2,8 @@
 import { Link } from '@inertiajs/vue3';
 import { UserPlusIcon, UserMinusIcon } from '@heroicons/vue/20/solid';
 import { ref, watch } from 'vue';
+import route from '@/routes/admin/user';
+
 interface User {
     nom: string;
     prenom: string;
@@ -27,9 +29,7 @@ const getRoleColor = (role: string) => {
     }
 };
 
-const getHref = (id: number) => {
-    return `/admin/users/${id}`;
-};
+
 
 const lastIndex = ref(props.users.length);
 watch(() => props.users, () => {
@@ -57,7 +57,7 @@ watch(() => props.users, () => {
                 <Link
                     v-for="(user, index) in users"
                     :key="user.email"
-                    :href="getHref(user.id)"
+                    :href="route.update.url(user.id)"
                     class="p-4 text-sm ease-in-out dark:border-gray-700 grid cursor-pointer grid-cols-12 border-t transition duration-150"
                     :class="{
                         'bg-gray-50 dark:bg-gray-700 hover:bg-indigo-100 dark:hover:bg-indigo-900': index % 2 === 0,
@@ -75,7 +75,7 @@ watch(() => props.users, () => {
                     </p>
 
                     <Link
-                        :href="getHref(user.id)"
+                        :href="route.delete.url(user.id)"
                         method="delete"
                         class="sm:col-span-2 end font-semibold col-span-2 text-right"
                     >

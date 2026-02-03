@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Head, useForm } from '@inertiajs/vue3';
-import { computed } from 'vue';
+import route from '@/routes/admin/user';
 
 interface User {
     id: number;
@@ -28,18 +28,14 @@ const form = useForm({
     departements: props.user?.departements ?? [],
 });
 
-const submitUrl = computed(() => {
-    if (props.user) {
-        return `/admin/users/${props.user.id}`;
-    }
-    return `/admin/users`; // Route de création
-});
 
 const submit = () => {
-    if(props.user){
-        form.patch(submitUrl.value);
+    if (props.user) {
+        form.post(route.post.update.url(props.user.id), {
+            method: 'patch',
+        });
     } else {
-        form.post(submitUrl.value);
+        form.post(route.post.create.url());
     }
 };
 </script>
@@ -100,11 +96,7 @@ const submit = () => {
                     <div v-if="form.errors.role" class="text-red-500">{{ form.errors.role }}</div>
                 </div>
             </div>
-
-
         </div>
-
-
 
         <button type="submit" :disabled="form.processing" class="py-2 mt-7 bg-indigo-600 text-white rounded w-full">
             {{ user ? 'Mettre à Jour' : 'Créer' }}

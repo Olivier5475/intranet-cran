@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import { Head, useForm } from '@inertiajs/vue3';
-import { computed } from 'vue';
-
+import route from '@/routes/editor/folder'
 const props = defineProps<{
-    parent_id: number;
+    parent_id?: number,
     folder?: {
         id: number;
         name: string;
@@ -11,32 +10,21 @@ const props = defineProps<{
     };
 }>();
 
-let form;
-if (props.folder) {
-    form = useForm({
-        name: props.folder.name,
-        color: props.folder.color,
-    });
-} else {
-    form = useForm({
-        name: '',
-        color: '#d7ac53',
-    });
-}
-
-const submitUrl = computed(() => {
-    if (props.folder) {
-        return `/navigation/${props.parent_id}/admin/folders/store/${props.folder.id}`;
-    }
-    return `/navigation/${props.parent_id}/admin/folders/store`;
+const form = useForm({
+    name: props.folder?.name ?? '',
+    color: props.folder?.color ?? '#d7ac53',
+    parent_id: props.folder ? null : (props.parent_id ?? null),
 });
 
+console.log(props.parent_id)
 const submit = () => {
-    const method = props.folder ? 'patch' : 'post';
-
-    form.post(submitUrl.value, {
-        method: method,
-    });
+    if (props.folder) {
+        form.patch(route.post.update.url(props.folder.id), {
+            method: 'patch',
+        });
+    } else {
+        form.post(route.post.create.url())
+    }
 };
 </script>
 
@@ -56,8 +44,11 @@ const submit = () => {
             <input type="color" name="color" v-model="form.color" class="rounded-md text-black block h-auto w-1/6" />
             <div v-if="form.errors.color" class="text-red-500">{{ form.errors.color }}</div>
         </div>
-
-        <button type="submit" :disabled="form.processing" class="py-2 mt-5 bg-indigo-600 text-white rounded w-full">
+        <button
+            type="submit"
+            :disabled="form.processing"
+            class="py-2 mt-5 bg-indigo-600 text-white rounded w-full"
+        >
             {{ folder ? 'Mettre à Jour' : 'Créer' }}
         </button>
     </form>

@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { Head, useForm } from '@inertiajs/vue3';
-import { computed } from 'vue';
 import CKEditor5Widget from '@/Components/CKEditor5Widget.vue';
 import { Departement } from '@/departement'
+import route from '@/routes/editor/document';
 
 interface Attachment {
     id: number;
@@ -17,7 +17,7 @@ interface Document {
     departements: number[];
 }
 const props = defineProps<{
-    folder_id: number;
+    parent_id: number;
     document?: Document;
     role : string;
     departements : Departement[];
@@ -30,14 +30,7 @@ const form = useForm({
     new_attachments: [] as File[],
     departements: props.document?.departements ?? [],
     ...(props.role === 'admin' && { color: props.document?.color ?? "#ffffff" }),
-});
-
-// La fonction 'route' est utilisée directement ici, car elle est globale.
-const submitUrl = computed(() => {
-    if (props.document) {
-        return `/navigation/${props.folder_id}/admin/documents/store/${props.document.id}`;
-    }
-    return `/navigation/${props.folder_id}/admin/documents/store`; // Route de création
+    parent_id: props.document ? null : (props.parent_id ?? null),
 });
 
 const handleNewFileUpload = (event: Event) => {
@@ -51,11 +44,11 @@ const removeExistingAttachment = (index: number) => {
 
 const submit = () => {
     if(props.document) {
-        form.post(submitUrl.value, {
+        form.post(route.post.update.url(props.document.id), {
             method: "patch",
         });
     } else {
-        form.post(submitUrl.value);
+        form.post(route.post.create.url());
     }
 };
 
