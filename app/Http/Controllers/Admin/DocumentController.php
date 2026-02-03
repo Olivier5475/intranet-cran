@@ -22,7 +22,7 @@ class DocumentController extends Controller {
         private readonly UserServiceInterface $userService,
     ){}
 
-    public function store(Request $request, $folder_id, $id = null) {
+    public function store(Request $request, $id = null) {
         // 1. Validation de la requête
         $validatedData = $request->validate([
             'title' => ['required', 'string', 'max:255'],
@@ -45,6 +45,7 @@ class DocumentController extends Controller {
             'new_attachments.*' => ['file', 'max:51200'],
 
             'departements' => ['sometimes', 'array'],
+            'parent_id' => ['integer', 'nullable'],
         ]);
         // 2. Préparation des données pour le Service
         if(empty($validatedData['color'])) {
@@ -69,18 +70,17 @@ class DocumentController extends Controller {
             $data['color'] = $validatedData["color"];
         }
 
-        if(!empty($folder_id)) {
-            $data["folder_id"] = $folder_id;
+        if(!is_null($validatedData["parent_id"])) {
+            $data["folder_id"] = $validatedData["parent_id"];
         }
-
         try {
             if($id) {
-                $this->documentsService->update($id, $data);
-                return redirect()->route("home")
+                $document = $this->documentsService->update($id, $data);
+                return redirect()->route("navigate.folder", ["folder_id" => $document->folder_id])
                     ->with("success", "Document mis à jour avec success");
             } else {
-                $this->documentsService->create($data);
-                return redirect()->route("home")
+                $document = $this->documentsService->create($data);
+                return redirect()->route("navigate.folder", ["folder_id" => $document->folder_id])
                     ->with("success", "Document créer avec success");
             }
 
@@ -106,17 +106,16 @@ class DocumentController extends Controller {
         }
     }
 
-    public function create($folder_id) {
+    public function create($parent_id) {
         return \Inertia\Inertia::render('Admin/DocumentForm', [
-            "folder_id" => $folder_id,
+            "parent_id" => $parent_id,
             "role" => $this->userService->getRole(),
         ]);
     }
-    public function update($folder_id, $id) {
+    public function update($id) {
         try {
             return \Inertia\Inertia::render('Admin/DocumentForm', [
                 "document" => $this->documentsService->read($id),
-                "folder_id" => $folder_id,
                 "role" => $this->userService->getRole(),
             ]);
         } catch (BadRequestException $e) {
@@ -128,9 +127,9 @@ class DocumentController extends Controller {
         }
     }
 
-    public function delete($folder_id, $id) {
+    public function delete($id) {
         try {
-            $this->documentsService->delete($folder_id, $id);
+            $this->documentsService->delete($id);
             return redirect()->back()->with("success", "Document deleted successfully");
         } catch (BadRequestException) {
             // 400 Bad Request (pour une erreur d'argument si non gérée par la validation)

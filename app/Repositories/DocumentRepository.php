@@ -19,7 +19,7 @@ class DocumentRepository implements Interfaces\DocumentRepositoryInterface {
      * @throws PersistenceException|AlreadyExistsException En cas d'erreur de base de données.
      */
     public function create(array $data): Document {
-        if($this->checkName($data['folder_id'], $data['name'])) {
+        if($this->checkName($data['folder_id'], $data['title'])) {
             throw new AlreadyExistsException();
         }
         try {
@@ -74,7 +74,7 @@ class DocumentRepository implements Interfaces\DocumentRepositoryInterface {
             throw new DocumentNotFoundException("Document with ID $id not found.");
         }
 
-        if($this->checkName($data['folder_id'], $data['name'], $id)) {
+        if($this->checkName($document->folder_id, $data['title'], $id)) {
             throw new AlreadyExistsException();
         }
         try {

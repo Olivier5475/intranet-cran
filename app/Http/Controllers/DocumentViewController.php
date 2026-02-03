@@ -9,20 +9,19 @@ use Illuminate\Contracts\Filesystem\FileNotFoundException;
 
 class DocumentViewController {
 
-    public function __invoke(DocumentsServiceInterface $documentsService, $folder_id, $id){
+    public function __invoke(DocumentsServiceInterface $documentsService, $document_id){
         try {
-            $document = $documentsService->read($id);
+            $document = $documentsService->read($document_id);
         } catch (FileNotFoundException|DocumentNotFoundException $e) {
-            return redirect("/navigation/".$folder_id)->with("error", "Document introuvable");
+            return redirect()->back()->with("error", "Document introuvable");
         }
 
         try {
             return \Inertia\Inertia::render('DocumentView', [
-                "folder_id" => $folder_id,
                 "document" => $document
             ]);
         } catch (\Throwable $e) {
-            return redirect("/navigation/".$folder_id)->with("error", "Document introuvable. " .  $e->getMessage());
+            return redirect()->back()->with("error", "Document introuvable. " .  $e->getMessage());
         }
     }
 

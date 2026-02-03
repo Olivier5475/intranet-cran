@@ -14,16 +14,16 @@ class FilesRepository implements Interfaces\FilesRepositoryInterface {
     /**
      * Créer un document.
      * @param array $data Les champs et leurs nouvelles valeurs (doivent être "fillable").
-     * @return void
+     * @return File
      * @throws PersistenceException|AlreadyExistsException En cas d'erreur de base de données.
      */
-    public function create(array $data): void {
+    public function create(array $data): File {
         if($this->checkName($data["folder_id"], $data["name"])){
             throw new AlreadyExistsException();
         }
         try {
             $file = new File();
-            $file->name = $data['name'];
+            $file->name = e($data['name']);
             $file->folder_id = $data['folder_id'];
             $file->user_id = $data['user_id'];
             $file->storage_path = $data['storage_path'];
@@ -31,6 +31,7 @@ class FilesRepository implements Interfaces\FilesRepositoryInterface {
             $file->size = $data['size'];
             $file->save();
             $file->departements()->attach($data['departements']);
+            return $file;
         } catch (\Throwable $e) {
             Log::error('Document creation error', [
                 'error' => $e->getMessage(),
@@ -59,32 +60,41 @@ class FilesRepository implements Interfaces\FilesRepositoryInterface {
      * Met à jour un document existant.
      * @param int $id L'ID du document à mettre à jour.
      * @param array $data Les champs et leurs nouvelles valeurs (doivent être "fillable").
-     * @return void
+     * @return File
      * @throws PersistenceException En cas d'erreur de base de données.
      * @throws FileNotFoundException|AlreadyExistsException si le fichier n'est pas trouvé
      */
-    public function update(int $id, array $data): void {
+    public function update(int $id, array $data): File {
         $file = File::find($id);
 
-        if (!$file || $data['folder_id'] != $file->folder_id) {
+        if (!$file) {
             throw new FileNotFoundException("File with ID $id not found.");
         }
 
-        if($this->checkName($data["folder_id"], $data["name"], $id)){
+        if($this->checkName($file->folder_id, $data["name"], $id)){
             throw new AlreadyExistsException();
         }
         try {
-            $file->name = $data["name"];
-            $file->storage_path = $data["storage_path"];
+            $file->name = e($data["name"]);
+            if($data["storage_path"]){
+                $file->storage_path = $data["storage_path"];
+            }
+            if($data["mimetype"]){
+                $file->mimetype = $data["mimetype"];
+            }
+            if($data["size"]){
+                $file->size = $data["size"];
+            }
             $file->save();
             $file->departements()->sync($data['departements']);
+            return $file;
         } catch (\Throwable $e) {
             Log::error('Document update failed for ID ' . $id, [
                 'error' => $e->getMessage(),
                 'data' => $data,
             ]);
 
-            throw new PersistenceException(message : "Could not update document with ID $id.", previous:$e);
+            throw new PersistenceException(message : "Could not update file with ID $id.", previous:$e);
         }
     }
 

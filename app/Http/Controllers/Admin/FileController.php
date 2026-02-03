@@ -19,7 +19,7 @@ class FileController extends Controller {
         private readonly FilesServiceInterface $filesService,
     ){}
 
-    public function store(Request $request, int $folder_id, $id = null) {
+    public function store(Request $request, $id = null) {
         // 1. Validation de la requête
         $validatedData = $request->validate([
             'name' => [
@@ -30,23 +30,27 @@ class FileController extends Controller {
             'files' => [$id ? 'sometimes' : 'required', 'array'],
             'files.*' => ['file', 'max:102400'],
             'departements' => ['sometimes', 'array'],
+            'parent_id' => ['integer', 'nullable'],
         ]);
+
         // 2. Préparation des données pour le Service
         $data = [
             "name" => $validatedData["name"],
             "file" => $request->file('files')[0] ?? null,
-            "folder_id" => $folder_id,
             "departements" => $validatedData["departements"] ?? [],
         ];
 
+        if(!is_null($validatedData["parent_id"])) {
+            $data["folder_id"] = $validatedData["parent_id"];
+        }
         try {
             if($id) {
-                $this->filesService->update($folder_id, $id, $data);
-                return redirect()->route("home")
+                $file = $this->filesService->update($id, $data);
+                return redirect()->route("navigate.folder", ["folder_id" => $file->folder_id])
                     ->with("success", "Fichier mis à jour avec success");
             } else {
-                $this->filesService->create($data);
-                return redirect()->route("home")
+                $file = $this->filesService->create($data);
+                return redirect()->route("navigate.folder", ["folder_id" => $file->folder_id])
                     ->with("success", "Fichier créé avec success");
             }
 
@@ -73,16 +77,15 @@ class FileController extends Controller {
         }
     }
 
-    public function create($folder_id) {
+    public function create($parent_id) {
         return \Inertia\Inertia::render('Admin/FileForm', [
-            "folder_id" => $folder_id
+            "parent_id" => $parent_id
         ]);
     }
-    public function update($folder_id, $id) {
+    public function update($file_id) {
         try {
             return \Inertia\Inertia::render('Admin/FileForm', [
-                "file" => $this->filesService->read($folder_id, $id),
-                "folder_id" => $folder_id
+                "file" => $this->filesService->read($file_id),
             ]);
         } catch (BadRequestException $e) {
             // 400 Bad Request (pour une erreur d'argument si non gérée par la validation)
@@ -93,9 +96,9 @@ class FileController extends Controller {
         }
     }
 
-    public function delete($folder_id, $id) {
+    public function delete($file_id) {
         try {
-            $this->filesService->delete($folder_id, $id);
+            $this->filesService->delete($file_id);
             return redirect()->back()->with("success", "Document deleted successfully");
         } catch (BadRequestException) {
             // 400 Bad Request (pour une erreur d'argument si non gérée par la validation)

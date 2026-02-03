@@ -59,7 +59,6 @@ interface DocumentsServiceInterface {
     public function update(int $id, array $data) : DocumentViewDTO|bool;
 
     /**
-     * @param int $folder_id
      * @param int $id
      * @return bool
      * @throws DocumentNotFoundException
@@ -68,7 +67,7 @@ interface DocumentsServiceInterface {
      * @throws PersistenceException en cas d'erreur lors de la persistence en BD (throw par le Repository)
      * @throws AttachmentNotFoundException si Attachment introuvable (throw par le Repository)
      */
-    public function delete(int $folder_id, int $id) : bool;
+    public function delete(int $id) : bool;
 
     /**
      * Fonction permettant l'obtention du premier document à la racine

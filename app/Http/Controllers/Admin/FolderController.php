@@ -16,58 +16,55 @@ class FolderController extends Controller {
         private readonly FoldersServiceInterface $foldersService
     ) {}
 
-    public function create($folder_id) {
-        if($folder_id != 0) {
+    public function create($parent_id) {
+        if($parent_id != 0) {
             try {
-                $this->foldersService->read($folder_id);
+                $this->foldersService->read($parent_id);
             } catch (FolderNotFoundException $e) {
                 return redirect()->back()->with("success" , "Argument(s) incorrect(s)");
             }
         }
 
         return \Inertia\Inertia::render('Admin/FolderForm', [
-            "parent_id" => $folder_id,
+            "parent_id" => $parent_id,
         ]);
     }
 
-    public function update(int $folder_id, int $id) {
+    public function update(int $folder_id) {
         if(empty($folder_id) && $folder_id != 0) {
             return redirect()->back()->with("success", "Argument(s) manquant(s)");
         }
         try {
-            $this->foldersService->read($folder_id);
-            $folder = $this->foldersService->read($id);
+            $folder = $this->foldersService->read($folder_id);
         } catch (FolderNotFoundException) {
             return redirect()->back()->with("success" , "Argument(s) incorrect(s)");
         }
 
         return \Inertia\Inertia::render('Admin/FolderForm', [
             "folder" => $folder,
-            "parent_id" => $folder_id,
         ]);
     }
 
-    public function store(Request $request, $folder_id, $id = null) {
+    public function store(Request $request, $id = null) {
         // 1. Validation de la requête
         $validatedData = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'color' => ['required', 'string', 'max:16'],
+            'parent_id' => ['integer', 'nullable'],
         ]);
 
-        if(!empty($folder_id)) {
-            $validatedData['parent_id'] = $folder_id;
-        } else {
-            $validatedData['parent_id'] = null;
+        if(is_null($validatedData["parent_id"])) {
+            unset($validatedData["parent_id"]);
         }
 
         try {
             if($id) {
                 $this->foldersService->update($id, $validatedData);
-                return redirect()->route("navigation", ["folder_id" => $folder_id])
+                return redirect()->route("navigate.folder", ["folder_id" => $id])
                     ->with("success", "Folder updated successfully");
             } else {
                 $this->foldersService->create($validatedData);
-                return redirect()->route("navigation", ["folder_id" => $folder_id])
+                return redirect()->route("navigate.folder", ["folder_id" => $validatedData["parent_id"]])
                     ->with("success", "Folder created successfully");
             }
 

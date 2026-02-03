@@ -8,6 +8,7 @@ readonly class FileDTO {
         public string $name,
         public array $departements,
         public string $created_at,
+        public int $folder_id,
         public ?string $storage_path,
         public ?string $mimetype,
         public string $type = "file",

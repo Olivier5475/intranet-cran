@@ -114,12 +114,9 @@ readonly class DocumentService implements Interfaces\DocumentsServiceInterface {
         }
     }
 
-    public function delete(int $folder_id, int $id): bool {
+    public function delete(int $id): bool {
         try {
             $document = $this->documentRepository->read($id);
-            if($document->folder_id != $folder_id) {
-                throw new BadRequestException("Document does not belong to this folder");
-            }
             foreach ($document->attachments() as $attachment) {
                 $this->attachmentService->delete($attachment->id);
             }
@@ -233,6 +230,7 @@ readonly class DocumentService implements Interfaces\DocumentsServiceInterface {
             created_at: $document->created_at,
             updated_at: $document->updated_at,
             departements: $this->departementsService->departementsIDs($document->departements),
+            folder_id: $document->folder_id,
             color: $document->color
         );
     }

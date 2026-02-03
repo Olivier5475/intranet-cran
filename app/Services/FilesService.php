@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use App\DTO\DepartementDTO;
 use App\DTO\FileDTO;
 use App\Exception\DiskWriteException;
 use App\Exception\FileNotFoundException;
@@ -17,8 +16,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use League\Flysystem\FilesystemException;
-use RuntimeException;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Illuminate\Contracts\Filesystem ;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -29,6 +26,8 @@ readonly class FilesService implements Interfaces\FilesServiceInterface {
     /**
      * @param FilesRepositoryInterface $filesRepository
      * @param FoldersServiceInterface $foldersService
+     * @param UserServiceInterface $userService
+     * @param DepartementsServiceInterface $departementsService
      */
     public function __construct(
         private FilesRepositoryInterface $filesRepository,
@@ -37,7 +36,7 @@ readonly class FilesService implements Interfaces\FilesServiceInterface {
         private DepartementsServiceInterface $departementsService
     ){}
 
-    public function create(array $data): void {
+    public function create(array $data): FileDTO {
         if (empty($data["folder_id"]) || !($data['file'] ?? null) instanceof UploadedFile) {
             throw new BadRequestException("Missing folder ID or uploaded file.");
         }
@@ -72,6 +71,9 @@ readonly class FilesService implements Interfaces\FilesServiceInterface {
         if(empty($data["name"])) {
             $data['name'] = $uploadedFile->getClientOriginalName(); // Nom affiché à l'utilisateur
         }
+        if (!str_ends_with($data["name"], "." . $uploadedFile->getClientOriginalExtension())) {
+            $data["name"] = $data["name"] . "." . $uploadedFile->getClientOriginalExtension();
+        }
         $data['mimetype'] = $uploadedFile->getMimeType();
         $data['size'] = $uploadedFile->getSize();
 
@@ -79,8 +81,9 @@ readonly class FilesService implements Interfaces\FilesServiceInterface {
 
         try {
             DB::beginTransaction();
-            $this->filesRepository->create($data);
+            $file = $this->filesRepository->create($data);
             DB::commit();
+            return $this->makeFileDTO($file);
         } catch (PersistenceException $e) {
             try {
                 DB::rollBack();
@@ -111,7 +114,7 @@ readonly class FilesService implements Interfaces\FilesServiceInterface {
         }
     }
 
-    public function read($folder_id, $id) : FileDTO {
+    public function read($id) : FileDTO {
         if(empty($id)) {
             $e = new BadRequestException("Missing id.");
             Log::critical("File read failed: ", ["exception" => $e]);
@@ -119,9 +122,6 @@ readonly class FilesService implements Interfaces\FilesServiceInterface {
         }
         try {
             $file = $this->filesRepository->read($id);
-            if($folder_id != $file->folder_id) {
-                throw new FileNotFoundException();
-            }
             return $this->makeFileDTO($file);
         } catch (FileNotFoundException $e) {
             Log::warning("File not found with id: " . $id);
@@ -132,8 +132,8 @@ readonly class FilesService implements Interfaces\FilesServiceInterface {
         }
     }
 
-    public function update(int $folder_id, int $id, array $data): void {
-        if(empty($id) || empty($data["name"])) {
+    public function update(int $id, array $data): FileDTO {
+        if(empty($id)) {
             throw new BadRequestException();
         }
         try {
@@ -143,19 +143,14 @@ readonly class FilesService implements Interfaces\FilesServiceInterface {
             throw $e;
         }
 
-        if($folder_id != $file->folder_id ) {
-            Log::warning("Bad folder_id : " . $folder_id);
-            throw new FileNotFoundException("bad folder_id: " . $folder_id);
-        }
-
         if(!empty($data["file"])) {
             $uploadedFile = $data["file"];
 
-            $folders = $this->foldersService->getBreadcrumbs($data["folder_id"]);
+            $folders = $this->foldersService->getBreadcrumbs($file->folder_id);
 
             $folder_path = "";
             foreach ($folders as $folder) {
-                if ($data['folder_id'] === $folder->id) {
+                if ($file->folder_id === $folder->id) {
                     $folder_path = $folder_path . $folder->id;
                 } else {
                     $folder_path = $folder_path . $folder->id . "/";
@@ -179,6 +174,9 @@ readonly class FilesService implements Interfaces\FilesServiceInterface {
             if(empty($data["name"])) {
                 $data['name'] = $uploadedFile->getClientOriginalName(); // Nom affiché à l'utilisateur
             }
+            if (!str_ends_with($data["name"], "." . $uploadedFile->getClientOriginalExtension())) {
+                $data["name"] = $data["name"] . "." . $uploadedFile->getClientOriginalExtension();
+            }
             $data['mimetype'] = $uploadedFile->getMimeType();
             $data['size'] = $uploadedFile->getSize();
 
@@ -186,11 +184,12 @@ readonly class FilesService implements Interfaces\FilesServiceInterface {
         }
         try {
             DB::beginTransaction();
-            $this->filesRepository->update($id, $data);
+            $file = $this->filesRepository->update($id, $data);
             if(!empty($uploadedFile)) {
                 Storage::delete($old_path);
             }
             DB::commit();
+            return $this->makeFileDTO($file);
         } catch (PersistenceException $e) {
             DB::rollBack();
             Log::warning("File attempted to update can\'t be persisted.: ", [
@@ -214,16 +213,13 @@ readonly class FilesService implements Interfaces\FilesServiceInterface {
         }
     }
 
-    public function delete(int $folder_id, int $id): bool {
+    public function delete(int $id): bool {
         if(empty($id)) {
             throw new BadRequestException("Missing argument", 400);
         }
 
         try {
             $file = $this->filesRepository->read($id);
-            if($file->folder_id != $folder_id) {
-                throw new FileNotFoundException();
-            }
             $storage_path = $file->storage_path;
 
             DB::beginTransaction();
@@ -268,8 +264,9 @@ readonly class FilesService implements Interfaces\FilesServiceInterface {
             name: $file->name,
             departements: $this->departementsService->departementsIDs($file->departements),
             created_at: $file->created_at,
+            folder_id: $file->folder_id,
             storage_path: $file->storage_path,
-            mimetype: $file->mimetype,
+            mimetype: $file->mimetype
         );
     }
 

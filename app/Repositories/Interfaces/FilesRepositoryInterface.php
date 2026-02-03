@@ -11,20 +11,20 @@ interface FilesRepositoryInterface {
     /**
      * Créer un document.
      * @param array $data Les champs et leurs nouvelles valeurs (doivent être "fillable").
-     * @return void
+     * @return File
      * @throws PersistenceException En cas d'erreur de base de données.
      */
-    public function create(array $data) : void;
+    public function create(array $data) : File;
 
     /**
      * Met à jour un document existant.
      * @param int $id L'ID du document à mettre à jour.
      * @param array $data Les champs et leurs nouvelles valeurs (doivent être "fillable").
-     * @return void
+     * @return File
      * @throws FileNotFoundException Si le document n'est pas trouvé.
      * @throws PersistenceException En cas d'erreur de base de données.
      */
-    public function update(int $id, array $data) : void;
+    public function update(int $id, array $data) : File;
 
     /**
      * Supprime un document existant.

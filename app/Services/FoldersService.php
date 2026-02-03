@@ -57,6 +57,7 @@ readonly class FoldersService implements Interfaces\FoldersServiceInterface {
                 name: $file->name,
                 departements: $departementsDTOs,
                 created_at: $file->created_at,
+                folder_id: $file->folder_id,
                 storage_path: $file->storage_path,
                 mimetype: $file->mimetype,
             );
@@ -182,6 +183,7 @@ readonly class FoldersService implements Interfaces\FoldersServiceInterface {
             name: $f->name,
             departements: $this->getDepartementsDTOs($f->departements),
             created_at: $f->created_at,
+            folder_id: $f->folder_id,
             storage_path: $f->storage_path,
             mimetype: $f->mimetype,
         ));
@@ -214,6 +216,7 @@ readonly class FoldersService implements Interfaces\FoldersServiceInterface {
             name: $f->name,
             departements: $this->getDepartementsDTOs($f->departements),
             created_at: $f->created_at,
+            folder_id: $f->folder_id,
             storage_path: $f->storage_path,
             mimetype: $f->mimetype,
         ));
