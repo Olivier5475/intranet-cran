@@ -8,6 +8,7 @@ use App\Exception\FileNotFoundException;
 use App\Exception\PersistenceException;
 use App\Http\Controllers\Controller;
 use App\Services\Interfaces\FilesServiceInterface;
+use App\Services\Interfaces\FoldersServiceInterface;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
@@ -15,11 +16,13 @@ use Illuminate\Contracts\Filesystem;
 use Throwable;
 
 class FileController extends Controller {
+
     public function __construct(
         private readonly FilesServiceInterface $filesService,
+        private readonly FoldersServiceInterface $foldersService
     ){}
 
-    public function store(Request $request, $id = null) {
+    public function store(Request $request, $file_id = null) {
         // 1. Validation de la requête
         $validatedData = $request->validate([
             'name' => [
@@ -27,7 +30,7 @@ class FileController extends Controller {
                 'string',
                 'max:255'
             ],
-            'files' => [$id ? 'sometimes' : 'required', 'array'],
+            'files' => [$file_id ? 'sometimes' : 'required', 'array'],
             'files.*' => ['file', 'max:102400'],
             'departements' => ['sometimes', 'array'],
             'parent_id' => ['integer', 'nullable'],
@@ -44,8 +47,11 @@ class FileController extends Controller {
             $data["folder_id"] = $validatedData["parent_id"];
         }
         try {
-            if($id) {
-                $file = $this->filesService->update($id, $data);
+            if($file_id) {
+                if(!$this->filesService->hasEditAccess($file_id)) {
+                    return redirect()->route("navigate.folder", ["folder_id" => $this->filesService->read($file_id)->folder_id]);
+                }
+                $file = $this->filesService->update($file_id, $data);
                 return redirect()->route("navigate.folder", ["folder_id" => $file->folder_id])
                     ->with("success", "Fichier mis à jour avec success");
             } else {
@@ -72,18 +78,24 @@ class FileController extends Controller {
 
         } catch (Throwable $t) {
             // Erreur imprévue (la transaction a été rollback dans le service)
-            Log::critical('Unhandled fatal error during file transaction.', ['error' => $t->getMessage(), 'id' => $id]);
+            Log::critical('Unhandled fatal error during file transaction.', ['error' => $t->getMessage(), 'id' => $file_id]);
             return redirect()->back()->with(['error' => 'Une erreur imprévue est survenue réessayer plus tard.']);
         }
     }
 
     public function create($parent_id) {
+        if(!$this->foldersService->hasEditAccess($parent_id)) {
+            return redirect()->route("navigate.folder", ["folder_id" => $parent_id])->with("warn" , "Vous n'avez pas le droit de modifier ce dossier");
+        }
         return \Inertia\Inertia::render('Admin/FileForm', [
             "parent_id" => $parent_id
         ]);
     }
     public function update($file_id) {
         try {
+            if(!$this->filesService->hasEditAccess($file_id)) {
+                return redirect()->route("navigate.folder", ["folder_id" => $this->filesService->read($file_id)->folder_id]);
+            }
             return \Inertia\Inertia::render('Admin/FileForm', [
                 "file" => $this->filesService->read($file_id),
             ]);
@@ -98,6 +110,9 @@ class FileController extends Controller {
 
     public function delete($file_id) {
         try {
+            if(!$this->filesService->hasEditAccess($file_id)) {
+                return redirect()->route("navigate.folder", ["folder_id" => $this->filesService->read($file_id)->folder_id]);
+            }
             $this->filesService->delete($file_id);
             return redirect()->back()->with("success", "Document deleted successfully");
         } catch (BadRequestException) {

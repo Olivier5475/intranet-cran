@@ -12,7 +12,9 @@ use App\Exception\PersistenceException;
 use App\Models\Document;
 use App\Models\File;
 use App\Models\Folder;
+use App\Repositories\Interfaces\DepartementRepositoryInterface;
 use App\Repositories\Interfaces\FolderRepositoryInterface;
+use App\Services\Interfaces\DepartementsServiceInterface;
 use App\Services\Interfaces\UserServiceInterface;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -38,24 +40,16 @@ readonly class FoldersService implements Interfaces\FoldersServiceInterface {
             $res[] = new FolderDTO(
                 id: $child->id,
                 name: $child->name,
+                departements: $child->departements->pluck('id')->toArray(),
                 color: '#f5be51',
                 created_at: $child->created_at,
             );
         }
         foreach ($files as $file) {
-            $departements = $file->departements;
-            $departementsDTOs = [];
-            foreach ($departements as $departement) {
-                $departementsDTOs[] = new DepartementDTO(
-                    id: $departement->id,
-                    name: $departement->name,
-                    initials: $departement->initials
-                );
-            }
             $res[] = new FileDTO(
                 id: $file->id,
                 name: $file->name,
-                departements: $departementsDTOs,
+                departements: $file->departements->pluck('id')->toArray(),
                 created_at: $file->created_at,
                 folder_id: $file->folder_id,
                 storage_path: $file->storage_path,
@@ -66,7 +60,7 @@ readonly class FoldersService implements Interfaces\FoldersServiceInterface {
             $res[] = new DocumentDTO(
                 id: $document->id,
                 name: $document->name,
-                departements: $document->departements,
+                departements: $document->departements->pluck('id')->toArray(),
                 created_at: $document->created_at,
                 color: '#f5be51',
             );
@@ -75,25 +69,14 @@ readonly class FoldersService implements Interfaces\FoldersServiceInterface {
     }
 
     public function getBreadcrumbs(int $id): array {
-        if(empty($id)) {
-            throw new BadRequestException("Missing argument", 400);
-        }
-
         $breadcrumbs = [];
+        $current = $this->folderRepository->getFolderWithParents($id);
 
-        try {
-            $current = $this->folderRepository->read($id);
-        } catch (FolderNotFoundException $e) {
-            Log::warning("Folder not found" , [
-                "id" => $id,
-                "message" => $e->getMessage()
-            ]);
-            throw $e;
-        }
         while ($current) {
             array_unshift($breadcrumbs, new FolderDTO(
                 id: $current->id,
                 name: $current->name,
+                departements: $current->departements->pluck('id')->toArray(),
                 color: '#f5be51',
             ));
             $current = $current->parent;
@@ -135,28 +118,23 @@ readonly class FoldersService implements Interfaces\FoldersServiceInterface {
      */
     private function mapFolderToDTO(Folder $folder): FolderDTO {
 
-        // Vérifie s'il existe une relation 'allChildren' chargée
+        // Gestion des enfants (inchangée)
+        $children = [];
         if ($folder->relationLoaded('allChildren') && $folder->allChildren->isNotEmpty()) {
-            $childrenDTOs = [];
-
-            // La récursion : on appelle mapFolderToDTO pour chaque enfant
             foreach ($folder->allChildren as $child) {
-                $childrenDTOs[] = $this->mapFolderToDTO($child);
+                $children[] = $this->mapFolderToDTO($child);
             }
-            $children = $childrenDTOs;
-        } else {
-            // Si la relation n'est pas chargée (ou vide), on n'envoie pas d'enfants
-            $children = [];
         }
 
-        // Retourne le DTO pour le niveau actuel
+        $departementsIds = $folder->relationLoaded('departements')
+            ? $folder->departements->pluck('id')->toArray()
+            : [];
+
         return new FolderDTO(
             id: $folder->id,
             name: $folder->name,
+            departements: $departementsIds,
             color: $folder->color,
-            // Si vous avez besoin d'autres propriétés (comme le parent_id si c'est nécessaire)
-
-            // Passe les DTOs enfants (ou un tableau vide)
             children: $children,
         );
     }
@@ -165,37 +143,36 @@ readonly class FoldersService implements Interfaces\FoldersServiceInterface {
      * Méthode privée pour la navigation
      */
     private function getRegularContents(int $folderId): Collection {
-        $folder = Folder::findOrFail($folderId);
-
-        $subfolders = $folder->children()->get();
-        $files = $folder->files()->get();
-        $documents = $folder->documents()->get();
-
-        $folderDTOs = $subfolders->map(fn($f) => new FolderDTO(
+        $folder = $this->folderRepository->getFolderWithContents($folderId);
+        $folderDTOs = $folder->children->map(fn($f) => new FolderDTO(
             id: $f->id,
             name: $f->name,
+            departements: $f->departements->pluck('id')->toArray(),
             color: $f->color,
             created_at: $f->created_at
         ));
 
-        $fileDTOs = $files->map(fn($f) => new FileDTO(
+        // On transforme les fichiers
+        $fileDTOs = $folder->files->map(fn($f) => new FileDTO(
             id: $f->id,
             name: $f->name,
-            departements: $this->getDepartementsDTOs($f->departements),
+            departements: $f->departements->pluck('id')->toArray(),
             created_at: $f->created_at,
             folder_id: $f->folder_id,
             storage_path: $f->storage_path,
             mimetype: $f->mimetype,
         ));
-        $documentDTOs = $documents->map(fn($f) => new DocumentDTO(
-            id: $f->id,
-            name: $f->title,
-            departements: $this->getDepartementsDTOs($f->departements),
-            created_at: $f->created_at,
-            color: $f->color,
+
+        // On transforme les documents
+        $documentDTOs = $folder->documents->map(fn($d) => new DocumentDTO(
+            id: $d->id,
+            name: $d->title,
+            departements: $d->departements->pluck('id')->toArray(),
+            created_at: $d->created_at,
+            color: $d->color,
         ));
 
-        return collect()->merge($folderDTOs)->merge($fileDTOs)->merge($documentDTOs)
+        return $folderDTOs->concat($fileDTOs)->concat($documentDTOs)
             ->sortBy('name')->values();
     }
 
@@ -214,7 +191,7 @@ readonly class FoldersService implements Interfaces\FoldersServiceInterface {
         $fileDTOs = $files->map(fn($f) => new FileDTO(
             id: $f->id,
             name: $f->name,
-            departements: $this->getDepartementsDTOs($f->departements),
+            departements: $f->departements->pluck('id')->toArray(),
             created_at: $f->created_at,
             folder_id: $f->folder_id,
             storage_path: $f->storage_path,
@@ -223,7 +200,7 @@ readonly class FoldersService implements Interfaces\FoldersServiceInterface {
         $documentDTOs = $documents->map(fn($f) => new DocumentDTO(
             id: $f->id,
             name: $f->title,
-            departements: $this->getDepartementsDTOs($f->departements),
+            departements: $f->departements->pluck('id')->toArray(),
             created_at: $f->created_at,
             color: $f->color,
         ));
@@ -232,24 +209,13 @@ readonly class FoldersService implements Interfaces\FoldersServiceInterface {
         return collect()->merge($fileDTOs)->merge($documentDTOs);
     }
 
-    private function getDepartementsDTOs(Collection $departements): array {
-        $departementsDTOs = [];
-        foreach ($departements as $departement) {
-            $departementsDTOs[] = new DepartementDTO(
-                id: $departement->id,
-                name: $departement->name,
-                initials: $departement->initials
-            );
-        }
-        return $departementsDTOs;
-    }
-
     public function read(int $id): FolderDTO {
         try {
             $folder = $this->folderRepository->read($id);
             return new FolderDTO(
                 id: $folder->id,
                 name: $folder->name,
+                departements: $folder->departements->pluck('id')->toArray(),
                 color: $folder->color,
             );
         } catch (FolderNotFoundException $e) {
@@ -276,6 +242,7 @@ readonly class FoldersService implements Interfaces\FoldersServiceInterface {
             return new FolderDTO(
                 id: $folder->id,
                 name: $folder->name,
+                departements: $folder->departements->pluck('id')->toArray(),
                 color: $folder->color,
             );
         } catch (PersistenceException $e) {
@@ -314,19 +281,13 @@ readonly class FoldersService implements Interfaces\FoldersServiceInterface {
         try {
             DB::beginTransaction();
             $folder = $this->folderRepository->update($id, $data);
-
-            if ($folder instanceof Folder) {
-                DB::commit(); // Tout a réussi
-                return new FolderDTO(
-                    id: $folder->id,
-                    name: $folder->name,
-                    color: $folder->color,
-                );
-            }
-
             DB::commit(); // Rien n'a changé, on valide
-            return $folder;
-
+            return new FolderDTO(
+                id: $folder->id,
+                name: $folder->name,
+                departements: $folder->departements->pluck('id')->toArray(),
+                color: $folder->color,
+            );
         } catch (Throwable $e) { // Attrape toutes les erreurs BD ou Disque
             Log::warning("Transaction failed during folder/attachment update.", [
                 'id' => $id,

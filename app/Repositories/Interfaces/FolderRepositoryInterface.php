@@ -29,11 +29,11 @@ interface FolderRepositoryInterface
     /**
      * @param int $id
      * @param array $data
-     * @return Folder|bool
+     * @return Folder
      * @throws PersistenceException
      * @throws FolderNotFoundException
      */
-    public function update(int $id, array $data): Folder|bool;
+    public function update(int $id, array $data): Folder;
 
     /**
      * @param int $id
@@ -48,4 +48,17 @@ interface FolderRepositoryInterface
      * @throws FolderNotFoundException
      */
     public function getRacineChildren(): Collection;
+
+    /**
+     * @param int $id
+     * @return Folder
+     */
+    public function getFolderWithContents(int $id): Folder;
+
+    /**
+     * @param int $id
+     * @return Folder
+     */
+    public function getFolderWithParents(int $id): Folder;
+
 }

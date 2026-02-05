@@ -45,7 +45,7 @@ class FilesRepository implements Interfaces\FilesRepositoryInterface {
 
     public function read(int $id) : File {
         try {
-            $file = File::find($id);
+            $file = File::with("departements")->find($id);
         } catch (\Throwable $e) {
             Log::error('File read fatal error', []);
             throw $e;
@@ -65,7 +65,7 @@ class FilesRepository implements Interfaces\FilesRepositoryInterface {
      * @throws FileNotFoundException|AlreadyExistsException si le fichier n'est pas trouvé
      */
     public function update(int $id, array $data): File {
-        $file = File::find($id);
+        $file = File::with("departements")->find($id);
 
         if (!$file) {
             throw new FileNotFoundException("File with ID $id not found.");

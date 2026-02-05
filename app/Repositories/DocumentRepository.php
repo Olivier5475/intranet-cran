@@ -51,7 +51,7 @@ class DocumentRepository implements Interfaces\DocumentRepositoryInterface {
      * @throws DocumentNotFoundException Si le document n'est pas trouvé.
      */
     public function read(int $id) : Document {
-        $document = Document::find($id);
+        $document = Document::with("departements")->find($id);
 
         if (!$document) {
             throw new DocumentNotFoundException("Document with ID $id not found.");
@@ -68,7 +68,7 @@ class DocumentRepository implements Interfaces\DocumentRepositoryInterface {
      * @throws PersistenceException|AlreadyExistsException En cas d'erreur de base de données.
      */
     public function update(int $id, array $data): Document|bool {
-        $document = Document::find($id);
+        $document = Document::with("departements")->find($id);
 
         if (!$document) {
             throw new DocumentNotFoundException("Document with ID $id not found.");

@@ -12,7 +12,6 @@ use Illuminate\Support\Facades\Log;
 class FolderRepository implements Interfaces\FolderRepositoryInterface{
 
     public function getDescendantFolderIds(int $rootFolderId): array {
-        // C'est notre fameuse CTE Récursive en SQL pur
         $query = <<<SQL
             WITH RECURSIVE all_folders (id) AS (
               SELECT id FROM folders WHERE id = ?
@@ -33,7 +32,12 @@ class FolderRepository implements Interfaces\FolderRepositoryInterface{
     }
 
     public function read(int $id): Folder {
-        $folder = Folder::find($id);
+        $folder = Folder::with([
+            'departements:id',
+            'children.departements:id', // Charge les départements des sous-dossiers
+            'files.departements:id',    // Charge les départements des fichiers
+            'documents.departements:id' // Charge les départements des documents
+        ])->find($id);
 
         if(!$folder){
             throw new FolderNotFoundException("Folder with ID ".$id." not found");
@@ -45,7 +49,14 @@ class FolderRepository implements Interfaces\FolderRepositoryInterface{
 
     public function create(array $data): Folder {
         try {
-            return Folder::create($data);
+            $folder = new Folder();
+            $folder->name = e($data['name']);
+            $folder->parent_id = $data['parent_id'];
+            $folder->user_id = $data['user_id'];
+            $folder->color = $data['color'];
+            $folder->save();
+            $folder->departements()->attach($data['departements']);
+            return $folder;
         } catch (\Throwable $e) {
             Log::error('Folder creation error', [
                 'error' => $e->getMessage(),
@@ -56,18 +67,31 @@ class FolderRepository implements Interfaces\FolderRepositoryInterface{
         }
     }
 
-    public function update(int $id, array $data): Folder|bool {
-        $folder = Folder::find($id);
+    public function update(int $id, array $data): Folder {
+        $folder = Folder::with("departements:id")->find($id);
 
         if (!$folder) {
             throw new FolderNotFoundException("Folder with ID $id not found.");
         }
 
         try {
-            $folder->fill($data);
-            $result = $folder->save();
-
-            return $result ? $folder : false;
+            if(isset($data['name'])){
+                $folder->name = e($data['name']);
+            }
+            if(isset($data['parent_id'])){
+                $folder->parent_id = $data['parent_id'];
+            }
+            if(isset($data['color'])){
+                $folder->color = $data['color'];
+            }
+            if(isset($data['user_id'])){
+                $folder->user_id = $data['user_id'];
+            }
+            $folder->save();
+            if(isset($data['departements'])){
+                $folder->departements()->sync($data['departements']);
+            }
+            return $folder;
         } catch (\Throwable $e) {
             Log::error('Folder update failed for ID ' . $id, [
                 'error' => $e->getMessage(),
@@ -98,14 +122,22 @@ class FolderRepository implements Interfaces\FolderRepositoryInterface{
     }
 
     public function getRacineChildren(): Collection {
-        try {
-            return Folder::where('parent_id', '=', null)
-                ->with('allChildren') // Charge tous les enfants
-                ->get();
-        }
-        catch (\Throwable $e) {
-            Log::error('Folder getRacineChildren error', ["message" => $e->getMessage()]);
-            throw new FolderNotFoundException();
-        }
+        return Folder::where('parent_id', '=', null)
+            ->with('allChildren')
+            ->get();
+    }
+
+    public function getFolderWithContents(int $id): Folder
+    {
+        return Folder::with([
+            'departements:id',
+            'children.departements:id',
+            'files.departements:id',
+            'documents.departements:id'
+        ])->findOrFail($id);
+    }
+
+    public function getFolderWithParents(int $id): Folder {
+        return Folder::with('parent.parent.parent.parent.parent')->findOrFail($id);
     }
 }
