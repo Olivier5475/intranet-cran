@@ -31,7 +31,7 @@ interface UserServiceInterface {
      */
     public function update(int $id, array $data) : void;
     public function readById($id) : AuthDTO ;
-    public function delete(int $id);
+    public function delete(int $id) : void;
     public function readAll();
     public function getRole();
 

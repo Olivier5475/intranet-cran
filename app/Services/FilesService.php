@@ -278,4 +278,13 @@ readonly class FilesService implements Interfaces\FilesServiceInterface {
         return Storage::disk('public')->download($file->storage_path, $file->name);
     }
 
+    public function hasEditAccess(int $file_id): bool
+    {
+        $user = $this->userService->readById($this->userService->getCurrentUserId());
+        $file = $this->read($file_id);
+        if($user->role === "admin" || empty($file->folder_id) || $file->departements === []) {
+            return true;
+        }
+        return (bool) array_intersect($user->departements, $file->departements);
+    }
 }

@@ -75,4 +75,6 @@ interface DocumentsServiceInterface {
      * @throws ServerException
      */
     public function readRacineDoc() : ?DocumentViewDTO;
+
+    public function hasEditAccess(int $document_id) : bool;
 }

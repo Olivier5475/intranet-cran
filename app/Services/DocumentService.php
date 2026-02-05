@@ -247,4 +247,14 @@ readonly class DocumentService implements Interfaces\DocumentsServiceInterface {
             throw new ServerException("Erreur lors de la lecture du document racine");
         }
     }
+
+    public function hasEditAccess(int $document_id): bool
+    {
+        $user = $this->userService->readById($this->userService->getCurrentUserId());
+        $document = $this->read($document_id);
+        if($user->role === "admin" || empty($document->folder_id) || $document->departements === []) {
+            return true;
+        }
+        return (bool) array_intersect($user->departements, $document->departements);
+    }
 }

@@ -55,7 +55,8 @@ readonly class AuthService implements Interfaces\UserServiceInterface {
         return $res;
     }
 
-    public function delete(int $id) {
+    public function delete(int $id): void
+    {
         try {
             $this->userRepository->delete($id);
         } catch (PersistenceException $e) {

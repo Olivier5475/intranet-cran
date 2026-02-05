@@ -9,8 +9,8 @@ use App\Exception\DocumentNotFoundException;
 use App\Exception\PersistenceException;
 use App\Http\Controllers\Controller;
 use App\Services\Interfaces\DocumentsServiceInterface;
-use App\Services\Interfaces\UserServiceInterface;
-use Illuminate\Contracts\Filesystem;
+use App\Services\Interfaces\FoldersServiceInterface;
+use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
@@ -19,7 +19,7 @@ use Throwable;
 class DocumentController extends Controller {
     public function __construct(
         private readonly DocumentsServiceInterface $documentsService,
-        private readonly UserServiceInterface $userService,
+        private readonly FoldersServiceInterface $foldersService,
     ){}
 
     public function store(Request $request, $id = null) {
@@ -107,21 +107,34 @@ class DocumentController extends Controller {
     }
 
     public function create($parent_id) {
+        if(!$this->foldersService->hasEditAccess($parent_id)) {
+            return redirect()->route("navigate.folder", ["folder_id" => $parent_id])->with("warn" , "Vous n'avez pas le droit de modifier ce dossier");
+        }
         return \Inertia\Inertia::render('Admin/DocumentForm', [
             "parent_id" => $parent_id,
-            "role" => $this->userService->getRole(),
         ]);
     }
+
+    /**
+     * @throws FileNotFoundException
+     * @throws DocumentNotFoundException
+     */
     public function update($id) {
+        $pass = $this->documentsService->hasEditAccess($id);
+        $document = $this->documentsService->read($id);
+        if(!$pass) {
+            return redirect()
+                ->route("navigate.folder", ["folder_id" => $document->folder_id])
+                ->with(["warn" => "Vous n'avez pas le droit de modifier cette ressource."]);
+        }
         try {
             return \Inertia\Inertia::render('Admin/DocumentForm', [
-                "document" => $this->documentsService->read($id),
-                "role" => $this->userService->getRole(),
+                "document" => $document,
             ]);
         } catch (BadRequestException $e) {
             // 400 Bad Request (pour une erreur d'argument si non gérée par la validation)
             return redirect()->back()->with(['error' => 'Arguments manquants ou invalides.']);
-        } catch (DocumentNotFoundException|Filesystem\FileNotFoundException $e) {
+        } catch (DocumentNotFoundException|FileNotFoundException $e) {
             // 404 Not Found
             return redirect()->back()->with(['error' => 'Le document ou un attachement spécifié est introuvable.']);
         }
@@ -129,6 +142,9 @@ class DocumentController extends Controller {
 
     public function delete($id) {
         try {
+            if(!$this->documentsService->hasEditAccess($id)) {
+                return redirect()->route("navigate.folder", ["folder_id" => $this->documentsService->read($id)->folder_id]);
+            }
             $this->documentsService->delete($id);
             return redirect()->back()->with("success", "Document deleted successfully");
         } catch (BadRequestException) {

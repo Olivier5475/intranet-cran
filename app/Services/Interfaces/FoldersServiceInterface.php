@@ -80,4 +80,10 @@ interface FoldersServiceInterface {
      * @throws FolderNotFoundException
      */
     public function delete(int $id) : bool;
+
+    /**
+     * @param int $folder_id
+     * @return bool
+     */
+    public function hasEditAccess(int $folder_id) : bool;
 }

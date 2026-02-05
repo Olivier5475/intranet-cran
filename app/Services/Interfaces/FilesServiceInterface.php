@@ -55,4 +55,11 @@ interface FilesServiceInterface {
      * @throws FileNotFoundException
      */
     public function download(int $id);
+
+    /**
+     * @param int $file_id
+     * @return bool
+     */
+    public function hasEditAccess(int $file_id): bool;
+
 }

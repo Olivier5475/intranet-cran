@@ -352,4 +352,14 @@ readonly class FoldersService implements Interfaces\FoldersServiceInterface {
             throw $e;
         }
     }
+
+    public function hasEditAccess(int $folder_id): bool
+    {
+        $user = $this->userService->readById($this->userService->getCurrentUserId());
+        $folder = $this->read($folder_id);
+        if($user->role === "admin" || empty($folder->parent_id) || $folder->departements === []) {
+            return true;
+        }
+        return (bool) array_intersect($user->departements, $folder->departements);
+    }
 }
