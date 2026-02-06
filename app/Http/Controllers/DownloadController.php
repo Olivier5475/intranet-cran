@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Services\Interfaces\AttachmentServiceInterface;
 use App\Services\Interfaces\FilesServiceInterface;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
 readonly class DownloadController {
@@ -16,7 +17,7 @@ readonly class DownloadController {
         try {
             return $this->attachmentService->download($id);
         } catch (\Throwable) {
-            return redirect()->back()->with(["success" => "can't download"]);
+            return redirect()->back()->with(["error" => "can't download"]);
         }
     }
 
@@ -24,7 +25,15 @@ readonly class DownloadController {
         try {
             return $this->filesService->download($id);
         } catch (\Throwable $e) {
-            return redirect()->back()->with(["success" => "can't download."]);
+            return redirect()->back()->with(["error" => "can't download."]);
+        }
+    }
+
+    public function version($id){
+        try {
+            return $this->filesService->downloadVersion($id);
+        } catch (\Throwable $e) {
+            return redirect()->back()->with(["error" => "can't download."]);
         }
     }
 }
