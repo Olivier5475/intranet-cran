@@ -17,10 +17,10 @@ class FolderController extends Controller {
     ) {}
 
     public function create($parent_id) {
-        if(!$this->foldersService->hasEditAccess($parent_id)) {
-            return redirect()->route("navigate.folder", ["folder_id" => $parent_id])->with("warn" , "Vous n'avez pas le droit de modifier ce dossier");
-        }
         if($parent_id != 0) {
+            if(!$this->foldersService->hasEditAccess($parent_id)) {
+                return redirect()->route("navigate.folder", ["folder_id" => $parent_id])->with("warn" , "Vous n'avez pas le droit de modifier ce dossier");
+            }
             try {
                 $this->foldersService->read($parent_id);
             } catch (FolderNotFoundException $e) {
