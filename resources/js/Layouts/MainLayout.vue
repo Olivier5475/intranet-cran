@@ -35,7 +35,7 @@ defineProps<{
 
 <template>
     <FlashMessage />
-    <div class="flex-grow">
+    <div class="flex-grow w-full">
         <header>
             <MainNav :racineChildren="racineChildren" />
         </header>
