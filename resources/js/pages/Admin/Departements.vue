@@ -23,7 +23,7 @@ watch(() => props.departements, () => {
 
 <template>
     <div class="p-4 max-w-4xl mx-auto min-h-screen">
-        <h1 class="text-3xl font-extrabold text-gray-900 dark:text-white mb-6 text-center">Gestion des Utilisateurs</h1>
+        <h1 class="text-3xl font-extrabold text-gray-900 dark:text-white mb-6 text-center">Gestion des Departements</h1>
 
         <div class="shadow-2xl rounded-xl bg-white dark:bg-gray-800 overflow-hidden">
             <!-- Header de la grille -->
@@ -34,7 +34,7 @@ watch(() => props.departements, () => {
             </div>
 
             <!-- Lignes de données -->
-            <div v-if="departements.length === 0" class="p-6 text-gray-500 dark:text-gray-400 text-center">Aucun utilisateur trouvé.</div>
+            <div v-if="departements.length === 0" class="p-6 text-gray-500 dark:text-gray-400 text-center">Aucun Departement trouvé.</div>
 
             <div v-else>
                 <Link
@@ -61,18 +61,18 @@ watch(() => props.departements, () => {
                         <MinusCircleIcon class="w-8 text-red-600 ml-auto"></MinusCircleIcon>
                     </Link>
                 </Link>
-                <Link
-                    :href="route.create.url()"
-                    class="p-4 text-sm ease-in-out dark:border-gray-700 flex cursor-pointer grid-cols-12 border-t transition duration-150"
-                    :class="
+            </div>
+            <Link
+                :href="route.create.url()"
+                class="p-4 text-sm ease-in-out dark:border-gray-700 flex cursor-pointer grid-cols-12 border-t transition duration-150"
+                :class="
                         lastIndex % 2 !== 0
                             ? 'bg-white dark:bg-gray-900 hover:bg-indigo-100 dark:hover:bg-indigo-900'
                             : 'bg-gray-50 dark:bg-gray-700 hover:bg-indigo-100 dark:hover:bg-indigo-900'
                     "
-                >
-                    <PlusCircleIcon class="w-8 mx-auto" />
-                </Link>
-            </div>
+            >
+                <PlusCircleIcon class="w-8 mx-auto" />
+            </Link>
         </div>
     </div>
 </template>

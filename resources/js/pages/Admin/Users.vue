@@ -82,18 +82,18 @@ watch(() => props.users, () => {
                         <UserMinusIcon class="w-8 text-red-600 ml-auto"></UserMinusIcon>
                     </Link>
                 </Link>
-                <Link
-                    :href="`/admin/users/create`"
-                    class="p-4 text-sm ease-in-out dark:border-gray-700 flex cursor-pointer grid-cols-12 border-t transition duration-150"
-                    :class="
+            </div>
+            <Link
+                :href="`/admin/users/create`"
+                class="p-4 text-sm ease-in-out dark:border-gray-700 flex cursor-pointer grid-cols-12 border-t transition duration-150"
+                :class="
                         lastIndex % 2 !== 0
                             ? 'bg-white dark:bg-gray-900 hover:bg-indigo-100 dark:hover:bg-indigo-900'
                             : 'bg-gray-50 dark:bg-gray-700 hover:bg-indigo-100 dark:hover:bg-indigo-900'
                     "
-                >
-                    <UserPlusIcon class="w-8 mx-auto" />
-                </Link>
-            </div>
+            >
+                <UserPlusIcon class="w-8 mx-auto" />
+            </Link>
         </div>
     </div>
 </template>
