@@ -34,13 +34,14 @@ const isActive = ref(true);
             />
             <Link
                 class="inline-flex items-center rounded-full font-extrabold text-yellow-600 hover:text-yellow-800 min-w-[40px] overflow-hidden transition-all duration-300"
-                :href="`/navigation/0/admin/folders/create` + folder_route.create.url(0)"
+                :href="folder_route.create.url(0)"
             >
                 <span class="flex-shrink flex-1 overflow-hidden whitespace-nowrap text-ellipsis mr-1 min-w-0">
                     Nouveau dossier
                 </span>
 
                 <span class="flex-none">+</span>
-            </Link>        </ul>
+            </Link>
+        </ul>
     </section>
 </template>
