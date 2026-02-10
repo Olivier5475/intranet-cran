@@ -20,7 +20,7 @@ export function useResource(props: any) {
             return {
                 href: navigate.folder.url(id),
                 update: editor.folder.update(id),
-                delete: null, // Pas de suppression directe ici selon ton code
+                delete: editor.folder.delete(id), // Pas de suppression directe ici selon ton code
             };
         } else {
             return {

@@ -48,7 +48,12 @@ const isActiveValidation = ref(false);
                     :href="links.update">
                     Update
                 </Link>
-                <p v-if="links.delete" @click="isActiveValidation = true" class="rounded-b-xl text-red-600 hover:text-white hover:bg-red-600 block pt-1 pb-2 px-2 cursor-pointer">
+                <p
+                    v-if="links.delete"
+                    @click="isActiveValidation = true"
+                    class="rounded-b-xl text-red-600 hover:text-white hover:bg-red-600
+                           block pt-1 pb-2 px-2 cursor-pointer"
+                >
                     Delete
                 </p>
             </div>

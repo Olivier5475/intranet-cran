@@ -6,6 +6,7 @@ import { Link, usePage } from '@inertiajs/vue3';
 import navigate from '@/routes/navigate';
 import folder_route from '@/routes/editor/folder';
 import { EllipsisHorizontalIcon } from '@heroicons/vue/24/solid';
+import DeleteModal from '@/Components/DeleteModal.vue';
 interface Child {
     id: number;
     name: string;
@@ -43,6 +44,8 @@ watch(currentFolderId, (newId) => {
 });
 
 const isMenuExpend = ref(false);
+const isActiveValidation = ref(false);
+
 </script>
 
 <template>
@@ -69,15 +72,28 @@ const isMenuExpend = ref(false);
 
                 <div class="relative" @mouseenter="isMenuExpend = true" @mouseleave="isMenuExpend = false">
                     <EllipsisHorizontalIcon class="h-7 w-7 text-gray-700 dark:text-gray-400 rounded-full bg-slate-400 dark:bg-slate-500" />
-                    <Link
+                    <div
                         v-if="isMenuExpend"
-                        :href="folder_route.update.url(child.id)"
-                        class="absolute right-0 top-5 min-w-[5rem] z-10 border-2 font-semibold text-center rounded-md
-                        bg-slate-400 border-slate-400 dark:bg-slate-800 dark:border-slate-800 text-yellow-400
-                        hover:text-yellow-800 hover:bg-yellow-400 hover:border-yellow-800"
+                        class="absolute right-0 top-5 z-10 rounded-md
+                        bg-slate-400 border-slate-400 dark:bg-slate-800 dark:border-slate-800"
                     >
-                        Modifier
-                    </Link>
+                        <Link
+                            :href="folder_route.update.url(child.id)"
+                            class="min-w-[5rem] border-2 font-semibold text-center rounded-md block
+                                border-slate-400 dark:border-slate-800 text-yellow-400
+                                hover:text-yellow-800 hover:bg-yellow-400 hover:border-yellow-800"
+                        >
+                            Modifier
+                        </Link>
+                        <p
+                            class="min-w-[5rem] border-2 font-semibold text-center rounded-md
+                                border-slate-400 dark:border-slate-800 text-red-400
+                                hover:text-red-900 hover:bg-red-400 hover:border-red-900"
+                            @click="isActiveValidation = true"
+                        >
+                            Delete
+                        </p>
+                    </div>
                 </div>
 
             </div>
@@ -95,4 +111,10 @@ const isMenuExpend = ref(false);
             </Link>
         </ul>
     </li>
+
+    <DeleteModal
+        :show="isActiveValidation"
+        :delete-href="folder_route.delete.url(child.id)"
+        @close="isActiveValidation = false"
+    />
 </template>
