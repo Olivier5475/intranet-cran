@@ -1,5 +1,60 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition, applyUrlDefaults } from './../../../../wayfinder'
 /**
+* @see \App\Http\Controllers\Admin\FolderController::create
+ * @see app/Http/Controllers/Admin/FolderController.php:59
+ * @route '/editor/folders/store'
+ */
+export const create = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
+    url: create.url(options),
+    method: 'post',
+})
+
+create.definition = {
+    methods: ["post"],
+    url: '/editor/folders/store',
+} satisfies RouteDefinition<["post"]>
+
+/**
+* @see \App\Http\Controllers\Admin\FolderController::create
+ * @see app/Http/Controllers/Admin/FolderController.php:59
+ * @route '/editor/folders/store'
+ */
+create.url = (options?: RouteQueryOptions) => {
+    return create.definition.url + queryParams(options)
+}
+
+/**
+* @see \App\Http\Controllers\Admin\FolderController::create
+ * @see app/Http/Controllers/Admin/FolderController.php:59
+ * @route '/editor/folders/store'
+ */
+create.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
+    url: create.url(options),
+    method: 'post',
+})
+
+    /**
+* @see \App\Http\Controllers\Admin\FolderController::create
+ * @see app/Http/Controllers/Admin/FolderController.php:59
+ * @route '/editor/folders/store'
+ */
+    const createForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+        action: create.url(options),
+        method: 'post',
+    })
+
+            /**
+* @see \App\Http\Controllers\Admin\FolderController::create
+ * @see app/Http/Controllers/Admin/FolderController.php:59
+ * @route '/editor/folders/store'
+ */
+        createForm.post = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+            action: create.url(options),
+            method: 'post',
+        })
+    
+    create.form = createForm
+/**
 * @see \App\Http\Controllers\Admin\FolderController::update
  * @see app/Http/Controllers/Admin/FolderController.php:59
  * @route '/editor/folders/store/{folder_id}'
@@ -83,64 +138,9 @@ update.patch = (args: { folder_id: string | number } | [folder_id: string | numb
         })
     
     update.form = updateForm
-/**
-* @see \App\Http\Controllers\Admin\FolderController::create
- * @see app/Http/Controllers/Admin/FolderController.php:59
- * @route '/editor/folders/store'
- */
-export const create = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
-    url: create.url(options),
-    method: 'post',
-})
-
-create.definition = {
-    methods: ["post"],
-    url: '/editor/folders/store',
-} satisfies RouteDefinition<["post"]>
-
-/**
-* @see \App\Http\Controllers\Admin\FolderController::create
- * @see app/Http/Controllers/Admin/FolderController.php:59
- * @route '/editor/folders/store'
- */
-create.url = (options?: RouteQueryOptions) => {
-    return create.definition.url + queryParams(options)
-}
-
-/**
-* @see \App\Http\Controllers\Admin\FolderController::create
- * @see app/Http/Controllers/Admin/FolderController.php:59
- * @route '/editor/folders/store'
- */
-create.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
-    url: create.url(options),
-    method: 'post',
-})
-
-    /**
-* @see \App\Http\Controllers\Admin\FolderController::create
- * @see app/Http/Controllers/Admin/FolderController.php:59
- * @route '/editor/folders/store'
- */
-    const createForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
-        action: create.url(options),
-        method: 'post',
-    })
-
-            /**
-* @see \App\Http\Controllers\Admin\FolderController::create
- * @see app/Http/Controllers/Admin/FolderController.php:59
- * @route '/editor/folders/store'
- */
-        createForm.post = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
-            action: create.url(options),
-            method: 'post',
-        })
-    
-    create.form = createForm
 const post = {
-    update: Object.assign(update, update),
-create: Object.assign(create, create),
+    create: Object.assign(create, create),
+update: Object.assign(update, update),
 }
 
 export default post

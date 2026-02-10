@@ -194,10 +194,95 @@ update.head = (args: { folder_id: string | number } | [folder_id: string | numbe
         })
     
     update.form = updateForm
+/**
+* @see \App\Http\Controllers\Admin\FolderController::deleteMethod
+ * @see app/Http/Controllers/Admin/FolderController.php:106
+ * @route '/editor/folders/delete/{folder_id}'
+ */
+export const deleteMethod = (args: { folder_id: string | number } | [folder_id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
+    url: deleteMethod.url(args, options),
+    method: 'delete',
+})
+
+deleteMethod.definition = {
+    methods: ["delete"],
+    url: '/editor/folders/delete/{folder_id}',
+} satisfies RouteDefinition<["delete"]>
+
+/**
+* @see \App\Http\Controllers\Admin\FolderController::deleteMethod
+ * @see app/Http/Controllers/Admin/FolderController.php:106
+ * @route '/editor/folders/delete/{folder_id}'
+ */
+deleteMethod.url = (args: { folder_id: string | number } | [folder_id: string | number ] | string | number, options?: RouteQueryOptions) => {
+    if (typeof args === 'string' || typeof args === 'number') {
+        args = { folder_id: args }
+    }
+
+    
+    if (Array.isArray(args)) {
+        args = {
+                    folder_id: args[0],
+                }
+    }
+
+    args = applyUrlDefaults(args)
+
+    const parsedArgs = {
+                        folder_id: args.folder_id,
+                }
+
+    return deleteMethod.definition.url
+            .replace('{folder_id}', parsedArgs.folder_id.toString())
+            .replace(/\/+$/, '') + queryParams(options)
+}
+
+/**
+* @see \App\Http\Controllers\Admin\FolderController::deleteMethod
+ * @see app/Http/Controllers/Admin/FolderController.php:106
+ * @route '/editor/folders/delete/{folder_id}'
+ */
+deleteMethod.delete = (args: { folder_id: string | number } | [folder_id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
+    url: deleteMethod.url(args, options),
+    method: 'delete',
+})
+
+    /**
+* @see \App\Http\Controllers\Admin\FolderController::deleteMethod
+ * @see app/Http/Controllers/Admin/FolderController.php:106
+ * @route '/editor/folders/delete/{folder_id}'
+ */
+    const deleteMethodForm = (args: { folder_id: string | number } | [folder_id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+        action: deleteMethod.url(args, {
+                    [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                        _method: 'DELETE',
+                        ...(options?.query ?? options?.mergeQuery ?? {}),
+                    }
+                }),
+        method: 'post',
+    })
+
+            /**
+* @see \App\Http\Controllers\Admin\FolderController::deleteMethod
+ * @see app/Http/Controllers/Admin/FolderController.php:106
+ * @route '/editor/folders/delete/{folder_id}'
+ */
+        deleteMethodForm.delete = (args: { folder_id: string | number } | [folder_id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+            action: deleteMethod.url(args, {
+                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                            _method: 'DELETE',
+                            ...(options?.query ?? options?.mergeQuery ?? {}),
+                        }
+                    }),
+            method: 'post',
+        })
+    
+    deleteMethod.form = deleteMethodForm
 const folder = {
     create: Object.assign(create, create),
 update: Object.assign(update, update),
 post: Object.assign(post, post),
+delete: Object.assign(deleteMethod, deleteMethod),
 }
 
 export default folder
