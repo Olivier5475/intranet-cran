@@ -238,14 +238,15 @@ readonly class DocumentService implements Interfaces\DocumentsServiceInterface {
     public function readRacineDoc(): ?DocumentViewDTO {
         try {
             $document = $this->documentRepository->readRacineDoc();
-            if(!empty($document)) {
-                return $this->makeDocumentViewDto($document);
-            }
-            return null;
+
         } catch (Throwable $e) {
             Log::warning("Document attempted to read RacineDoc.");
             throw new ServerException("Erreur lors de la lecture du document racine");
         }
+        if(!empty($document)) {
+            return $this->makeDocumentViewDto($document);
+        }
+        return null;
     }
 
     public function hasEditAccess(int $document_id): bool

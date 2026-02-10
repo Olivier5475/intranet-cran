@@ -30,7 +30,7 @@ const props = defineProps<{
 const page = usePage();
 
 const form = useForm({
-    title: props.document?.title ?? '',
+    title: props.document?.title ?? ((props.parent_id == 0) ? 'Accueil' : ''),
     content: props.document?.content ?? '',
     existing_attachments: props.document?.attachments ?? [],
     new_attachments: [] as File[],
@@ -83,7 +83,7 @@ const isCheckboxDisabled = (departementId: number) => {
     const mySelectedDeps = form.departements.filter(id => userDepartementIds.includes(id));
 
     // 3. Si ce département est coché ET que c'est le dernier des miens restant
-    // Alors on le désactive pour empêcher de le décocher
+    // Alors, on le désactive pour empêcher de le décocher.
     return form.departements.includes(departementId) && mySelectedDeps.length <= 1;
 };
 </script>
@@ -117,6 +117,7 @@ const isCheckboxDisabled = (departementId: number) => {
                 placeholder="Titre du document"
                 v-model="form.title"
                 class="rounded-md text-black block grow"
+                :disabled="parent_id == 0"
             />
             <input
                 v-if="page.props.auth.user.role == 'admin'"

@@ -18,10 +18,10 @@ const props = defineProps<{
 
 const page = usePage();
 
-// 1. Extraire le folder_id de l'URL (/navigation/{id}/...)
+// 1. Extraire le folder_id de l'URL (/navigation/f/{id})
 const currentFolderId = computed(() => {
     const parts = page.url.split('/');
-    const navIndex = parts.indexOf('navigation');
+    const navIndex = parts.indexOf('f');
     return navIndex !== -1 ? parseInt(parts[navIndex + 1]) : null;
 });
 
@@ -60,7 +60,10 @@ const isMenuExpend = ref(false);
             />
 
             <div class="flex w-full justify-between">
-                <Link :href="navigate.folder.url(child.id)" class="hover:text-sky-600 dark:hover:text-sky-300" :class="child.id === currentFolderId ? `text-sky-500 font-bold` : ``">
+                <Link
+                    :href="navigate.folder.url(child.id)"
+                    class="hover:text-sky-600 dark:hover:text-sky-300"
+                    :class="child.id === currentFolderId ? `text-sky-500 font-bold` : ``">
                     {{ child.name }}
                 </Link>
 

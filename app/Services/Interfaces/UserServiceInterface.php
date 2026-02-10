@@ -34,5 +34,5 @@ interface UserServiceInterface {
     public function delete(int $id) : void;
     public function readAll();
     public function getRole();
-
+    public function isAdmin();
 }

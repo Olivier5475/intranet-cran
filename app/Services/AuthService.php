@@ -91,5 +91,7 @@ readonly class AuthService implements Interfaces\UserServiceInterface {
         $user = $this->userRepository->getUserById($user_id);
         return $user->role;
     }
-
+    public function isAdmin() : bool {
+        return $this->getRole() === "admin";
+    }
 }
