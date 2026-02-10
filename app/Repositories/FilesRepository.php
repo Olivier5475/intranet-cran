@@ -7,6 +7,8 @@ use App\Exception\PersistenceException;
 use App\Models\Document;
 use App\Models\File;
 use App\Exception\AlreadyExistsException;
+use App\Models\Version;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Log;
 
 class FilesRepository implements Interfaces\FilesRepositoryInterface {
@@ -76,17 +78,19 @@ class FilesRepository implements Interfaces\FilesRepositoryInterface {
         }
         try {
             $file->name = e($data["name"]);
-            if($data["storage_path"]){
+            if(isset($data["storage_path"]) && $data["storage_path"]){
                 $file->storage_path = $data["storage_path"];
             }
-            if($data["mimetype"]){
+            if(isset($data["mimetype"]) && $data["mimetype"]){
                 $file->mimetype = $data["mimetype"];
             }
-            if($data["size"]){
+            if(isset($data["size"]) && $data["size"]){
                 $file->size = $data["size"];
             }
             $file->save();
-            $file->departements()->sync($data['departements']);
+            if(isset($data["departements"])){
+                $file->departements()->sync($data['departements']);
+            }
             return $file;
         } catch (\Throwable $e) {
             Log::error('Document update failed for ID ' . $id, [
@@ -133,5 +137,15 @@ class FilesRepository implements Interfaces\FilesRepositoryInterface {
             ->where('title', "=", $name);
 
         return $fileQuery->exists() || $docQuery->exists();
+    }
+
+    public function findVersionWithParent(int $versionId): Version
+    {
+        return Version::with('versionable')->findOrFail($versionId);
+    }
+
+    public function findVersionsFromParent(int $parent_id): Collection
+    {
+        return Version::where('versionable_id', '=', $parent_id)->where("versionable_type", "=", File::class)->get();
     }
 }
