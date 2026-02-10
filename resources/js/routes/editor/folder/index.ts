@@ -1,8 +1,8 @@
-import { queryParams, type RouteQueryOptions, type RouteDefinition, applyUrlDefaults } from './../../../wayfinder'
+import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition, applyUrlDefaults } from './../../../wayfinder'
 import post from './post'
 /**
 * @see \App\Http\Controllers\Admin\FolderController::create
- * @see app/Http/Controllers/Admin/FolderController.php:19
+ * @see app/Http/Controllers/Admin/FolderController.php:22
  * @route '/editor/folders/create/p/{parent_id}'
  */
 export const create = (args: { parent_id: string | number } | [parent_id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -17,7 +17,7 @@ create.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\FolderController::create
- * @see app/Http/Controllers/Admin/FolderController.php:19
+ * @see app/Http/Controllers/Admin/FolderController.php:22
  * @route '/editor/folders/create/p/{parent_id}'
  */
 create.url = (args: { parent_id: string | number } | [parent_id: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -45,7 +45,7 @@ create.url = (args: { parent_id: string | number } | [parent_id: string | number
 
 /**
 * @see \App\Http\Controllers\Admin\FolderController::create
- * @see app/Http/Controllers/Admin/FolderController.php:19
+ * @see app/Http/Controllers/Admin/FolderController.php:22
  * @route '/editor/folders/create/p/{parent_id}'
  */
 create.get = (args: { parent_id: string | number } | [parent_id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -54,7 +54,7 @@ create.get = (args: { parent_id: string | number } | [parent_id: string | number
 })
 /**
 * @see \App\Http\Controllers\Admin\FolderController::create
- * @see app/Http/Controllers/Admin/FolderController.php:19
+ * @see app/Http/Controllers/Admin/FolderController.php:22
  * @route '/editor/folders/create/p/{parent_id}'
  */
 create.head = (args: { parent_id: string | number } | [parent_id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -62,9 +62,44 @@ create.head = (args: { parent_id: string | number } | [parent_id: string | numbe
     method: 'head',
 })
 
+    /**
+* @see \App\Http\Controllers\Admin\FolderController::create
+ * @see app/Http/Controllers/Admin/FolderController.php:22
+ * @route '/editor/folders/create/p/{parent_id}'
+ */
+    const createForm = (args: { parent_id: string | number } | [parent_id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+        action: create.url(args, options),
+        method: 'get',
+    })
+
+            /**
+* @see \App\Http\Controllers\Admin\FolderController::create
+ * @see app/Http/Controllers/Admin/FolderController.php:22
+ * @route '/editor/folders/create/p/{parent_id}'
+ */
+        createForm.get = (args: { parent_id: string | number } | [parent_id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+            action: create.url(args, options),
+            method: 'get',
+        })
+            /**
+* @see \App\Http\Controllers\Admin\FolderController::create
+ * @see app/Http/Controllers/Admin/FolderController.php:22
+ * @route '/editor/folders/create/p/{parent_id}'
+ */
+        createForm.head = (args: { parent_id: string | number } | [parent_id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+            action: create.url(args, {
+                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                            _method: 'HEAD',
+                            ...(options?.query ?? options?.mergeQuery ?? {}),
+                        }
+                    }),
+            method: 'get',
+        })
+    
+    create.form = createForm
 /**
 * @see \App\Http\Controllers\Admin\FolderController::update
- * @see app/Http/Controllers/Admin/FolderController.php:36
+ * @see app/Http/Controllers/Admin/FolderController.php:40
  * @route '/editor/folders/update/{folder_id}'
  */
 export const update = (args: { folder_id: string | number } | [folder_id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -79,7 +114,7 @@ update.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\FolderController::update
- * @see app/Http/Controllers/Admin/FolderController.php:36
+ * @see app/Http/Controllers/Admin/FolderController.php:40
  * @route '/editor/folders/update/{folder_id}'
  */
 update.url = (args: { folder_id: string | number } | [folder_id: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -107,7 +142,7 @@ update.url = (args: { folder_id: string | number } | [folder_id: string | number
 
 /**
 * @see \App\Http\Controllers\Admin\FolderController::update
- * @see app/Http/Controllers/Admin/FolderController.php:36
+ * @see app/Http/Controllers/Admin/FolderController.php:40
  * @route '/editor/folders/update/{folder_id}'
  */
 update.get = (args: { folder_id: string | number } | [folder_id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -116,13 +151,49 @@ update.get = (args: { folder_id: string | number } | [folder_id: string | number
 })
 /**
 * @see \App\Http\Controllers\Admin\FolderController::update
- * @see app/Http/Controllers/Admin/FolderController.php:36
+ * @see app/Http/Controllers/Admin/FolderController.php:40
  * @route '/editor/folders/update/{folder_id}'
  */
 update.head = (args: { folder_id: string | number } | [folder_id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     url: update.url(args, options),
     method: 'head',
 })
+
+    /**
+* @see \App\Http\Controllers\Admin\FolderController::update
+ * @see app/Http/Controllers/Admin/FolderController.php:40
+ * @route '/editor/folders/update/{folder_id}'
+ */
+    const updateForm = (args: { folder_id: string | number } | [folder_id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+        action: update.url(args, options),
+        method: 'get',
+    })
+
+            /**
+* @see \App\Http\Controllers\Admin\FolderController::update
+ * @see app/Http/Controllers/Admin/FolderController.php:40
+ * @route '/editor/folders/update/{folder_id}'
+ */
+        updateForm.get = (args: { folder_id: string | number } | [folder_id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+            action: update.url(args, options),
+            method: 'get',
+        })
+            /**
+* @see \App\Http\Controllers\Admin\FolderController::update
+ * @see app/Http/Controllers/Admin/FolderController.php:40
+ * @route '/editor/folders/update/{folder_id}'
+ */
+        updateForm.head = (args: { folder_id: string | number } | [folder_id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+            action: update.url(args, {
+                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                            _method: 'HEAD',
+                            ...(options?.query ?? options?.mergeQuery ?? {}),
+                        }
+                    }),
+            method: 'get',
+        })
+    
+    update.form = updateForm
 const folder = {
     create: Object.assign(create, create),
 update: Object.assign(update, update),
