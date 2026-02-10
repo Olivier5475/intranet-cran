@@ -5,6 +5,8 @@ namespace App\Repositories\Interfaces;
 use App\Exception\FileNotFoundException;
 use App\Exception\PersistenceException;
 use App\Models\File;
+use App\Models\Version;
+use Illuminate\Database\Eloquent\Collection;
 
 interface FilesRepositoryInterface {
 
@@ -43,4 +45,17 @@ interface FilesRepositoryInterface {
      * @throws \Throwable
      */
     public function read(int $id) : File ;
+
+    /**
+     * @param int $versionId
+     * @return Version
+     */
+    public function findVersionWithParent(int $versionId): Version;
+
+    /**
+     * @param int $parent_id
+     * @param $type
+     * @return array
+     */
+    public function findVersionsFromParent(int $parent_id): Collection;
 }

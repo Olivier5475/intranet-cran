@@ -10,15 +10,18 @@ use App\Exception\FileNotFoundException;
 use App\Exception\FolderNotFoundException;
 use App\Exception\PersistenceException;
 use Illuminate\Contracts\Filesystem ;
+use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
-interface FilesServiceInterface {
+interface FilesServiceInterface
+{
     /**
      * @param array $data
      * @return FileDTO
      * @throws FolderNotFoundException|AlreadyExistsException|DiskWriteException|PersistenceException
      */
-    public function create(array $data) : FileDTO;
+    public function create(array $data): FileDTO;
 
     /**
      * Fonction pour obtenir le storage_path d'un fichier selon son ID
@@ -27,7 +30,7 @@ interface FilesServiceInterface {
      * @throws FileNotFoundException si le fichier n'est pas trouvé en BD
      * @throws BadRequestException si pas de folder_id ou de fichier
      */
-    public function read($id) : FileDTO ;
+    public function read($id): FileDTO;
 
     /**
      * @param int $id
@@ -35,7 +38,7 @@ interface FilesServiceInterface {
      * @return FileDTO
      * @throws PersistenceException|AlreadyExistsException|FileNotFoundException|BadRequestException|DiskWriteException
      */
-    public function update(int $id, array $data) : FileDTO;
+    public function update(int $id, array $data): FileDTO;
 
     /**
      * @param int $id ID du fichier
@@ -46,7 +49,7 @@ interface FilesServiceInterface {
      * @throws Filesystem\FileNotFoundException
      * @throws DiskWriteException si une erreur survient lors de l'écriture du fichier
      */
-    public function delete(int $id) : bool;
+    public function delete(int $id): bool;
 
     /**
      * Lance le telechargement d'un fichier
@@ -62,4 +65,21 @@ interface FilesServiceInterface {
      */
     public function hasEditAccess(int $file_id): bool;
 
+    /**
+     * @param int $versionId
+     * @return void
+     */
+    public function restoreFromVersionId(int $versionId): void;
+
+    /**
+     * @param int $parent_id
+     * @return array
+     */
+    public function readVersionsFromParent(int $parent_id): array;
+
+    /**
+     * @param $id
+     * @return StreamedResponse
+     */
+    public function downloadVersion($id): StreamedResponse;
 }

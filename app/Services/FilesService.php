@@ -3,14 +3,17 @@
 namespace App\Services;
 
 use App\DTO\FileDTO;
+use App\DTO\VersionDTO;
 use App\Exception\DiskWriteException;
 use App\Exception\FileNotFoundException;
 use App\Exception\PersistenceException;
 use App\Models\File;
+use App\Models\Version;
 use App\Repositories\Interfaces\FilesRepositoryInterface;
 use App\Services\Interfaces\DepartementsServiceInterface;
 use App\Services\Interfaces\FoldersServiceInterface;
 use App\Services\Interfaces\UserServiceInterface;
+use Exception;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -208,7 +211,7 @@ readonly class FilesService implements Interfaces\FilesServiceInterface {
             throw $e;
         } catch (Throwable $e) {
             DB::rollBack();
-            Log::warning("DB Transaction failed: ", []);
+            Log::warning("DB Transaction failed: ");
             throw new PersistenceException();
         }
     }
@@ -286,5 +289,72 @@ readonly class FilesService implements Interfaces\FilesServiceInterface {
             return true;
         }
         return (bool) array_intersect($user->departements, $file->departements);
+    }
+
+    public function restoreFromVersionId(int $versionId): void
+    {
+        // 1. On récupère la version et son parent
+        $version = $this->filesRepository->findVersionWithParent($versionId);
+
+        // 2. SÉCURITÉ TYPE
+        if ($version->versionable_type !== File::class) {
+            throw new Exception("Cette version ne correspond pas à un fichier.");
+        }
+
+        /** @var File $file */
+        $file = $version->versionable;
+
+        $oldData = $version->payload;
+
+        // Logique physique : Si un fichier archivé existe, on écrase l'actuel
+        if (isset($oldData['archived_path']) && isset($oldData['storage_path'])) {
+            if (!Storage::disk('public')->exists($oldData['archived_path'])) {
+                throw new Exception("Le fichier archivé est introuvable sur le disque.");
+            }
+            Storage::disk('public')->copy($oldData['archived_path'], $oldData['storage_path']);
+        }
+
+        $attributes = collect($oldData)->except(['archived_path', '_relations'])->toArray();
+
+        if (isset($oldData['_relations']['departements'])) {
+            $attributes['departements'] = $oldData['_relations']['departements'];
+        }
+
+        $this->filesRepository->update($file->id, $attributes);
+    }
+
+    public function readVersionsFromParent(int $parent_id): array
+    {
+        try {
+            $versions = $this->filesRepository->findVersionsFromParent($parent_id);
+            $dtos = [];
+            foreach ($versions as $version) {
+                $dtos[] = $this->makeVersionDTO($version);
+            }
+            return $dtos;
+        } catch (Throwable $e) {
+            Log::alert($e->getMessage(), ["exception" => $e]);
+            throw $e;
+        }
+    }
+
+    private function makeVersionDTO(Version $version): VersionDTO
+    {
+        return new VersionDTO(
+            id: $version->id,
+            versionable_id: intval($version->versionable_id),
+            versionable_type: $version->versionable_type,
+            payload: $version->payload
+        );
+    }
+
+    public function downloadVersion($id): StreamedResponse {
+        $file = $this->filesRepository->findVersionWithParent($id);
+        $payload = $file->payload;
+        if (empty($payload["storage_path"])) {
+            throw new Filesystem\FileNotFoundException("Empty path");
+        }
+        Log::alert(Storage::disk('public')->download($payload["storage_path"], $payload["name"]));
+        return Storage::disk('public')->download($payload["storage_path"], $payload["name"]);
     }
 }
