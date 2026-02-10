@@ -33,7 +33,7 @@ class FolderRepository implements Interfaces\FolderRepositoryInterface
 
     public function read(int $id): Folder
     {
-        $folder = Folder::where('isDelete', false)->orWhereNull('isDelete')
+        $folder = Folder::where(fn($q) => $q->where('isDelete', false)->orWhereNull('isDelete'))
         ->with([
             'departements:id',
             'children' => fn($q) => $q->where('isDelete', false)->with('departements:id'),
@@ -68,7 +68,7 @@ class FolderRepository implements Interfaces\FolderRepositoryInterface
 
     public function update(int $id, array $data): Folder
     {
-        $folder = Folder::where('isDelete', false)->orWhereNull('isDelete')->find($id);
+        $folder = Folder::where(fn($q) => $q->where('isDelete', false)->orWhereNull('isDelete'))->find($id);
 
         if (!$folder) {
             throw new FolderNotFoundException("Folder with ID $id not found or deleted.");
@@ -111,14 +111,14 @@ class FolderRepository implements Interfaces\FolderRepositoryInterface
 
     public function getRacineChildren(): Collection
     {
-        return Folder::whereNull('parent_id')->orWhere("isDelete", false)->where('isDelete', null)
+        return Folder::whereNull('parent_id')->where(fn($q) => $q->where('isDelete', false)->orWhereNull('isDelete'))
             ->with(['allChildren' => fn($q) => $q->where('isDelete', false)->orWhereNull('isDelete')])
             ->get();
     }
 
     public function getFolderWithContents(int $id): Folder
     {
-        return Folder::where('isDelete', false)->orWhereNull('isDelete')
+        return Folder::where(fn($q) => $q->where('isDelete', false)->orWhereNull('isDelete'))
             ->with([
                 'departements:id',
                 'children' => fn($q) => $q->where('isDelete', false)->orWhereNull('isDelete')->with('departements:id'),
@@ -132,7 +132,7 @@ class FolderRepository implements Interfaces\FolderRepositoryInterface
     {
         // Note : pour les parents récursifs, il faudrait idéalement
         // filtrer isDelete sur chaque niveau de la relation dans le modèle
-        return Folder::where('isDelete', false)->orWhereNull('isDelete')
+        return Folder::where(fn($q) => $q->where('isDelete', false)->orWhereNull('isDelete'))
             ->with('parent.parent.parent.parent.parent')
             ->findOrFail($id);
     }
