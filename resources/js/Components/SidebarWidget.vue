@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import TreeViewItem from '@/Components/TreeViewItem.vue';
-import { Link } from '@inertiajs/vue3';
+import { Link, usePage } from '@inertiajs/vue3';
 import editor from '@/routes/editor';
 import { home } from '@/routes'
+
+const page = usePage();
 interface Child {
     id: number;
     name: string;
@@ -36,13 +38,14 @@ const isActive = ref(true);
                 v-if="racineDocument"
                 :href="home.url()"
                 class="font-semibold hover:font-extrabold block text-center
-                text-lg hover:text-sky-600 dark:hover:text-sky-500"
+                text-lg hover:text-sky-400 dark:hover:text-sky-400"
+                :class="page.url == '/' ? 'text-sky-600 dark:text-sky-500' : ''"
             >
                 Accueil
             </Link>
             <Link
                 class="font-semibold hover:font-extrabold block text-center
-                text-lg hover:text-sky-600 dark:hover:text-sky-500"
+                text-lg hover:text-sky-400 dark:hover:text-sky-400"
                 v-else :href="editor.document.create.url(0)"
             >
                 Créer la page d'accueil
