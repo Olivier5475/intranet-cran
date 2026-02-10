@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Head, useForm, usePage } from '@inertiajs/vue3';
 import { Departement } from '@/departement';
-import route from '@/routes/editor/file/index';
+import route from '@/routes/editor/file/index.js';
 import { computed, onMounted } from 'vue';
 import { CloudArrowUpIcon } from '@heroicons/vue/24/solid';
 import WarningPermission from '@/Components/WarningPermission.vue';

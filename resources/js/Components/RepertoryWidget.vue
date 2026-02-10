@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
 import { HomeIcon, ChevronRightIcon } from '@heroicons/vue/20/solid';
-import navigate from '@/routes/navigate/index';
+import navigate from '@/routes/navigate/index.js';
 
 defineProps<{
     parents : Array<{

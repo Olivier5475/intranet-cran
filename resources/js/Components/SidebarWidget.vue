@@ -2,7 +2,7 @@
 import { ref } from 'vue';
 import TreeViewItem from '@/Components/TreeViewItem.vue';
 import { Link } from '@inertiajs/vue3';
-import editor from '@/routes/editor/index';
+import editor from '@/routes/editor/index.js';
 import { home } from '@/routes'
 interface Child {
     id: number;

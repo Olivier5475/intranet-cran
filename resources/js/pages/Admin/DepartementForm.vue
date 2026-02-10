@@ -2,7 +2,7 @@
 import { Head, useForm } from '@inertiajs/vue3';
 import { ref } from 'vue';
 import { Departement } from '@/departement';
-import route from '@/routes/admin/departements/index';
+import route from '@/routes/admin/departements/index.js';
 
 const props = defineProps<{
     departement: Departement;

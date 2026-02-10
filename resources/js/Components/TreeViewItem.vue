@@ -3,8 +3,8 @@ import { ref, computed, watch } from 'vue';
 import { ChevronRightIcon, ChevronDownIcon } from '@heroicons/vue/20/solid';
 import TreeViewItem from './TreeViewItem.vue';
 import { Link, usePage } from '@inertiajs/vue3';
-import navigate from '@/routes/navigate/index';
-import folder_route from '@/routes/editor/folder/index';
+import navigate from '@/routes/navigate/index.js';
+import folder_route from '@/routes/editor/folder/index.js';
 import { EllipsisHorizontalIcon } from '@heroicons/vue/24/solid';
 interface Child {
     id: number;

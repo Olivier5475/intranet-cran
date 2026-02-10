@@ -2,7 +2,7 @@
 import { Head, useForm, usePage } from '@inertiajs/vue3';
 import CKEditor5Widget from '@/Components/CKEditor5Widget.vue';
 import { Departement } from '@/departement';
-import route from '@/routes/editor/document/index';
+import route from '@/routes/editor/document/index.js';
 import { computed, onMounted } from 'vue';
 import { CloudArrowUpIcon } from '@heroicons/vue/24/solid';
 import WarningPermission from '@/Components/WarningPermission.vue';

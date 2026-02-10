@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Head, useForm, usePage } from '@inertiajs/vue3';
-import route from '@/routes/editor/folder/index';
+import route from '@/routes/editor/folder/index.js';
 import { Departement } from '@/departement';
 import { computed, onMounted } from 'vue';
 import WarningPermission from '@/Components/WarningPermission.vue';

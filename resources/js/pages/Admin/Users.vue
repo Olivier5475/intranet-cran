@@ -2,7 +2,7 @@
 import { Link } from '@inertiajs/vue3';
 import { UserPlusIcon, UserMinusIcon } from '@heroicons/vue/20/solid';
 import { ref, watch } from 'vue';
-import route from '@/routes/admin/user/index';
+import route from '@/routes/admin/user/index.js';
 
 interface User {
     nom: string;

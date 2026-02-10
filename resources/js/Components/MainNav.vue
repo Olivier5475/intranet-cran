@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { Link, usePage } from '@inertiajs/vue3';
 import { UserGroupIcon, BuildingOfficeIcon } from '@heroicons/vue/20/solid';
-import editor from '@/routes/editor/index';
-import admin_routes from '@/routes/admin/index'
-import navigate from '@/routes/navigate/index'
+import editor from '@/routes/editor/index.js';
+import admin_routes from '@/routes/admin/index.js'
+import navigate from '@/routes/navigate/index.js'
 
 defineProps<{
     racineChildren: Array<{
