@@ -15,7 +15,7 @@ const page = usePage();
 </script>
 
 <template>
-    <nav class="bg-gray-800 h-16 flex">
+    <nav class="bg-slate-700 dark:bg-slate-800 h-16 flex">
         <ul class="ml-10 space-x-1 px-2 container flex flex-wrap items-center">
             <li v-for="child in racineChildren" :key="child.id">
                 <Link

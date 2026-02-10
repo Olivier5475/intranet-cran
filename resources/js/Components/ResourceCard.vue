@@ -35,21 +35,26 @@ const isActiveValidation = ref(false);
 
         <div
             v-if="canEdit"
-            @click="isActive = !isActive"
-            class="text-center bg-slate-500 absolute bottom-0 right-0 w-6 rounded-full aspect-square cursor-pointer"
+            @mouseover="isActive = true" @mouseleave="isActive = false"
+            class="text-center bg-slate-500 absolute right-0 bottom-0 w-6 rounded-full aspect-square cursor-pointer"
         >
             <ChevronDownIcon v-if="isActive" class="w-4 inline"/>
             <ChevronRightIcon v-else class="w-4 inline"/>
+
+            <div v-if="isActive && canEdit" class="rounded-xl absolute right-0 top-5 bg-slate-500 z-10">
+                <Link
+                    class="rounded-t-xl text-yellow-500 hover:text-white hover:bg-yellow-500 block pb-1 pt-2 px-2"
+                    :class="links.delete ? '' : 'rounded-b-xl'"
+                    :href="links.update">
+                    Update
+                </Link>
+                <p v-if="links.delete" @click="isActiveValidation = true" class="rounded-b-xl text-red-600 hover:text-white hover:bg-red-600 block pt-1 pb-2 px-2 cursor-pointer">
+                    Delete
+                </p>
+            </div>
         </div>
 
-        <div v-if="isActive && canEdit" class="rounded-xl absolute right-0 bottom-negative bg-slate-500 z-10">
-            <Link class="rounded-t-xl text-yellow-500 hover:text-white hover:bg-yellow-500 block pb-1 pt-2 px-2" :href="links.update">
-                Update
-            </Link>
-            <p v-if="links.delete" @click="isActiveValidation = true" class="rounded-b-xl text-red-600 hover:text-white hover:bg-red-600 block pt-1 pb-2 px-2 cursor-pointer">
-                Delete
-            </p>
-        </div>
+
     </div>
 
     <DeleteModal

@@ -21,7 +21,7 @@ const isActive = ref(true);
     <section class="bg-white shadow rounded-lg overflow-hidden">
         <h2
             @click="isActive = !isActive"
-            class="font-bold text-lg p-4 space-x-2 bg-slate-300 dark:bg-slate-800 dark:text-gray-300 flex h-[6vh] items-center border-b hover:cursor-pointer"
+            class="font-bold text-lg p-4 space-x-2 bg-slate-400 dark:bg-slate-800 dark:text-gray-300 flex h-[6vh] items-center border-b hover:cursor-pointer"
         >
             {{ title }}
         </h2>

@@ -52,8 +52,8 @@ const toggle = function() {
 
 <template>
     <section class="bg-white shadow rounded-lg overflow-hidden">
-        <h2 @click=toggle class="h-[6vh] hover:cursor-pointer font-bold text-lg p-4 border-b flex items-center space-x-2 bg-slate-300 dark:bg-slate-800 dark:text-gray-300">
-            <AdjustmentsHorizontalIcon class="h-6 w-6 text-gray-500 dark:text-gray-300" />
+        <h2 @click=toggle class="h-[6vh] hover:cursor-pointer font-bold text-lg p-4 border-b flex items-center space-x-2 bg-slate-400 dark:bg-slate-800 dark:text-gray-300">
+            <AdjustmentsHorizontalIcon class="h-6 w-6 text-gray-700 dark:text-gray-300" />
             <span>Filtres</span>
         </h2>
 
