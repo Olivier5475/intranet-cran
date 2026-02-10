@@ -11,7 +11,7 @@ readonly class DocumentViewDTO {
         public string $created_at,
         public string $updated_at,
         public array $departements,
-        public int $folder_id,
+        public ?int $folder_id,
         public ?string $color = null,
     ) {}
 }

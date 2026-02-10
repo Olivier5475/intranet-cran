@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Services\Interfaces\DepartementsServiceInterface;
+use App\Services\Interfaces\DocumentsServiceInterface;
 use App\Services\Interfaces\FoldersServiceInterface;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
@@ -12,7 +13,8 @@ class HandleInertiaRequests extends Middleware {
 
     public function __construct(
         private readonly FoldersServiceInterface $foldersService,
-        private readonly DepartementsServiceInterface $departementsService
+        private readonly DepartementsServiceInterface $departementsService,
+        private readonly DocumentsServiceInterface $documentsService,
     ) {}
 
     /**
@@ -66,6 +68,7 @@ class HandleInertiaRequests extends Middleware {
                 'warn' => $request->session()->get('warn'),
             ],
             'racineChildren' => $this->foldersService->getRacineChildren(),
+            'racineDocument' => $this->documentsService->readRacineDoc(),
             'departements' => $this->departementsService->readAll(),
         ];
     }

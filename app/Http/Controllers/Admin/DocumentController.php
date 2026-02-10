@@ -10,6 +10,7 @@ use App\Exception\PersistenceException;
 use App\Http\Controllers\Controller;
 use App\Services\Interfaces\DocumentsServiceInterface;
 use App\Services\Interfaces\FoldersServiceInterface;
+use App\Services\Interfaces\UserServiceInterface;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -17,9 +18,11 @@ use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Throwable;
 
 class DocumentController extends Controller {
+
     public function __construct(
         private readonly DocumentsServiceInterface $documentsService,
         private readonly FoldersServiceInterface $foldersService,
+        private readonly UserServiceInterface $usersService,
     ){}
 
     public function store(Request $request, $id = null) {
@@ -88,7 +91,7 @@ class DocumentController extends Controller {
             // 400 Bad Request (pour une erreur d'argument si non gérée par la validation)
             return redirect()->back()->with(['error' => 'Arguments manquants ou invalides.'. $e->getMessage()]);
 
-        } catch (DocumentNotFoundException|AttachmentNotFoundException|Filesystem\FileNotFoundException) {
+        } catch (DocumentNotFoundException|AttachmentNotFoundException|FileNotFoundException) {
             // 404 Not Found (Ressource à mettre à jour non trouvée)
             return redirect()->back()->with(['error' => 'Le document ou un attachement spécifié est introuvable.']);
 
@@ -107,8 +110,11 @@ class DocumentController extends Controller {
     }
 
     public function create($parent_id) {
-        if(!$this->foldersService->hasEditAccess($parent_id)) {
-            return redirect()->route("navigate.folder", ["folder_id" => $parent_id])->with("warn" , "Vous n'avez pas le droit de modifier ce dossier");
+        if($parent_id != 0 && !$this->foldersService->hasEditAccess($parent_id)) {
+            return redirect()->route("navigate.folder", ["folder_id" => $parent_id])->with("warn" , "Vous n'avez pas le droit de créer dans ce dossier");
+        }
+        elseif ($parent_id == 0 && !$this->usersService->isAdmin()) {
+            return redirect()->back()->with(["warn" => "Vous n'avez pas le droit de créer une page d'accueil"]);
         }
         return \Inertia\Inertia::render('Admin/DocumentForm', [
             "parent_id" => $parent_id,
