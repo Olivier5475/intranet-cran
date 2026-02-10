@@ -60,22 +60,18 @@ const isMenuExpend = ref(false);
             />
 
             <div class="flex w-full justify-between">
-                <Link :href="navigate.folder.url(child.id)" class="hover:text-sky-300" :class="child.id === currentFolderId ? `text-sky-500 font-bold` : ``">
+                <Link :href="navigate.folder.url(child.id)" class="hover:text-sky-600 dark:hover:text-sky-300" :class="child.id === currentFolderId ? `text-sky-500 font-bold` : ``">
                     {{ child.name }}
                 </Link>
 
-                <div class="relative">
-                    <EllipsisHorizontalIcon
-                        class="h-7 w-7 text-gray-400 rounded-full bg-slate-500"
-                        @click="isMenuExpend = !isMenuExpend"
-                    />
-
+                <div class="relative" @mouseenter="isMenuExpend = true" @mouseleave="isMenuExpend = false">
+                    <EllipsisHorizontalIcon class="h-7 w-7 text-gray-700 dark:text-gray-400 rounded-full bg-slate-400 dark:bg-slate-500" />
                     <Link
                         v-if="isMenuExpend"
                         :href="folder_route.update.url(child.id)"
-                        class="absolute right-0 top-4 min-w-[5rem] z-[999]
-                        text-center rounded-md bg-slate-800 text-yellow-400
-                        hover:text-yellow-800 hover:bg-yellow-400 hover:border-yellow-800 hover:border-2"
+                        class="absolute right-0 top-5 min-w-[5rem] z-10 border-2 font-semibold text-center rounded-md
+                        bg-slate-400 border-slate-400 dark:bg-slate-800 dark:border-slate-800 text-yellow-400
+                        hover:text-yellow-800 hover:bg-yellow-400 hover:border-yellow-800"
                     >
                         Modifier
                     </Link>

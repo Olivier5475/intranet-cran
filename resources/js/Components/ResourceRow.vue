@@ -35,7 +35,7 @@ const isActiveValidation = ref(false);
             </p>
         </component>
 
-        <div class="mx-2 col-span-3 col-start-5 m-auto text-center verflow-hidden">
+        <div class="mx-2 col-span-3 col-start-5 m-auto text-center overflow-hidden">
             <span v-if="child.type == 'folder'">Dossier</span>
             <span v-else-if="child.type == 'document'">Document</span>
             <span v-else>Fichier</span>
@@ -47,21 +47,31 @@ const isActiveValidation = ref(false);
 
         <div
             v-if="canEdit"
-            class="col-start-12 mx-auto aspect-square bg-slate-500 w-6 rounded-full text-center cursor-pointer"
-            @click="isActive = !isActive"
+            class="col-start-12 m-auto pb-1 aspect-square bg-slate-400 dark:bg-slate-500 w-7 rounded-full text-center cursor-pointer relative"
+            @mouseenter="isActive = true" @mouseleave="isActive = false"
         >
             <ChevronDownIcon v-if="isActive" class="w-4 inline" />
             <ChevronRightIcon v-else class="w-4 inline" />
+
+            <div v-if="isActive && canEdit" class="rounded-xl right-2 top-4 bg-slate-500 absolute z-10">
+                <Link
+                    class="rounded-t-xl text-yellow-500 hover:text-white hover:bg-yellow-500 pb-1 pt-2 px-2 block" :class="links.delete ? '' : 'rounded-b-lg'"
+                    :href="links.update"
+                >
+                    Update
+                </Link>
+                <p
+                    v-if="links.delete"
+                    @click="isActiveValidation = true"
+                    class="rounded-b-xl text-red-600 hover:text-white hover:bg-red-600
+                           pt-1 pb-2 px-2 block cursor-pointer"
+                >
+                    Delete
+                </p>
+            </div>
         </div>
 
-        <div v-if="isActive && canEdit" class="rounded-xl right-0 bottom-negative bg-slate-500 absolute z-10">
-            <Link class="rounded-t-xl text-yellow-500 hover:text-white hover:bg-yellow-500 pb-1 pt-2 px-2 block" :href="links.update">
-                Update
-            </Link>
-            <p v-if="links.delete" @click="isActiveValidation = true" class="rounded-b-xl text-red-600 hover:text-white hover:bg-red-600 pt-1 pb-2 px-2 block cursor-pointer">
-                Delete
-            </p>
-        </div>
+
     </div>
 
     <DeleteModal
