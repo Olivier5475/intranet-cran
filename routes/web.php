@@ -23,8 +23,13 @@ Route::prefix("editor")
             Route::get("/update/{folder_id}", [Controllers\Admin\FolderController::class, "update"])->name("editor.folder.update");
 
             // POST (submit)
-            Route::patch("/store/{folder_id}", [Controllers\Admin\FolderController::class, "store"])->name("editor.folder.post.update");
             Route::post("/store", [Controllers\Admin\FolderController::class, "store"])->name("editor.folder.post.create");
+
+            // PATCH (submit)
+            Route::patch("/store/{folder_id}", [Controllers\Admin\FolderController::class, "store"])->name("editor.folder.post.update");
+
+            // DELETE
+            Route ::delete("/delete/{folder_id}", [Controllers\Admin\FolderController::class, "delete"])->name("editor.folder.delete");
         });
 
         Route::prefix("documents")->group(function () {

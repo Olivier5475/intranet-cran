@@ -29,7 +29,8 @@ readonly class FoldersService implements Interfaces\FoldersServiceInterface {
         private UserServiceInterface $userService,
     ) {}
 
-    public function getChildren(int $id): array {
+    public function getChildren(int $id): array
+    {
         $current = Folder::find($id);
         $children = $current->children;
         $files = $current->files;
@@ -68,7 +69,8 @@ readonly class FoldersService implements Interfaces\FoldersServiceInterface {
         return $res;
     }
 
-    public function getBreadcrumbs(int $id): array {
+    public function getBreadcrumbs(int $id): array
+    {
         $breadcrumbs = [];
         $current = $this->folderRepository->getFolderWithParents($id);
 
@@ -88,7 +90,8 @@ readonly class FoldersService implements Interfaces\FoldersServiceInterface {
     /**
      * @throws FolderNotFoundException
      */
-    public function getRacineChildren() : array {
+    public function getRacineChildren() : array
+    {
         try {
             $folders = $this->folderRepository->getRacineChildren();
         } catch (FolderNotFoundException $e) {
@@ -103,7 +106,8 @@ readonly class FoldersService implements Interfaces\FoldersServiceInterface {
         return $res;
     }
 
-    public function getFolderContents(int $folderId, ?string $searchQuery) : Collection {
+    public function getFolderContents(int $folderId, ?string $searchQuery) : Collection
+    {
         if ($searchQuery && $searchQuery !== '') {
             // MODE RECHERCHE
             return $this->performSearch($folderId, $searchQuery);
@@ -116,7 +120,8 @@ readonly class FoldersService implements Interfaces\FoldersServiceInterface {
     /**
      * Convertit un modèle Folder (avec ses relations) en FolderDTO récursivement.
      */
-    private function mapFolderToDTO(Folder $folder): FolderDTO {
+    private function mapFolderToDTO(Folder $folder): FolderDTO
+    {
 
         // Gestion des enfants (inchangée)
         $children = [];
@@ -142,7 +147,8 @@ readonly class FoldersService implements Interfaces\FoldersServiceInterface {
     /*
      * Méthode privée pour la navigation
      */
-    private function getRegularContents(int $folderId): Collection {
+    private function getRegularContents(int $folderId): Collection
+    {
         $folder = $this->folderRepository->getFolderWithContents($folderId);
         $folderDTOs = $folder->children->map(fn($f) => new FolderDTO(
             id: $f->id,
@@ -179,7 +185,8 @@ readonly class FoldersService implements Interfaces\FoldersServiceInterface {
     /*
      * Méthode privée pour la recherche
      */
-    private function performSearch(int $rootFolderId, string $query) : Collection {
+    private function performSearch(int $rootFolderId, string $query) : Collection
+    {
         // 1. On utilise le Repository pour avoir les IDs
         $folderIds = $this->folderRepository->getDescendantFolderIds($rootFolderId);
 
@@ -209,7 +216,8 @@ readonly class FoldersService implements Interfaces\FoldersServiceInterface {
         return collect()->merge($fileDTOs)->merge($documentDTOs);
     }
 
-    public function read(int $id): FolderDTO {
+    public function read(int $id): FolderDTO
+    {
         try {
             $folder = $this->folderRepository->read($id);
             return new FolderDTO(
@@ -226,7 +234,8 @@ readonly class FoldersService implements Interfaces\FoldersServiceInterface {
         }
     }
 
-    public function create(array $data): FolderDTO {
+    public function create(array $data): FolderDTO
+    {
         if(empty($data['name']) || empty($data['color'])) {
             throw new BadRequestException("Missing argument(s)");
         }
@@ -273,7 +282,8 @@ readonly class FoldersService implements Interfaces\FoldersServiceInterface {
         }
     }
 
-    public function update(int $id, array $data): FolderDTO|bool {
+    public function update(int $id, array $data): FolderDTO|bool
+    {
         if(empty($id)) {
             throw new BadRequestException("Missing argument");
         }
@@ -302,9 +312,10 @@ readonly class FoldersService implements Interfaces\FoldersServiceInterface {
         }
     }
 
-    public function delete(int $id): bool {
+    public function delete(int $id): void
+    {
         try {
-            return $this->folderRepository->delete($id);
+            $this->folderRepository->delete($id);
         } catch (FolderNotFoundException $e) {
             Log::warning('Document attempted to delete was not found.', ['id' => $id]);
             throw $e;

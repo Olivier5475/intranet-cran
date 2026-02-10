@@ -37,11 +37,11 @@ interface FolderRepositoryInterface
 
     /**
      * @param int $id
-     * @return bool
+     * @return void
      * @throws FolderNotFoundException
      * @throws PersistenceException
      */
-    public function delete(int $id): bool;
+    public function delete(int $id): void;
 
     /**
      * @return Collection

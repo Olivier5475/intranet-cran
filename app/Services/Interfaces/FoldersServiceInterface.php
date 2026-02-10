@@ -74,12 +74,12 @@ interface FoldersServiceInterface {
 
     /**
      * @param int $id
-     * @return bool
+     * @return void
      * @throws BadRequestException si pas d'ID
      * @throws PersistenceException en cas d'erreur lors de la persistence en BD (throw par le Repository)
      * @throws FolderNotFoundException
      */
-    public function delete(int $id) : bool;
+    public function delete(int $id) : void;
 
     /**
      * @param int $folder_id

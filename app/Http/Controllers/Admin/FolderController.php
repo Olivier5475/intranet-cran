@@ -11,12 +11,16 @@ use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Throwable;
 
-class FolderController extends Controller {
+class FolderController extends Controller
+{
     public function __construct(
         private readonly FoldersServiceInterface $foldersService
-    ) {}
+    )
+    {
+    }
 
-    public function create($parent_id) {
+    public function create($parent_id)
+    {
         if($parent_id != 0) {
             if(!$this->foldersService->hasEditAccess($parent_id)) {
                 return redirect()->route("navigate.folder", ["folder_id" => $parent_id])->with("warn" , "Vous n'avez pas le droit de modifier ce dossier");
@@ -33,7 +37,8 @@ class FolderController extends Controller {
         ]);
     }
 
-    public function update(int $folder_id) {
+    public function update(int $folder_id)
+    {
         if(!$this->foldersService->hasEditAccess($folder_id)) {
             return redirect()->route("navigate.folder", ["folder_id" => $folder_id])->with("warn" , "Vous n'avez pas le droit de modifier ce dossier");
         }
@@ -51,7 +56,8 @@ class FolderController extends Controller {
         ]);
     }
 
-    public function store(Request $request, $id = null) {
+    public function store(Request $request, $id = null)
+    {
         // 1. Validation de la requête
         $validatedData = $request->validate([
             'name' => ['required', 'string', 'max:255'],
@@ -95,5 +101,24 @@ class FolderController extends Controller {
             Log::critical('Unhandled fatal error during folder transaction.', ['error' => $t->getMessage(), 'id' => $id]);
             return redirect()->back()->with(['error' => 'Une erreur imprévue est survenue (Code: 500).']);
         }
+    }
+
+    public function delete(int $folder_id)
+    {
+        if(!$this->foldersService->hasEditAccess($folder_id)) {
+            return redirect()->back()->with("warn" , "Vous n'avez pas le droit de supprimer ce dossier !");
+        }
+
+        try {
+            $this->foldersService->delete($folder_id);
+        } catch (FolderNotFoundException) {
+            return redirect()->back()->with("error" , "Dossier introuvable ou inexistant !");
+        } catch (PersistenceException) {
+            return redirect()->back()->with("error", "Une erreur est survenu. Impossible de supprimer le dossier");
+        } catch (BadRequestException) {
+            return redirect()->back()->with("error", "Erreur de requête, veuillez réessayer.");
+        }
+
+        return redirect()->back()->with("success", "Dossier supprimer avec succès");
     }
 }

@@ -9,9 +9,11 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
-class FolderRepository implements Interfaces\FolderRepositoryInterface{
+class FolderRepository implements Interfaces\FolderRepositoryInterface
+{
 
-    public function getDescendantFolderIds(int $rootFolderId): array {
+    public function getDescendantFolderIds(int $rootFolderId): array
+    {
         $query = <<<SQL
             WITH RECURSIVE all_folders (id) AS (
               SELECT id FROM folders WHERE id = ?
@@ -31,7 +33,8 @@ class FolderRepository implements Interfaces\FolderRepositoryInterface{
         return collect($results)->pluck('id')->all();
     }
 
-    public function read(int $id): Folder {
+    public function read(int $id): Folder
+    {
         $folder = Folder::with([
             'departements:id',
             'children.departements:id', // Charge les départements des sous-dossiers
@@ -47,7 +50,8 @@ class FolderRepository implements Interfaces\FolderRepositoryInterface{
     }
 
 
-    public function create(array $data): Folder {
+    public function create(array $data): Folder
+    {
         try {
             $folder = new Folder();
             $folder->name = e($data['name']);
@@ -67,7 +71,8 @@ class FolderRepository implements Interfaces\FolderRepositoryInterface{
         }
     }
 
-    public function update(int $id, array $data): Folder {
+    public function update(int $id, array $data): Folder
+    {
         $folder = Folder::with("departements:id")->find($id);
 
         if (!$folder) {
@@ -102,7 +107,8 @@ class FolderRepository implements Interfaces\FolderRepositoryInterface{
         }
     }
 
-    public function delete(int $id): bool {
+    public function delete(int $id) : void
+    {
         $folder = Folder::find($id);
 
         if (!$folder) {
@@ -110,8 +116,8 @@ class FolderRepository implements Interfaces\FolderRepositoryInterface{
         }
 
         try {
-            $folder->delete();
-            return true;
+            $folder->isDelete = true;
+            $folder->save();
         } catch (\Throwable $e) {
             Log::error('Folder delete failed for ID ' . $id, [
                 'error' => $e->getMessage(),
@@ -121,7 +127,8 @@ class FolderRepository implements Interfaces\FolderRepositoryInterface{
         }
     }
 
-    public function getRacineChildren(): Collection {
+    public function getRacineChildren(): Collection
+    {
         return Folder::where('parent_id', '=', null)
             ->with('allChildren')
             ->get();
@@ -137,7 +144,8 @@ class FolderRepository implements Interfaces\FolderRepositoryInterface{
         ])->findOrFail($id);
     }
 
-    public function getFolderWithParents(int $id): Folder {
+    public function getFolderWithParents(int $id): Folder
+    {
         return Folder::with('parent.parent.parent.parent.parent')->findOrFail($id);
     }
 }
