@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
 import { PlusCircleIcon, MinusCircleIcon } from '@heroicons/vue/20/solid';
-import route from '@/routes/admin/departements';
+import route from '@/routes/admin/departements/index';
 //BuildingOfficeIcon
 import { ref, watch } from 'vue';
 interface Departement {

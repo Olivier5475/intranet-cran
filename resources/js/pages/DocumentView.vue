@@ -2,8 +2,8 @@
 import { isDocFile, isImageFile, isPresentationFile, isTabFile, isVideoFile } from '@/lib/documentsTypeRegex';
 import { PencilIcon } from "@heroicons/vue/20/solid"
 import { Link } from '@inertiajs/vue3';
-import editor_route from '@/routes/editor';
-import download from '@/routes/download';
+import editor_route from '@/routes/editor/index';
+import download from '@/routes/download/index';
 
 defineProps<{
     document : {

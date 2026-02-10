@@ -2,7 +2,7 @@
 import { Link } from '@inertiajs/vue3';
 import { ChevronRightIcon, ChevronDownIcon } from '@heroicons/vue/20/solid';
 import { ref } from 'vue';
-import editor from '@/routes/editor';
+import editor from '@/routes/editor/index';
 
 const isActive = ref(false);
 

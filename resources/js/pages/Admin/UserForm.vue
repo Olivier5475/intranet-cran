@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Head, useForm } from '@inertiajs/vue3';
-import route from '@/routes/admin/user';
+import route from '@/routes/admin/user/index';
 
 interface User {
     id: number;
