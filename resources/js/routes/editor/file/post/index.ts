@@ -1,4 +1,4 @@
-import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition, applyUrlDefaults } from './../../../../wayfinder'
+import { queryParams, type RouteQueryOptions, type RouteDefinition, applyUrlDefaults } from './../../../../wayfinder'
 /**
 * @see \App\Http\Controllers\Admin\FileController::create
  * @see app/Http/Controllers/Admin/FileController.php:25
@@ -33,27 +33,6 @@ create.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
     method: 'post',
 })
 
-    /**
-* @see \App\Http\Controllers\Admin\FileController::create
- * @see app/Http/Controllers/Admin/FileController.php:25
- * @route '/editor/files/store'
- */
-    const createForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
-        action: create.url(options),
-        method: 'post',
-    })
-
-            /**
-* @see \App\Http\Controllers\Admin\FileController::create
- * @see app/Http/Controllers/Admin/FileController.php:25
- * @route '/editor/files/store'
- */
-        createForm.post = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
-            action: create.url(options),
-            method: 'post',
-        })
-    
-    create.form = createForm
 /**
 * @see \App\Http\Controllers\Admin\FileController::update
  * @see app/Http/Controllers/Admin/FileController.php:25
@@ -106,28 +85,6 @@ update.post = (args: { file_id: string | number } | [file_id: string | number ] 
     url: update.url(args, options),
     method: 'post',
 })
-
-    /**
-* @see \App\Http\Controllers\Admin\FileController::update
- * @see app/Http/Controllers/Admin/FileController.php:25
- * @route '/editor/files/store/{file_id}'
- */
-    const updateForm = (args: { file_id: string | number } | [file_id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
-        action: update.url(args, options),
-        method: 'post',
-    })
-
-            /**
-* @see \App\Http\Controllers\Admin\FileController::update
- * @see app/Http/Controllers/Admin/FileController.php:25
- * @route '/editor/files/store/{file_id}'
- */
-        updateForm.post = (args: { file_id: string | number } | [file_id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
-            action: update.url(args, options),
-            method: 'post',
-        })
-    
-    update.form = updateForm
 const post = {
     create: Object.assign(create, create),
 update: Object.assign(update, update),

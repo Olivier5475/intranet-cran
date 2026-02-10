@@ -1,4 +1,4 @@
-import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition, applyUrlDefaults } from './../../../../wayfinder'
+import { queryParams, type RouteQueryOptions, type RouteDefinition, applyUrlDefaults } from './../../../../wayfinder'
 /**
 * @see \App\Http\Controllers\Admin\FolderController::create
  * @see app/Http/Controllers/Admin/FolderController.php:59
@@ -33,27 +33,6 @@ create.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
     method: 'post',
 })
 
-    /**
-* @see \App\Http\Controllers\Admin\FolderController::create
- * @see app/Http/Controllers/Admin/FolderController.php:59
- * @route '/editor/folders/store'
- */
-    const createForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
-        action: create.url(options),
-        method: 'post',
-    })
-
-            /**
-* @see \App\Http\Controllers\Admin\FolderController::create
- * @see app/Http/Controllers/Admin/FolderController.php:59
- * @route '/editor/folders/store'
- */
-        createForm.post = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
-            action: create.url(options),
-            method: 'post',
-        })
-    
-    create.form = createForm
 /**
 * @see \App\Http\Controllers\Admin\FolderController::update
  * @see app/Http/Controllers/Admin/FolderController.php:59
@@ -106,38 +85,6 @@ update.patch = (args: { folder_id: string | number } | [folder_id: string | numb
     url: update.url(args, options),
     method: 'patch',
 })
-
-    /**
-* @see \App\Http\Controllers\Admin\FolderController::update
- * @see app/Http/Controllers/Admin/FolderController.php:59
- * @route '/editor/folders/store/{folder_id}'
- */
-    const updateForm = (args: { folder_id: string | number } | [folder_id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
-        action: update.url(args, {
-                    [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                        _method: 'PATCH',
-                        ...(options?.query ?? options?.mergeQuery ?? {}),
-                    }
-                }),
-        method: 'post',
-    })
-
-            /**
-* @see \App\Http\Controllers\Admin\FolderController::update
- * @see app/Http/Controllers/Admin/FolderController.php:59
- * @route '/editor/folders/store/{folder_id}'
- */
-        updateForm.patch = (args: { folder_id: string | number } | [folder_id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
-            action: update.url(args, {
-                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                            _method: 'PATCH',
-                            ...(options?.query ?? options?.mergeQuery ?? {}),
-                        }
-                    }),
-            method: 'post',
-        })
-    
-    update.form = updateForm
 const post = {
     create: Object.assign(create, create),
 update: Object.assign(update, update),

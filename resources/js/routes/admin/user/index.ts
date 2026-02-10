@@ -1,4 +1,4 @@
-import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition, applyUrlDefaults } from './../../../wayfinder'
+import { queryParams, type RouteQueryOptions, type RouteDefinition, applyUrlDefaults } from './../../../wayfinder'
 import post from './post'
 /**
 * @see \App\Http\Controllers\Admin\UsersController::create
@@ -43,41 +43,6 @@ create.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     method: 'head',
 })
 
-    /**
-* @see \App\Http\Controllers\Admin\UsersController::create
- * @see app/Http/Controllers/Admin/UsersController.php:70
- * @route '/admin/users/create'
- */
-    const createForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-        action: create.url(options),
-        method: 'get',
-    })
-
-            /**
-* @see \App\Http\Controllers\Admin\UsersController::create
- * @see app/Http/Controllers/Admin/UsersController.php:70
- * @route '/admin/users/create'
- */
-        createForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: create.url(options),
-            method: 'get',
-        })
-            /**
-* @see \App\Http\Controllers\Admin\UsersController::create
- * @see app/Http/Controllers/Admin/UsersController.php:70
- * @route '/admin/users/create'
- */
-        createForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: create.url({
-                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                            _method: 'HEAD',
-                            ...(options?.query ?? options?.mergeQuery ?? {}),
-                        }
-                    }),
-            method: 'get',
-        })
-    
-    create.form = createForm
 /**
 * @see \App\Http\Controllers\Admin\UsersController::update
  * @see app/Http/Controllers/Admin/UsersController.php:73
@@ -140,41 +105,6 @@ update.head = (args: { id: string | number } | [id: string | number ] | string |
     method: 'head',
 })
 
-    /**
-* @see \App\Http\Controllers\Admin\UsersController::update
- * @see app/Http/Controllers/Admin/UsersController.php:73
- * @route '/admin/users/{id}'
- */
-    const updateForm = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-        action: update.url(args, options),
-        method: 'get',
-    })
-
-            /**
-* @see \App\Http\Controllers\Admin\UsersController::update
- * @see app/Http/Controllers/Admin/UsersController.php:73
- * @route '/admin/users/{id}'
- */
-        updateForm.get = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: update.url(args, options),
-            method: 'get',
-        })
-            /**
-* @see \App\Http\Controllers\Admin\UsersController::update
- * @see app/Http/Controllers/Admin/UsersController.php:73
- * @route '/admin/users/{id}'
- */
-        updateForm.head = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: update.url(args, {
-                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                            _method: 'HEAD',
-                            ...(options?.query ?? options?.mergeQuery ?? {}),
-                        }
-                    }),
-            method: 'get',
-        })
-    
-    update.form = updateForm
 /**
 * @see \App\Http\Controllers\Admin\UsersController::deleteMethod
  * @see app/Http/Controllers/Admin/UsersController.php:87
@@ -227,38 +157,6 @@ deleteMethod.delete = (args: { id: string | number } | [id: string | number ] | 
     url: deleteMethod.url(args, options),
     method: 'delete',
 })
-
-    /**
-* @see \App\Http\Controllers\Admin\UsersController::deleteMethod
- * @see app/Http/Controllers/Admin/UsersController.php:87
- * @route '/admin/users/{id}'
- */
-    const deleteMethodForm = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
-        action: deleteMethod.url(args, {
-                    [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                        _method: 'DELETE',
-                        ...(options?.query ?? options?.mergeQuery ?? {}),
-                    }
-                }),
-        method: 'post',
-    })
-
-            /**
-* @see \App\Http\Controllers\Admin\UsersController::deleteMethod
- * @see app/Http/Controllers/Admin/UsersController.php:87
- * @route '/admin/users/{id}'
- */
-        deleteMethodForm.delete = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
-            action: deleteMethod.url(args, {
-                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                            _method: 'DELETE',
-                            ...(options?.query ?? options?.mergeQuery ?? {}),
-                        }
-                    }),
-            method: 'post',
-        })
-    
-    deleteMethod.form = deleteMethodForm
 const user = {
     create: Object.assign(create, create),
 update: Object.assign(update, update),
