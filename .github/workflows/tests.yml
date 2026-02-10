@@ -44,7 +44,7 @@ jobs:
         run: php artisan key:generate
 
       - name : Generate Wayfinder Routes
-        run : php artisan wayfinder:generate && ls -l /home/runner/work/intranet_laravel/intranet_laravel
+        run : php artisan wayfinder:generate && ls -l /home/runner/work/intranet_laravel/intranet_laravel/ressources
 
       - name: Build Assets
         run: npm run build
