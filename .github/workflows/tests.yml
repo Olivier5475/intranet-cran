@@ -47,7 +47,7 @@ jobs:
         run : php artisan wayfinder:generate
 
       - name: Build Assets
-        run: npm run build
+        run: ls -l /home/runner/work/intranet_laravel/intranet_laravel/resources/js/routes/ && npm run build
 
       - name: Tests
         run: ./vendor/bin/phpunit
