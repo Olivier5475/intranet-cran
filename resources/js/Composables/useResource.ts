@@ -1,8 +1,8 @@
 import { computed } from 'vue';
 import { usePage } from '@inertiajs/vue3';
-import download from '@/routes/download/index.js';
-import editor from '@/routes/editor/index.js';
-import navigate from '@/routes/navigate/index.js';
+import download from '@/routes/download';
+import editor from '@/routes/editor';
+import navigate from '@/routes/navigate';
 
 export function useResource(props: any) {
     const page = usePage();
