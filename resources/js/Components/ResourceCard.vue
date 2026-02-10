@@ -70,5 +70,4 @@ const isActiveValidation = ref(false);
 </template>
 
 <style scoped>
-.bottom-negative { bottom: -4.5rem; }
 </style>
