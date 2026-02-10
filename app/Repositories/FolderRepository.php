@@ -111,9 +111,8 @@ class FolderRepository implements Interfaces\FolderRepositoryInterface
 
     public function getRacineChildren(): Collection
     {
-        return Folder::where('isDelete', false)->orWhereNull('isDelete')
-            ->whereNull('parent_id')
-            ->with(['allChildren' => fn($q) => $q->where('isDelete', false)])
+        return Folder::whereNull('parent_id')->orWhere("isDelete", false)->where('isDelete', null)
+            ->with(['allChildren' => fn($q) => $q->where('isDelete', false)->orWhereNull('isDelete')])
             ->get();
     }
 
@@ -122,7 +121,7 @@ class FolderRepository implements Interfaces\FolderRepositoryInterface
         return Folder::where('isDelete', false)->orWhereNull('isDelete')
             ->with([
                 'departements:id',
-                'children' => fn($q) => $q->where('isDelete', false)->with('departements:id'),
+                'children' => fn($q) => $q->where('isDelete', false)->orWhereNull('isDelete')->with('departements:id'),
                 'files.departements:id',
                 'documents.departements:id'
             ])
