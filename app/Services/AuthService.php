@@ -96,7 +96,8 @@ readonly class AuthService implements Interfaces\UserServiceInterface {
         return $this->getRole() === "admin";
     }
 
-    public function logout() : void {
-        phpCAS::logout();
+    public function logout() : void
+    {
+        phpCAS::logoutWithRedirectService("https://auth.univ-lorraine.fr/logout");
     }
 }
