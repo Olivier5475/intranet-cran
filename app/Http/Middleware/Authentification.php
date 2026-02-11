@@ -23,7 +23,7 @@ class Authentification {
      * @throws \Exception
      */
     public function handle(Request $request, Closure $next): Response {
-        // SI ON EST EN LOCAL ALORS ON DEMANDE PAS D'AUTHENTIFICATION
+//         SI ON EST EN LOCAL ALORS ON DEMANDE PAS D'AUTHENTIFICATION
         if (App::environment('local')) {
             if (!Auth::check()) {
                 $localDevUser = User::find(1);
@@ -36,8 +36,23 @@ class Authentification {
             }
             return $next($request);
         }
-
         phpCAS::handleLogoutRequests();
+
+        $maxIdleTime = 7200; // 120 minutes en secondes
+        $lastActivity = session('last_activity');
+
+        // Vérification du timeout avant toute chose
+        if ($lastActivity && (time() - $lastActivity > $maxIdleTime)) {
+            session()->forget('last_activity');
+            $request->session()->invalidate();
+
+            // IMPORTANT : On force le logout CAS pour éviter la reconnexion auto
+            phpCAS::logout(["url" => phpCAS::getServerLoginURL(), "service" => phpCAS::getServiceURL()]);
+        }
+
+        // On met à jour l'activité
+        session(['last_activity' => time()]);
+
         phpCAS::forceAuthentication();
 
         $casUser = phpCAS::getUser();
