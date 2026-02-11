@@ -1,4 +1,4 @@
-import { queryParams, type RouteQueryOptions, type RouteDefinition, applyUrlDefaults } from './../../wayfinder'
+import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition, applyUrlDefaults } from './../../wayfinder'
 /**
 * @see \App\Http\Controllers\NavigationController::__invoke
  * @see app/Http/Controllers/NavigationController.php:14
@@ -61,6 +61,41 @@ folder.head = (args: { folder_id: string | number } | [folder_id: string | numbe
     method: 'head',
 })
 
+    /**
+* @see \App\Http\Controllers\NavigationController::__invoke
+ * @see app/Http/Controllers/NavigationController.php:14
+ * @route '/navigation/f/{folder_id}'
+ */
+    const folderForm = (args: { folder_id: string | number } | [folder_id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+        action: folder.url(args, options),
+        method: 'get',
+    })
+
+            /**
+* @see \App\Http\Controllers\NavigationController::__invoke
+ * @see app/Http/Controllers/NavigationController.php:14
+ * @route '/navigation/f/{folder_id}'
+ */
+        folderForm.get = (args: { folder_id: string | number } | [folder_id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+            action: folder.url(args, options),
+            method: 'get',
+        })
+            /**
+* @see \App\Http\Controllers\NavigationController::__invoke
+ * @see app/Http/Controllers/NavigationController.php:14
+ * @route '/navigation/f/{folder_id}'
+ */
+        folderForm.head = (args: { folder_id: string | number } | [folder_id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+            action: folder.url(args, {
+                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                            _method: 'HEAD',
+                            ...(options?.query ?? options?.mergeQuery ?? {}),
+                        }
+                    }),
+            method: 'get',
+        })
+    
+    folder.form = folderForm
 /**
 * @see \App\Http\Controllers\DocumentViewController::__invoke
  * @see app/Http/Controllers/DocumentViewController.php:12
@@ -122,6 +157,42 @@ document.head = (args: { document_id: string | number } | [document_id: string |
     url: document.url(args, options),
     method: 'head',
 })
+
+    /**
+* @see \App\Http\Controllers\DocumentViewController::__invoke
+ * @see app/Http/Controllers/DocumentViewController.php:12
+ * @route '/navigation/d/{document_id}'
+ */
+    const documentForm = (args: { document_id: string | number } | [document_id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+        action: document.url(args, options),
+        method: 'get',
+    })
+
+            /**
+* @see \App\Http\Controllers\DocumentViewController::__invoke
+ * @see app/Http/Controllers/DocumentViewController.php:12
+ * @route '/navigation/d/{document_id}'
+ */
+        documentForm.get = (args: { document_id: string | number } | [document_id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+            action: document.url(args, options),
+            method: 'get',
+        })
+            /**
+* @see \App\Http\Controllers\DocumentViewController::__invoke
+ * @see app/Http/Controllers/DocumentViewController.php:12
+ * @route '/navigation/d/{document_id}'
+ */
+        documentForm.head = (args: { document_id: string | number } | [document_id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+            action: document.url(args, {
+                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                            _method: 'HEAD',
+                            ...(options?.query ?? options?.mergeQuery ?? {}),
+                        }
+                    }),
+            method: 'get',
+        })
+    
+    document.form = documentForm
 const navigate = {
     folder: Object.assign(folder, folder),
 document: Object.assign(document, document),

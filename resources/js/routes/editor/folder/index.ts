@@ -1,4 +1,4 @@
-import { queryParams, type RouteQueryOptions, type RouteDefinition, applyUrlDefaults } from './../../../wayfinder'
+import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition, applyUrlDefaults } from './../../../wayfinder'
 import post from './post'
 /**
 * @see \App\Http\Controllers\Admin\FolderController::create
@@ -62,6 +62,41 @@ create.head = (args: { parent_id: string | number } | [parent_id: string | numbe
     method: 'head',
 })
 
+    /**
+* @see \App\Http\Controllers\Admin\FolderController::create
+ * @see app/Http/Controllers/Admin/FolderController.php:22
+ * @route '/editor/folders/create/p/{parent_id}'
+ */
+    const createForm = (args: { parent_id: string | number } | [parent_id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+        action: create.url(args, options),
+        method: 'get',
+    })
+
+            /**
+* @see \App\Http\Controllers\Admin\FolderController::create
+ * @see app/Http/Controllers/Admin/FolderController.php:22
+ * @route '/editor/folders/create/p/{parent_id}'
+ */
+        createForm.get = (args: { parent_id: string | number } | [parent_id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+            action: create.url(args, options),
+            method: 'get',
+        })
+            /**
+* @see \App\Http\Controllers\Admin\FolderController::create
+ * @see app/Http/Controllers/Admin/FolderController.php:22
+ * @route '/editor/folders/create/p/{parent_id}'
+ */
+        createForm.head = (args: { parent_id: string | number } | [parent_id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+            action: create.url(args, {
+                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                            _method: 'HEAD',
+                            ...(options?.query ?? options?.mergeQuery ?? {}),
+                        }
+                    }),
+            method: 'get',
+        })
+    
+    create.form = createForm
 /**
 * @see \App\Http\Controllers\Admin\FolderController::update
  * @see app/Http/Controllers/Admin/FolderController.php:40
@@ -124,6 +159,41 @@ update.head = (args: { folder_id: string | number } | [folder_id: string | numbe
     method: 'head',
 })
 
+    /**
+* @see \App\Http\Controllers\Admin\FolderController::update
+ * @see app/Http/Controllers/Admin/FolderController.php:40
+ * @route '/editor/folders/update/{folder_id}'
+ */
+    const updateForm = (args: { folder_id: string | number } | [folder_id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+        action: update.url(args, options),
+        method: 'get',
+    })
+
+            /**
+* @see \App\Http\Controllers\Admin\FolderController::update
+ * @see app/Http/Controllers/Admin/FolderController.php:40
+ * @route '/editor/folders/update/{folder_id}'
+ */
+        updateForm.get = (args: { folder_id: string | number } | [folder_id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+            action: update.url(args, options),
+            method: 'get',
+        })
+            /**
+* @see \App\Http\Controllers\Admin\FolderController::update
+ * @see app/Http/Controllers/Admin/FolderController.php:40
+ * @route '/editor/folders/update/{folder_id}'
+ */
+        updateForm.head = (args: { folder_id: string | number } | [folder_id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+            action: update.url(args, {
+                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                            _method: 'HEAD',
+                            ...(options?.query ?? options?.mergeQuery ?? {}),
+                        }
+                    }),
+            method: 'get',
+        })
+    
+    update.form = updateForm
 /**
 * @see \App\Http\Controllers\Admin\FolderController::deleteMethod
  * @see app/Http/Controllers/Admin/FolderController.php:106
@@ -176,6 +246,38 @@ deleteMethod.delete = (args: { folder_id: string | number } | [folder_id: string
     url: deleteMethod.url(args, options),
     method: 'delete',
 })
+
+    /**
+* @see \App\Http\Controllers\Admin\FolderController::deleteMethod
+ * @see app/Http/Controllers/Admin/FolderController.php:106
+ * @route '/editor/folders/delete/{folder_id}'
+ */
+    const deleteMethodForm = (args: { folder_id: string | number } | [folder_id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+        action: deleteMethod.url(args, {
+                    [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                        _method: 'DELETE',
+                        ...(options?.query ?? options?.mergeQuery ?? {}),
+                    }
+                }),
+        method: 'post',
+    })
+
+            /**
+* @see \App\Http\Controllers\Admin\FolderController::deleteMethod
+ * @see app/Http/Controllers/Admin/FolderController.php:106
+ * @route '/editor/folders/delete/{folder_id}'
+ */
+        deleteMethodForm.delete = (args: { folder_id: string | number } | [folder_id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+            action: deleteMethod.url(args, {
+                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                            _method: 'DELETE',
+                            ...(options?.query ?? options?.mergeQuery ?? {}),
+                        }
+                    }),
+            method: 'post',
+        })
+    
+    deleteMethod.form = deleteMethodForm
 const folder = {
     create: Object.assign(create, create),
 update: Object.assign(update, update),

@@ -1,4 +1,4 @@
-import { queryParams, type RouteQueryOptions, type RouteDefinition, applyUrlDefaults } from './../../wayfinder'
+import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition, applyUrlDefaults } from './../../wayfinder'
 import fileF7f338 from './file'
 /**
 * @see \App\Http\Controllers\DownloadController::attachment
@@ -62,6 +62,41 @@ attachment.head = (args: { id: string | number } | [id: string | number ] | stri
     method: 'head',
 })
 
+    /**
+* @see \App\Http\Controllers\DownloadController::attachment
+ * @see app/Http/Controllers/DownloadController.php:16
+ * @route '/download/attachment/{id}'
+ */
+    const attachmentForm = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+        action: attachment.url(args, options),
+        method: 'get',
+    })
+
+            /**
+* @see \App\Http\Controllers\DownloadController::attachment
+ * @see app/Http/Controllers/DownloadController.php:16
+ * @route '/download/attachment/{id}'
+ */
+        attachmentForm.get = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+            action: attachment.url(args, options),
+            method: 'get',
+        })
+            /**
+* @see \App\Http\Controllers\DownloadController::attachment
+ * @see app/Http/Controllers/DownloadController.php:16
+ * @route '/download/attachment/{id}'
+ */
+        attachmentForm.head = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+            action: attachment.url(args, {
+                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                            _method: 'HEAD',
+                            ...(options?.query ?? options?.mergeQuery ?? {}),
+                        }
+                    }),
+            method: 'get',
+        })
+    
+    attachment.form = attachmentForm
 /**
 * @see \App\Http\Controllers\DownloadController::file
  * @see app/Http/Controllers/DownloadController.php:24
@@ -123,6 +158,42 @@ file.head = (args: { id: string | number } | [id: string | number ] | string | n
     url: file.url(args, options),
     method: 'head',
 })
+
+    /**
+* @see \App\Http\Controllers\DownloadController::file
+ * @see app/Http/Controllers/DownloadController.php:24
+ * @route '/download/file/{id}'
+ */
+    const fileForm = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+        action: file.url(args, options),
+        method: 'get',
+    })
+
+            /**
+* @see \App\Http\Controllers\DownloadController::file
+ * @see app/Http/Controllers/DownloadController.php:24
+ * @route '/download/file/{id}'
+ */
+        fileForm.get = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+            action: file.url(args, options),
+            method: 'get',
+        })
+            /**
+* @see \App\Http\Controllers\DownloadController::file
+ * @see app/Http/Controllers/DownloadController.php:24
+ * @route '/download/file/{id}'
+ */
+        fileForm.head = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+            action: file.url(args, {
+                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                            _method: 'HEAD',
+                            ...(options?.query ?? options?.mergeQuery ?? {}),
+                        }
+                    }),
+            method: 'get',
+        })
+    
+    file.form = fileForm
 const download = {
     attachment: Object.assign(attachment, attachment),
 file: Object.assign(file, fileF7f338),

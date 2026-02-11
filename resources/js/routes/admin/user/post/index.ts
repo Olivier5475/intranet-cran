@@ -1,4 +1,4 @@
-import { queryParams, type RouteQueryOptions, type RouteDefinition, applyUrlDefaults } from './../../../../wayfinder'
+import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition, applyUrlDefaults } from './../../../../wayfinder'
 /**
 * @see \App\Http\Controllers\Admin\UsersController::create
  * @see app/Http/Controllers/Admin/UsersController.php:29
@@ -33,6 +33,27 @@ create.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
     method: 'post',
 })
 
+    /**
+* @see \App\Http\Controllers\Admin\UsersController::create
+ * @see app/Http/Controllers/Admin/UsersController.php:29
+ * @route '/admin/users'
+ */
+    const createForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+        action: create.url(options),
+        method: 'post',
+    })
+
+            /**
+* @see \App\Http\Controllers\Admin\UsersController::create
+ * @see app/Http/Controllers/Admin/UsersController.php:29
+ * @route '/admin/users'
+ */
+        createForm.post = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+            action: create.url(options),
+            method: 'post',
+        })
+    
+    create.form = createForm
 /**
 * @see \App\Http\Controllers\Admin\UsersController::update
  * @see app/Http/Controllers/Admin/UsersController.php:29
@@ -85,6 +106,38 @@ update.patch = (args: { id: string | number } | [id: string | number ] | string 
     url: update.url(args, options),
     method: 'patch',
 })
+
+    /**
+* @see \App\Http\Controllers\Admin\UsersController::update
+ * @see app/Http/Controllers/Admin/UsersController.php:29
+ * @route '/admin/users/{id}'
+ */
+    const updateForm = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+        action: update.url(args, {
+                    [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                        _method: 'PATCH',
+                        ...(options?.query ?? options?.mergeQuery ?? {}),
+                    }
+                }),
+        method: 'post',
+    })
+
+            /**
+* @see \App\Http\Controllers\Admin\UsersController::update
+ * @see app/Http/Controllers/Admin/UsersController.php:29
+ * @route '/admin/users/{id}'
+ */
+        updateForm.patch = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+            action: update.url(args, {
+                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                            _method: 'PATCH',
+                            ...(options?.query ?? options?.mergeQuery ?? {}),
+                        }
+                    }),
+            method: 'post',
+        })
+    
+    update.form = updateForm
 const post = {
     create: Object.assign(create, create),
 update: Object.assign(update, update),
