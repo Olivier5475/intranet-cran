@@ -13,6 +13,10 @@ defineProps<{
     }> | null;
 }>();
 const page = usePage();
+
+const gologout = async () => {
+    window.location.href = 'https://auth.univ-lorraine.fr/logout';
+}
 </script>
 
 <template>
@@ -57,7 +61,9 @@ const page = usePage();
             </div>
             <Link
                 :href="logout.url()"
-                class="text-white gap-2 mr-8 flex">
+                class="text-white gap-2 mr-8 flex"
+                @click="gologout()"
+            >
                 <span class="text-2xl">Logout</span>
                 <ArrowLeftEndOnRectangleIcon class="w-8"></ArrowLeftEndOnRectangleIcon>
             </Link>
