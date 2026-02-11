@@ -98,6 +98,6 @@ readonly class AuthService implements Interfaces\UserServiceInterface {
 
     public function logout() : void
     {
-        phpCAS::logoutWithRedirectService("https://auth.univ-lorraine.fr/logout");
+        phpCAS::logout("https://auth.univ-lorraine.fr/logout");
     }
 }
