@@ -125,6 +125,68 @@ update.head = (args: { file_id: string | number } | [file_id: string | number ] 
 })
 
 /**
+* @see \App\Http\Controllers\Admin\VersionController::history
+ * @see app/Http/Controllers/Admin/VersionController.php:26
+ * @route '/editor/files/history/{file_id}'
+ */
+export const history = (args: { file_id: string | number } | [file_id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: history.url(args, options),
+    method: 'get',
+})
+
+history.definition = {
+    methods: ["get","head"],
+    url: '/editor/files/history/{file_id}',
+} satisfies RouteDefinition<["get","head"]>
+
+/**
+* @see \App\Http\Controllers\Admin\VersionController::history
+ * @see app/Http/Controllers/Admin/VersionController.php:26
+ * @route '/editor/files/history/{file_id}'
+ */
+history.url = (args: { file_id: string | number } | [file_id: string | number ] | string | number, options?: RouteQueryOptions) => {
+    if (typeof args === 'string' || typeof args === 'number') {
+        args = { file_id: args }
+    }
+
+    
+    if (Array.isArray(args)) {
+        args = {
+                    file_id: args[0],
+                }
+    }
+
+    args = applyUrlDefaults(args)
+
+    const parsedArgs = {
+                        file_id: args.file_id,
+                }
+
+    return history.definition.url
+            .replace('{file_id}', parsedArgs.file_id.toString())
+            .replace(/\/+$/, '') + queryParams(options)
+}
+
+/**
+* @see \App\Http\Controllers\Admin\VersionController::history
+ * @see app/Http/Controllers/Admin/VersionController.php:26
+ * @route '/editor/files/history/{file_id}'
+ */
+history.get = (args: { file_id: string | number } | [file_id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: history.url(args, options),
+    method: 'get',
+})
+/**
+* @see \App\Http\Controllers\Admin\VersionController::history
+ * @see app/Http/Controllers/Admin/VersionController.php:26
+ * @route '/editor/files/history/{file_id}'
+ */
+history.head = (args: { file_id: string | number } | [file_id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
+    url: history.url(args, options),
+    method: 'head',
+})
+
+/**
 * @see \App\Http\Controllers\Admin\FileController::deleteMethod
  * @see app/Http/Controllers/Admin/FileController.php:111
  * @route '/editor/files/delete/{file_id}'
@@ -179,6 +241,7 @@ deleteMethod.delete = (args: { file_id: string | number } | [file_id: string | n
 const file = {
     create: Object.assign(create, create),
 update: Object.assign(update, update),
+history: Object.assign(history, history),
 post: Object.assign(post, post),
 delete: Object.assign(deleteMethod, deleteMethod),
 }

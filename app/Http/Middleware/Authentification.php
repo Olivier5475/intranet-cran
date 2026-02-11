@@ -37,17 +37,23 @@ class Authentification {
             return $next($request);
         }
 
+        phpCAS::handleLogoutRequests();
         phpCAS::forceAuthentication();
-        if (Auth::check()) {
-            return $next($request);
-        }
+
         $casUser = phpCAS::getUser();
         $attributes = phpCAS::getAttributes();
-        $user = $this->userService->getUserByEmail($attributes['mail']);
+        $email = $attributes['mail'] ?? ($casUser . '@univ-lorraine.fr');
 
-        if(!$user) {
-            $user = $this->userService->getUserByEmail($casUser . '@univ-lorraine.fr');
+        if (Auth::check()) {
+            if (Auth::user()->email !== $email) {
+                Auth::logout();
+                $request->session()->invalidate();
+            } else {
+                return $next($request);
+            }
         }
+
+        $user = $this->userService->getUserByEmail($email);
 
         if (!$user)  {
             try {

@@ -15,6 +15,8 @@ Route::prefix('/navigation')->group(function () {
     Route::get("/d/{document_id}", Controllers\DocumentViewController::class)->name('navigate.document');
 });
 
+Route::get('/logout', [Controllers\AuthController::class, 'logout'])->name('logout');
+
 Route::prefix("editor")
     ->middleware(Middleware\IsEditeur::class)
     ->group(function () {

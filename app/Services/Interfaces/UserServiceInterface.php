@@ -35,4 +35,9 @@ interface UserServiceInterface {
     public function readAll();
     public function getRole();
     public function isAdmin();
+
+    /**
+     * @return void
+     */
+    public function logout() : void ;
 }

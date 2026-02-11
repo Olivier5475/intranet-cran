@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { Link, usePage } from '@inertiajs/vue3';
-import { UserGroupIcon, BuildingOfficeIcon } from '@heroicons/vue/20/solid';
+import { UserGroupIcon, BuildingOfficeIcon, ArrowLeftEndOnRectangleIcon } from '@heroicons/vue/20/solid';
 import editor from '@/routes/editor';
 import admin_routes from '@/routes/admin'
 import navigate from '@/routes/navigate'
+import {logout} from '@/routes';
 
 defineProps<{
     racineChildren: Array<{
@@ -46,6 +47,19 @@ const page = usePage();
                 class="text-white gap-2 mr-8 flex">
                 <span class="text-2xl">Admin</span>
                 <UserGroupIcon class="w-8"></UserGroupIcon>
+            </Link>
+
+            <div
+                v-if="page.props.auth.user.role === 'admin'"
+                class="text-white gap-2 mr-8 flex text-3xl"
+            >
+                |
+            </div>
+            <Link
+                :href="logout.url()"
+                class="text-white gap-2 mr-8 flex">
+                <span class="text-2xl">Logout</span>
+                <ArrowLeftEndOnRectangleIcon class="w-8"></ArrowLeftEndOnRectangleIcon>
             </Link>
         </div>
     </nav>

@@ -10,6 +10,7 @@ use App\Services\Interfaces\DepartementsServiceInterface;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use phpCAS;
 
 readonly class AuthService implements Interfaces\UserServiceInterface {
     public function __construct(
@@ -93,5 +94,9 @@ readonly class AuthService implements Interfaces\UserServiceInterface {
     }
     public function isAdmin() : bool {
         return $this->getRole() === "admin";
+    }
+
+    public function logout() : void {
+        phpCAS::logout();
     }
 }
