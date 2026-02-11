@@ -55,13 +55,13 @@ const page = usePage();
             >
                 |
             </div>
-            <Link
+            <a
                 :href="logout.url()"
                 class="text-white gap-2 mr-8 flex"
             >
                 <span class="text-2xl">Logout</span>
                 <ArrowLeftEndOnRectangleIcon class="w-8"></ArrowLeftEndOnRectangleIcon>
-            </Link>
+            </a>
         </div>
     </nav>
 </template>
