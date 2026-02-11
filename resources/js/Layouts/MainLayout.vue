@@ -5,7 +5,9 @@ import FilterWidget from '@/Components/FilterWidget.vue';
 import FlashMessage from '@/Components/FlashMessage.vue';
 import LogoWidget from '@/Components/LogoWidget.vue';
 import { provide, readonly, ref } from 'vue';
+import timeout from "@/autologout"
 
+timeout.setup();
 const activeFilters = ref({});
 
 function handleFilterChange(newFilters : any) {
