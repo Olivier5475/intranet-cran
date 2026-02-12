@@ -98,6 +98,6 @@ readonly class AuthService implements Interfaces\UserServiceInterface {
 
     public function logout() : void
     {
-        phpCAS::logout();
+        phpCAS::logout(["url" => phpCAS::getServerLoginURL(), "service" => phpCAS::getServiceURL()]);
     }
 }
