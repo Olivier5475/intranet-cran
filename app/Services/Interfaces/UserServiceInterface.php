@@ -37,7 +37,8 @@ interface UserServiceInterface {
     public function isAdmin();
 
     /**
+     * @param string $returnUrl
      * @return void
      */
-    public function logout() : void ;
+    public function logout(string $returnUrl) : void ;
 }

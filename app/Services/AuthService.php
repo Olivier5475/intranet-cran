@@ -96,8 +96,16 @@ readonly class AuthService implements Interfaces\UserServiceInterface {
         return $this->getRole() === "admin";
     }
 
-    public function logout() : void
+    public function logout(string $returnUrl) : void
     {
-        phpCAS::logout(["url" => phpCAS::getServerLoginURL(), "service" => url("/")]);
+        // Sécurité : si le referer est la page de logout, on force la racine
+        if (str_contains($returnUrl, '/logout')) {
+            $returnUrl = url('/');
+        }
+
+        phpCAS::logout([
+            "url" => phpCAS::getServerLoginURL(),
+            "service" => $returnUrl
+        ]);
     }
 }
