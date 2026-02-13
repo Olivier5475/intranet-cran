@@ -4,8 +4,8 @@
             class="editor-container editor-container_classic-editor editor-container_include-style editor-container_include-block-toolbar editor-container_include-fullscreen"
             ref="editorContainerElement"
         >
-            <div class="editor-container__editor">
-                <div ref="editorElement">
+            <div class="editor-container__editor bg-slate-800">
+                <div ref="editorElement" style="">
                     <ckeditor
                         v-if="editor && config"
                         :modelValue="modelValue"
