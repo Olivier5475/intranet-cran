@@ -3,7 +3,7 @@ import { Head, useForm, usePage } from '@inertiajs/vue3';
 import { Departement } from '@/departement';
 import route from '@/routes/editor/file';
 import { computed, onMounted } from 'vue';
-import { CloudArrowUpIcon } from '@heroicons/vue/24/solid';
+import { CloudArrowUpIcon, DocumentIcon, CheckIcon } from '@heroicons/vue/24/solid';
 import WarningPermission from '@/Components/WarningPermission.vue';
 
 const props = defineProps<{
@@ -52,97 +52,121 @@ const showExternalWarning = computed(() => {
     return form.departements.some((selectedId) => !userDepartementIds.includes(selectedId));
 });
 
-// Vérifie si la checkbox doit être désactivée
 const isCheckboxDisabled = (departementId: number) => {
-    // 1. Si ce département ne fait pas partie des miens, on ne bloque jamais
-    if (!userDepartementIds.includes(departementId)) {
-        return false;
-    }
-
-    // 2. On compte combien de MES départements sont actuellement cochés dans le formulaire
+    if (!userDepartementIds.includes(departementId)) return false;
     const mySelectedDeps = form.departements.filter(id => userDepartementIds.includes(id));
-
-    // 3. Si ce département est coché ET que c'est le dernier des miens restant
-    // Alors on le désactive pour empêcher de le décocher
     return form.departements.includes(departementId) && mySelectedDeps.length <= 1;
 };
 </script>
 
 <template>
     <Head :title="file ? `Modifier le fichier ${file.name}` : 'Créer un nouveau fichier'" />
-    <h1 class="text-3xl m-4 text-center first-letter:uppercase">
-        {{ file ? "Modification d'un fichier" : "Création d'un nouveau fichier" }}
-    </h1>
-    <hr class="mx-auto w-11/12" />
-    <form @submit.prevent="submit" class="pt-4 mx-auto w-11/12">
-        <input
-            type="text"
-            name="name"
-            placeholder="Nom du fichier"
-            v-model="form.name"
-            class="mr-10 rounded-md text-black block w-full grow"
-        />
-        <div v-if="form.errors.name" class="text-red-500">{{ form.errors.name }}</div>
 
-        <div class="my-6 mx-auto w-full">
-            <label for="file_input" class="font-semibold mb-2 block">
-                {{ file ? 'Remplacer le fichier (Optionnel) 📁' : 'Ajouter un fichier 📁' }}
-            </label>
-
-            <label
-                for="files_input"
-                class="p-4 border-indigo-300 rounded-lg bg-indigo-50 hover:bg-indigo-100 ease-in-out shadow-sm hover:shadow-md flex cursor-pointer items-center justify-center border-2 border-dashed transition duration-300"
-            >
-                <CloudArrowUpIcon class="w-6 text-indigo-700 mr-1" />
-                <span class="text-indigo-700 font-semibold text-base">
-                     Cliquez ou glissez-déposez ici pour uploader
-                </span>
-
-                <input id="files_input" type="file" name="files[]" @change="handleNewFileUpload" class="sr-only" />
-            </label>
-
-            <div v-if="form.errors.files" class="text-red-500 text-sm mt-2">
-                {{ form.errors.files }}
+    <div class="max-w-4xl mx-auto py-6">
+        <header class="mb-8 text-center">
+            <div class="inline-flex p-3 rounded-2xl bg-amber-500/10 mb-4">
+                <DocumentIcon class="w-8 h-8 text-amber-500" />
             </div>
+            <h1 class="text-3xl font-black text-gray-900 dark:text-white uppercase tracking-tight">
+                {{ file ? "Modification du fichier" : "Importer un fichier" }}
+            </h1>
+        </header>
 
-            <div v-if="form.files.length" class="text-sm text-green-600 mt-2">
-                {{ form.files.length }} fichier(s) sélectionné(s).
-            </div>
-        </div>
-
-        <div class="w-full">
-            <p class="mb-1">Départements</p>
-            <div v-for="departement in departements" :key="departement.id" class="flex gap-2">
+        <form @submit.prevent="submit" class="space-y-8">
+            <div class="space-y-2">
+                <label class="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 ml-1">Désignation du fichier</label>
                 <input
-                    type="checkbox"
-                    :id="'dept-' + departement.id"
-                    :value="departement.id"
-                    v-model="form.departements"
-                    :disabled="isCheckboxDisabled(departement.id)"
-                    class="my-auto rounded border-gray-300 text-indigo-600 focus:ring-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                    type="text"
+                    v-model="form.name"
+                    placeholder="Ex: Rapport_Annuel_2025.pdf"
+                    class="w-full px-5 py-4 rounded-2xl border-gray-200 dark:border-zinc-800 dark:bg-zinc-900/50 focus:ring-4 focus:ring-sky-500/10 focus:border-sky-500 transition-all text-gray-900 dark:text-white font-medium"
                 />
-                <label
-                    :for="'dept-' + departement.id"
-                    class="text-sm text-gray-700 dark:text-gray-100"
-                    :class="{ 'opacity-50': isCheckboxDisabled(departement.id) }"
-                >
-                    {{ departement.name }}
-                </label>
+                <div v-if="form.errors.name" class="text-xs text-red-500 font-bold ml-1">{{ form.errors.name }}</div>
             </div>
-            <div v-if="form.errors.departements" class="text-red-500">{{ form.errors.departements }}</div>
+
+            <div class="space-y-2">
+                <label class="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 ml-1">Source du document</label>
+
+                <label
+                    for="files_input"
+                    class="relative group flex flex-col items-center justify-center p-10 border-2 border-dashed rounded-3xl transition-all cursor-pointer shadow-sm hover:shadow-xl group"
+                    :class="form.files.length ? 'border-emerald-500 bg-emerald-500/5' : 'border-sky-200 dark:border-zinc-800 hover:border-sky-400 dark:hover:border-zinc-700'"
+                >
+                    <div class="p-4 rounded-full bg-sky-50 dark:bg-zinc-800 group-hover:scale-110 transition-transform duration-300">
+                        <CloudArrowUpIcon class="w-8 h-8 text-sky-600 dark:text-sky-400" />
+                    </div>
+
+                    <div class="mt-4 text-center">
+                        <span class="block text-sm font-bold text-gray-700 dark:text-gray-200">
+                            {{ form.files.length ? 'Fichier sélectionné' : 'Cliquez ou glissez un fichier ici' }}
+                        </span>
+                        <span class="text-xs text-gray-400 mt-1 block">
+                            {{ file ? '(Laissez vide pour conserver le fichier actuel)' : 'PDF, Image, Word, Excel...' }}
+                        </span>
+                    </div>
+
+                    <input id="files_input" type="file" @change="handleNewFileUpload" class="sr-only" />
+
+                    <div v-if="form.files.length" class="absolute top-4 right-4 flex items-center gap-1 bg-emerald-500 text-white px-3 py-1 rounded-full text-[10px] font-black">
+                        <CheckIcon class="w-3 h-3" /> PRÊT
+                    </div>
+                </label>
+
+                <div v-if="form.files.length" class="mt-3 flex items-center justify-center gap-2 text-emerald-600 dark:text-emerald-400 font-bold text-sm">
+                    <DocumentIcon class="w-4 h-4" />
+                    {{ form.files[0].name }}
+                </div>
+
+                <div v-if="form.errors.files" class="text-xs text-red-500 font-bold text-center mt-2">{{ form.errors.files }}</div>
+            </div>
+
+            <div class="space-y-4">
+                <label class="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 ml-1 text-center block">Accès au fichier</label>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    <label
+                        v-for="departement in departements"
+                        :key="departement.id"
+                        :class="[
+                            'relative flex items-center p-4 rounded-2xl border-2 transition-all cursor-pointer group',
+                            form.departements.includes(departement.id)
+                                ? 'border-sky-500 bg-sky-500/5'
+                                : 'border-gray-100 dark:border-zinc-800 hover:border-gray-200 dark:hover:border-zinc-700',
+                            isCheckboxDisabled(departement.id) ? 'opacity-40 cursor-not-allowed' : ''
+                        ]"
+                    >
+                        <input
+                            type="checkbox"
+                            :value="departement.id"
+                            v-model="form.departements"
+                            :disabled="isCheckboxDisabled(departement.id)"
+                            class="sr-only"
+                        />
+                        <span :class="[
+                            'w-5 h-5 rounded-lg border flex items-center justify-center mr-3 transition-colors',
+                            form.departements.includes(departement.id) ? 'bg-sky-500 border-sky-500 shadow-sm shadow-sky-500/40' : 'border-gray-300 dark:border-zinc-600'
+                        ]">
+                            <CheckIcon v-if="form.departements.includes(departement.id)" class="w-3.5 h-3.5 text-white stroke-[3]" />
+                        </span>
+                        <span class="text-sm font-bold tracking-tight" :class="form.departements.includes(departement.id) ? 'text-sky-700 dark:text-sky-400' : 'text-gray-500 dark:text-zinc-400'">
+                            {{ departement.name }}
+                        </span>
+                    </label>
+                </div>
+            </div>
 
             <WarningPermission :show="showExternalWarning" object-type="fichier">
-                <ul class="ml-4">
-                    <li><strong>- Renommer ou supprimer le fichier</strong></li>
-                    <li><strong>- Télécharger une nouvelle version (écraser)</strong></li>
-                </ul>
+                <div class="text-sm space-y-1">
+                    <p class="font-bold text-amber-600 dark:text-amber-400 italic text-center">Ce fichier sera partagé hors de votre département.</p>
+                </div>
             </WarningPermission>
-        </div>
 
-        <button type="submit" :disabled="form.processing" class="py-2 mt-4 bg-indigo-600 text-white rounded w-full">
-            {{ file ? 'Mettre à Jour' : 'Créer' }}
-        </button>
-    </form>
+            <button
+                type="submit"
+                :disabled="form.processing"
+                class="w-full py-4 bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 font-black rounded-2xl shadow-xl hover:scale-[1.01] active:scale-[0.98] transition-all disabled:opacity-50 uppercase tracking-[0.1em] text-sm"
+            >
+                {{ file ? 'Mettre à jour le fichier' : 'Lancer l\'importation' }}
+            </button>
+        </form>
+    </div>
 </template>
-
-<style scoped></style>

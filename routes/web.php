@@ -70,8 +70,6 @@ Route::prefix("admin")
     Route::prefix("users")->group(function () {
         // GET
         Route::get("", [Controllers\Admin\UsersController::class, "readAll"])->name("admin.user");
-        Route::get("/create", [Controllers\Admin\UsersController::class, "create"])->name("admin.user.create");
-        Route::get("/{id}", [Controllers\Admin\UsersController::class, "update"])->name("admin.user.update");
 
         // POST
         Route::post("/", [Controllers\Admin\UsersController::class, "store"])->name("admin.user.post.create");
@@ -86,8 +84,6 @@ Route::prefix("admin")
     Route::prefix("departements")->group(function () {
         // GET
         Route::get("", [Controllers\Admin\DepartementController::class, "readAll"])->name("admin.departements");
-        Route::get("/create", [Controllers\Admin\DepartementController::class, "create"])->name("admin.departements.create");
-        Route::get("/{id}", [Controllers\Admin\DepartementController::class, "update"])->name("admin.departements.update");
 
         // POST
         Route::post("/", [Controllers\Admin\DepartementController::class, "store"])->name("admin.departements.post.create");
