@@ -1,7 +1,7 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, applyUrlDefaults } from './../../../../wayfinder'
 /**
 * @see \App\Http\Controllers\Admin\DepartementController::create
- * @see app/Http/Controllers/Admin/DepartementController.php:27
+ * @see app/Http/Controllers/Admin/DepartementController.php:32
  * @route '/admin/departements'
  */
 export const create = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -16,7 +16,7 @@ create.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\DepartementController::create
- * @see app/Http/Controllers/Admin/DepartementController.php:27
+ * @see app/Http/Controllers/Admin/DepartementController.php:32
  * @route '/admin/departements'
  */
 create.url = (options?: RouteQueryOptions) => {
@@ -25,7 +25,7 @@ create.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\Admin\DepartementController::create
- * @see app/Http/Controllers/Admin/DepartementController.php:27
+ * @see app/Http/Controllers/Admin/DepartementController.php:32
  * @route '/admin/departements'
  */
 create.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -35,7 +35,7 @@ create.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
 
 /**
 * @see \App\Http\Controllers\Admin\DepartementController::update
- * @see app/Http/Controllers/Admin/DepartementController.php:27
+ * @see app/Http/Controllers/Admin/DepartementController.php:32
  * @route '/admin/departements/{id}'
  */
 export const update = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
@@ -50,7 +50,7 @@ update.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\DepartementController::update
- * @see app/Http/Controllers/Admin/DepartementController.php:27
+ * @see app/Http/Controllers/Admin/DepartementController.php:32
  * @route '/admin/departements/{id}'
  */
 update.url = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -78,7 +78,7 @@ update.url = (args: { id: string | number } | [id: string | number ] | string | 
 
 /**
 * @see \App\Http\Controllers\Admin\DepartementController::update
- * @see app/Http/Controllers/Admin/DepartementController.php:27
+ * @see app/Http/Controllers/Admin/DepartementController.php:32
  * @route '/admin/departements/{id}'
  */
 update.patch = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({

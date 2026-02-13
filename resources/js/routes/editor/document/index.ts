@@ -2,7 +2,7 @@ import { queryParams, type RouteQueryOptions, type RouteDefinition, applyUrlDefa
 import post from './post'
 /**
 * @see \App\Http\Controllers\Admin\DocumentController::create
- * @see app/Http/Controllers/Admin/DocumentController.php:112
+ * @see app/Http/Controllers/Admin/DocumentController.php:102
  * @route '/editor/documents/create/p/{parent_id}'
  */
 export const create = (args: { parent_id: string | number } | [parent_id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -17,7 +17,7 @@ create.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\DocumentController::create
- * @see app/Http/Controllers/Admin/DocumentController.php:112
+ * @see app/Http/Controllers/Admin/DocumentController.php:102
  * @route '/editor/documents/create/p/{parent_id}'
  */
 create.url = (args: { parent_id: string | number } | [parent_id: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -45,7 +45,7 @@ create.url = (args: { parent_id: string | number } | [parent_id: string | number
 
 /**
 * @see \App\Http\Controllers\Admin\DocumentController::create
- * @see app/Http/Controllers/Admin/DocumentController.php:112
+ * @see app/Http/Controllers/Admin/DocumentController.php:102
  * @route '/editor/documents/create/p/{parent_id}'
  */
 create.get = (args: { parent_id: string | number } | [parent_id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -54,7 +54,7 @@ create.get = (args: { parent_id: string | number } | [parent_id: string | number
 })
 /**
 * @see \App\Http\Controllers\Admin\DocumentController::create
- * @see app/Http/Controllers/Admin/DocumentController.php:112
+ * @see app/Http/Controllers/Admin/DocumentController.php:102
  * @route '/editor/documents/create/p/{parent_id}'
  */
 create.head = (args: { parent_id: string | number } | [parent_id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -64,7 +64,7 @@ create.head = (args: { parent_id: string | number } | [parent_id: string | numbe
 
 /**
 * @see \App\Http\Controllers\Admin\DocumentController::update
- * @see app/Http/Controllers/Admin/DocumentController.php:128
+ * @see app/Http/Controllers/Admin/DocumentController.php:115
  * @route '/editor/documents/update/{document_id}'
  */
 export const update = (args: { document_id: string | number } | [document_id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -79,7 +79,7 @@ update.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\DocumentController::update
- * @see app/Http/Controllers/Admin/DocumentController.php:128
+ * @see app/Http/Controllers/Admin/DocumentController.php:115
  * @route '/editor/documents/update/{document_id}'
  */
 update.url = (args: { document_id: string | number } | [document_id: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -107,7 +107,7 @@ update.url = (args: { document_id: string | number } | [document_id: string | nu
 
 /**
 * @see \App\Http\Controllers\Admin\DocumentController::update
- * @see app/Http/Controllers/Admin/DocumentController.php:128
+ * @see app/Http/Controllers/Admin/DocumentController.php:115
  * @route '/editor/documents/update/{document_id}'
  */
 update.get = (args: { document_id: string | number } | [document_id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -116,7 +116,7 @@ update.get = (args: { document_id: string | number } | [document_id: string | nu
 })
 /**
 * @see \App\Http\Controllers\Admin\DocumentController::update
- * @see app/Http/Controllers/Admin/DocumentController.php:128
+ * @see app/Http/Controllers/Admin/DocumentController.php:115
  * @route '/editor/documents/update/{document_id}'
  */
 update.head = (args: { document_id: string | number } | [document_id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -126,7 +126,7 @@ update.head = (args: { document_id: string | number } | [document_id: string | n
 
 /**
 * @see \App\Http\Controllers\Admin\DocumentController::deleteMethod
- * @see app/Http/Controllers/Admin/DocumentController.php:149
+ * @see app/Http/Controllers/Admin/DocumentController.php:136
  * @route '/editor/documents/delete/{document_id}'
  */
 export const deleteMethod = (args: { document_id: string | number } | [document_id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
@@ -141,7 +141,7 @@ deleteMethod.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\DocumentController::deleteMethod
- * @see app/Http/Controllers/Admin/DocumentController.php:149
+ * @see app/Http/Controllers/Admin/DocumentController.php:136
  * @route '/editor/documents/delete/{document_id}'
  */
 deleteMethod.url = (args: { document_id: string | number } | [document_id: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -169,7 +169,7 @@ deleteMethod.url = (args: { document_id: string | number } | [document_id: strin
 
 /**
 * @see \App\Http\Controllers\Admin\DocumentController::deleteMethod
- * @see app/Http/Controllers/Admin/DocumentController.php:149
+ * @see app/Http/Controllers/Admin/DocumentController.php:136
  * @route '/editor/documents/delete/{document_id}'
  */
 deleteMethod.delete = (args: { document_id: string | number } | [document_id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({

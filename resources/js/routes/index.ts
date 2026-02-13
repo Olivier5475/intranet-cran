@@ -1,7 +1,7 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition } from './../wayfinder'
 /**
 * @see \App\Http\Controllers\MainController::__invoke
- * @see app/Http/Controllers/MainController.php:12
+ * @see app/Http/Controllers/MainController.php:14
  * @route '/'
  */
 export const home = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -16,7 +16,7 @@ home.definition = {
 
 /**
 * @see \App\Http\Controllers\MainController::__invoke
- * @see app/Http/Controllers/MainController.php:12
+ * @see app/Http/Controllers/MainController.php:14
  * @route '/'
  */
 home.url = (options?: RouteQueryOptions) => {
@@ -25,7 +25,7 @@ home.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\MainController::__invoke
- * @see app/Http/Controllers/MainController.php:12
+ * @see app/Http/Controllers/MainController.php:14
  * @route '/'
  */
 home.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -34,7 +34,7 @@ home.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 })
 /**
 * @see \App\Http\Controllers\MainController::__invoke
- * @see app/Http/Controllers/MainController.php:12
+ * @see app/Http/Controllers/MainController.php:14
  * @route '/'
  */
 home.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -44,7 +44,7 @@ home.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
 /**
 * @see \App\Http\Controllers\AuthController::logout
- * @see app/Http/Controllers/AuthController.php:8
+ * @see app/Http/Controllers/AuthController.php:13
  * @route '/logout'
  */
 export const logout = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -59,7 +59,7 @@ logout.definition = {
 
 /**
 * @see \App\Http\Controllers\AuthController::logout
- * @see app/Http/Controllers/AuthController.php:8
+ * @see app/Http/Controllers/AuthController.php:13
  * @route '/logout'
  */
 logout.url = (options?: RouteQueryOptions) => {
@@ -68,7 +68,7 @@ logout.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\AuthController::logout
- * @see app/Http/Controllers/AuthController.php:8
+ * @see app/Http/Controllers/AuthController.php:13
  * @route '/logout'
  */
 logout.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -77,7 +77,7 @@ logout.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 })
 /**
 * @see \App\Http\Controllers\AuthController::logout
- * @see app/Http/Controllers/AuthController.php:8
+ * @see app/Http/Controllers/AuthController.php:13
  * @route '/logout'
  */
 logout.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({

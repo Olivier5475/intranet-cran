@@ -2,7 +2,7 @@ import { queryParams, type RouteQueryOptions, type RouteDefinition, applyUrlDefa
 import post from './post'
 /**
 * @see \App\Http\Controllers\Admin\UsersController::deleteMethod
- * @see app/Http/Controllers/Admin/UsersController.php:70
+ * @see app/Http/Controllers/Admin/UsersController.php:77
  * @route '/admin/users/{id}'
  */
 export const deleteMethod = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
@@ -17,7 +17,7 @@ deleteMethod.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\UsersController::deleteMethod
- * @see app/Http/Controllers/Admin/UsersController.php:70
+ * @see app/Http/Controllers/Admin/UsersController.php:77
  * @route '/admin/users/{id}'
  */
 deleteMethod.url = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -45,7 +45,7 @@ deleteMethod.url = (args: { id: string | number } | [id: string | number ] | str
 
 /**
 * @see \App\Http\Controllers\Admin\UsersController::deleteMethod
- * @see app/Http/Controllers/Admin/UsersController.php:70
+ * @see app/Http/Controllers/Admin/UsersController.php:77
  * @route '/admin/users/{id}'
  */
 deleteMethod.delete = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({

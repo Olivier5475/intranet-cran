@@ -2,7 +2,7 @@ import { queryParams, type RouteQueryOptions, type RouteDefinition, applyUrlDefa
 import post from './post'
 /**
 * @see \App\Http\Controllers\Admin\FileController::create
- * @see app/Http/Controllers/Admin/FileController.php:86
+ * @see app/Http/Controllers/Admin/FileController.php:90
  * @route '/editor/files/create/p/{parent_id}'
  */
 export const create = (args: { parent_id: string | number } | [parent_id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -17,7 +17,7 @@ create.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\FileController::create
- * @see app/Http/Controllers/Admin/FileController.php:86
+ * @see app/Http/Controllers/Admin/FileController.php:90
  * @route '/editor/files/create/p/{parent_id}'
  */
 create.url = (args: { parent_id: string | number } | [parent_id: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -45,7 +45,7 @@ create.url = (args: { parent_id: string | number } | [parent_id: string | number
 
 /**
 * @see \App\Http\Controllers\Admin\FileController::create
- * @see app/Http/Controllers/Admin/FileController.php:86
+ * @see app/Http/Controllers/Admin/FileController.php:90
  * @route '/editor/files/create/p/{parent_id}'
  */
 create.get = (args: { parent_id: string | number } | [parent_id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -54,7 +54,7 @@ create.get = (args: { parent_id: string | number } | [parent_id: string | number
 })
 /**
 * @see \App\Http\Controllers\Admin\FileController::create
- * @see app/Http/Controllers/Admin/FileController.php:86
+ * @see app/Http/Controllers/Admin/FileController.php:90
  * @route '/editor/files/create/p/{parent_id}'
  */
 create.head = (args: { parent_id: string | number } | [parent_id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -64,7 +64,7 @@ create.head = (args: { parent_id: string | number } | [parent_id: string | numbe
 
 /**
 * @see \App\Http\Controllers\Admin\FileController::update
- * @see app/Http/Controllers/Admin/FileController.php:94
+ * @see app/Http/Controllers/Admin/FileController.php:99
  * @route '/editor/files/update/{file_id}'
  */
 export const update = (args: { file_id: string | number } | [file_id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -79,7 +79,7 @@ update.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\FileController::update
- * @see app/Http/Controllers/Admin/FileController.php:94
+ * @see app/Http/Controllers/Admin/FileController.php:99
  * @route '/editor/files/update/{file_id}'
  */
 update.url = (args: { file_id: string | number } | [file_id: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -107,7 +107,7 @@ update.url = (args: { file_id: string | number } | [file_id: string | number ] |
 
 /**
 * @see \App\Http\Controllers\Admin\FileController::update
- * @see app/Http/Controllers/Admin/FileController.php:94
+ * @see app/Http/Controllers/Admin/FileController.php:99
  * @route '/editor/files/update/{file_id}'
  */
 update.get = (args: { file_id: string | number } | [file_id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -116,7 +116,7 @@ update.get = (args: { file_id: string | number } | [file_id: string | number ] |
 })
 /**
 * @see \App\Http\Controllers\Admin\FileController::update
- * @see app/Http/Controllers/Admin/FileController.php:94
+ * @see app/Http/Controllers/Admin/FileController.php:99
  * @route '/editor/files/update/{file_id}'
  */
 update.head = (args: { file_id: string | number } | [file_id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -126,7 +126,7 @@ update.head = (args: { file_id: string | number } | [file_id: string | number ] 
 
 /**
 * @see \App\Http\Controllers\Admin\VersionController::history
- * @see app/Http/Controllers/Admin/VersionController.php:26
+ * @see app/Http/Controllers/Admin/VersionController.php:35
  * @route '/editor/files/history/{file_id}'
  */
 export const history = (args: { file_id: string | number } | [file_id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -141,7 +141,7 @@ history.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\VersionController::history
- * @see app/Http/Controllers/Admin/VersionController.php:26
+ * @see app/Http/Controllers/Admin/VersionController.php:35
  * @route '/editor/files/history/{file_id}'
  */
 history.url = (args: { file_id: string | number } | [file_id: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -169,7 +169,7 @@ history.url = (args: { file_id: string | number } | [file_id: string | number ] 
 
 /**
 * @see \App\Http\Controllers\Admin\VersionController::history
- * @see app/Http/Controllers/Admin/VersionController.php:26
+ * @see app/Http/Controllers/Admin/VersionController.php:35
  * @route '/editor/files/history/{file_id}'
  */
 history.get = (args: { file_id: string | number } | [file_id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -178,7 +178,7 @@ history.get = (args: { file_id: string | number } | [file_id: string | number ] 
 })
 /**
 * @see \App\Http\Controllers\Admin\VersionController::history
- * @see app/Http/Controllers/Admin/VersionController.php:26
+ * @see app/Http/Controllers/Admin/VersionController.php:35
  * @route '/editor/files/history/{file_id}'
  */
 history.head = (args: { file_id: string | number } | [file_id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -188,7 +188,7 @@ history.head = (args: { file_id: string | number } | [file_id: string | number ]
 
 /**
 * @see \App\Http\Controllers\Admin\FileController::deleteMethod
- * @see app/Http/Controllers/Admin/FileController.php:111
+ * @see app/Http/Controllers/Admin/FileController.php:117
  * @route '/editor/files/delete/{file_id}'
  */
 export const deleteMethod = (args: { file_id: string | number } | [file_id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
@@ -203,7 +203,7 @@ deleteMethod.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\FileController::deleteMethod
- * @see app/Http/Controllers/Admin/FileController.php:111
+ * @see app/Http/Controllers/Admin/FileController.php:117
  * @route '/editor/files/delete/{file_id}'
  */
 deleteMethod.url = (args: { file_id: string | number } | [file_id: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -231,7 +231,7 @@ deleteMethod.url = (args: { file_id: string | number } | [file_id: string | numb
 
 /**
 * @see \App\Http\Controllers\Admin\FileController::deleteMethod
- * @see app/Http/Controllers/Admin/FileController.php:111
+ * @see app/Http/Controllers/Admin/FileController.php:117
  * @route '/editor/files/delete/{file_id}'
  */
 deleteMethod.delete = (args: { file_id: string | number } | [file_id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({

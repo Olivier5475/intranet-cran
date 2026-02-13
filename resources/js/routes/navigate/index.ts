@@ -1,7 +1,7 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, applyUrlDefaults } from './../../wayfinder'
 /**
 * @see \App\Http\Controllers\NavigationController::__invoke
- * @see app/Http/Controllers/NavigationController.php:14
+ * @see app/Http/Controllers/NavigationController.php:17
  * @route '/navigation/f/{folder_id}'
  */
 export const folder = (args: { folder_id: string | number } | [folder_id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -16,7 +16,7 @@ folder.definition = {
 
 /**
 * @see \App\Http\Controllers\NavigationController::__invoke
- * @see app/Http/Controllers/NavigationController.php:14
+ * @see app/Http/Controllers/NavigationController.php:17
  * @route '/navigation/f/{folder_id}'
  */
 folder.url = (args: { folder_id: string | number } | [folder_id: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -44,7 +44,7 @@ folder.url = (args: { folder_id: string | number } | [folder_id: string | number
 
 /**
 * @see \App\Http\Controllers\NavigationController::__invoke
- * @see app/Http/Controllers/NavigationController.php:14
+ * @see app/Http/Controllers/NavigationController.php:17
  * @route '/navigation/f/{folder_id}'
  */
 folder.get = (args: { folder_id: string | number } | [folder_id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -53,7 +53,7 @@ folder.get = (args: { folder_id: string | number } | [folder_id: string | number
 })
 /**
 * @see \App\Http\Controllers\NavigationController::__invoke
- * @see app/Http/Controllers/NavigationController.php:14
+ * @see app/Http/Controllers/NavigationController.php:17
  * @route '/navigation/f/{folder_id}'
  */
 folder.head = (args: { folder_id: string | number } | [folder_id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -63,7 +63,7 @@ folder.head = (args: { folder_id: string | number } | [folder_id: string | numbe
 
 /**
 * @see \App\Http\Controllers\DocumentViewController::__invoke
- * @see app/Http/Controllers/DocumentViewController.php:12
+ * @see app/Http/Controllers/DocumentViewController.php:14
  * @route '/navigation/d/{document_id}'
  */
 export const document = (args: { document_id: string | number } | [document_id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -78,7 +78,7 @@ document.definition = {
 
 /**
 * @see \App\Http\Controllers\DocumentViewController::__invoke
- * @see app/Http/Controllers/DocumentViewController.php:12
+ * @see app/Http/Controllers/DocumentViewController.php:14
  * @route '/navigation/d/{document_id}'
  */
 document.url = (args: { document_id: string | number } | [document_id: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -106,7 +106,7 @@ document.url = (args: { document_id: string | number } | [document_id: string | 
 
 /**
 * @see \App\Http\Controllers\DocumentViewController::__invoke
- * @see app/Http/Controllers/DocumentViewController.php:12
+ * @see app/Http/Controllers/DocumentViewController.php:14
  * @route '/navigation/d/{document_id}'
  */
 document.get = (args: { document_id: string | number } | [document_id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -115,7 +115,7 @@ document.get = (args: { document_id: string | number } | [document_id: string | 
 })
 /**
 * @see \App\Http\Controllers\DocumentViewController::__invoke
- * @see app/Http/Controllers/DocumentViewController.php:12
+ * @see app/Http/Controllers/DocumentViewController.php:14
  * @route '/navigation/d/{document_id}'
  */
 document.head = (args: { document_id: string | number } | [document_id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'head'> => ({

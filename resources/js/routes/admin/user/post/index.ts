@@ -1,7 +1,7 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, applyUrlDefaults } from './../../../../wayfinder'
 /**
 * @see \App\Http\Controllers\Admin\UsersController::create
- * @see app/Http/Controllers/Admin/UsersController.php:29
+ * @see app/Http/Controllers/Admin/UsersController.php:32
  * @route '/admin/users'
  */
 export const create = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -16,7 +16,7 @@ create.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\UsersController::create
- * @see app/Http/Controllers/Admin/UsersController.php:29
+ * @see app/Http/Controllers/Admin/UsersController.php:32
  * @route '/admin/users'
  */
 create.url = (options?: RouteQueryOptions) => {
@@ -25,7 +25,7 @@ create.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\Admin\UsersController::create
- * @see app/Http/Controllers/Admin/UsersController.php:29
+ * @see app/Http/Controllers/Admin/UsersController.php:32
  * @route '/admin/users'
  */
 create.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -35,7 +35,7 @@ create.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
 
 /**
 * @see \App\Http\Controllers\Admin\UsersController::update
- * @see app/Http/Controllers/Admin/UsersController.php:29
+ * @see app/Http/Controllers/Admin/UsersController.php:32
  * @route '/admin/users/{id}'
  */
 export const update = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
@@ -50,7 +50,7 @@ update.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\UsersController::update
- * @see app/Http/Controllers/Admin/UsersController.php:29
+ * @see app/Http/Controllers/Admin/UsersController.php:32
  * @route '/admin/users/{id}'
  */
 update.url = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -78,7 +78,7 @@ update.url = (args: { id: string | number } | [id: string | number ] | string | 
 
 /**
 * @see \App\Http\Controllers\Admin\UsersController::update
- * @see app/Http/Controllers/Admin/UsersController.php:29
+ * @see app/Http/Controllers/Admin/UsersController.php:32
  * @route '/admin/users/{id}'
  */
 update.patch = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({

@@ -2,7 +2,7 @@ import { queryParams, type RouteQueryOptions, type RouteDefinition, applyUrlDefa
 import post from './post'
 /**
 * @see \App\Http\Controllers\Admin\FolderController::create
- * @see app/Http/Controllers/Admin/FolderController.php:22
+ * @see app/Http/Controllers/Admin/FolderController.php:21
  * @route '/editor/folders/create/p/{parent_id}'
  */
 export const create = (args: { parent_id: string | number } | [parent_id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -17,7 +17,7 @@ create.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\FolderController::create
- * @see app/Http/Controllers/Admin/FolderController.php:22
+ * @see app/Http/Controllers/Admin/FolderController.php:21
  * @route '/editor/folders/create/p/{parent_id}'
  */
 create.url = (args: { parent_id: string | number } | [parent_id: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -45,7 +45,7 @@ create.url = (args: { parent_id: string | number } | [parent_id: string | number
 
 /**
 * @see \App\Http\Controllers\Admin\FolderController::create
- * @see app/Http/Controllers/Admin/FolderController.php:22
+ * @see app/Http/Controllers/Admin/FolderController.php:21
  * @route '/editor/folders/create/p/{parent_id}'
  */
 create.get = (args: { parent_id: string | number } | [parent_id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -54,7 +54,7 @@ create.get = (args: { parent_id: string | number } | [parent_id: string | number
 })
 /**
 * @see \App\Http\Controllers\Admin\FolderController::create
- * @see app/Http/Controllers/Admin/FolderController.php:22
+ * @see app/Http/Controllers/Admin/FolderController.php:21
  * @route '/editor/folders/create/p/{parent_id}'
  */
 create.head = (args: { parent_id: string | number } | [parent_id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -64,7 +64,7 @@ create.head = (args: { parent_id: string | number } | [parent_id: string | numbe
 
 /**
 * @see \App\Http\Controllers\Admin\FolderController::update
- * @see app/Http/Controllers/Admin/FolderController.php:40
+ * @see app/Http/Controllers/Admin/FolderController.php:41
  * @route '/editor/folders/update/{folder_id}'
  */
 export const update = (args: { folder_id: string | number } | [folder_id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -79,7 +79,7 @@ update.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\FolderController::update
- * @see app/Http/Controllers/Admin/FolderController.php:40
+ * @see app/Http/Controllers/Admin/FolderController.php:41
  * @route '/editor/folders/update/{folder_id}'
  */
 update.url = (args: { folder_id: string | number } | [folder_id: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -107,7 +107,7 @@ update.url = (args: { folder_id: string | number } | [folder_id: string | number
 
 /**
 * @see \App\Http\Controllers\Admin\FolderController::update
- * @see app/Http/Controllers/Admin/FolderController.php:40
+ * @see app/Http/Controllers/Admin/FolderController.php:41
  * @route '/editor/folders/update/{folder_id}'
  */
 update.get = (args: { folder_id: string | number } | [folder_id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -116,7 +116,7 @@ update.get = (args: { folder_id: string | number } | [folder_id: string | number
 })
 /**
 * @see \App\Http\Controllers\Admin\FolderController::update
- * @see app/Http/Controllers/Admin/FolderController.php:40
+ * @see app/Http/Controllers/Admin/FolderController.php:41
  * @route '/editor/folders/update/{folder_id}'
  */
 update.head = (args: { folder_id: string | number } | [folder_id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -126,7 +126,7 @@ update.head = (args: { folder_id: string | number } | [folder_id: string | numbe
 
 /**
 * @see \App\Http\Controllers\Admin\FolderController::deleteMethod
- * @see app/Http/Controllers/Admin/FolderController.php:106
+ * @see app/Http/Controllers/Admin/FolderController.php:110
  * @route '/editor/folders/delete/{folder_id}'
  */
 export const deleteMethod = (args: { folder_id: string | number } | [folder_id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
@@ -141,7 +141,7 @@ deleteMethod.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\FolderController::deleteMethod
- * @see app/Http/Controllers/Admin/FolderController.php:106
+ * @see app/Http/Controllers/Admin/FolderController.php:110
  * @route '/editor/folders/delete/{folder_id}'
  */
 deleteMethod.url = (args: { folder_id: string | number } | [folder_id: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -169,7 +169,7 @@ deleteMethod.url = (args: { folder_id: string | number } | [folder_id: string | 
 
 /**
 * @see \App\Http\Controllers\Admin\FolderController::deleteMethod
- * @see app/Http/Controllers/Admin/FolderController.php:106
+ * @see app/Http/Controllers/Admin/FolderController.php:110
  * @route '/editor/folders/delete/{folder_id}'
  */
 deleteMethod.delete = (args: { folder_id: string | number } | [folder_id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({

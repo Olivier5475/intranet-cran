@@ -88,7 +88,7 @@ update.post = (args: { file_id: string | number } | [file_id: string | number ] 
 
 /**
 * @see \App\Http\Controllers\Admin\VersionController::restore
- * @see app/Http/Controllers/Admin/VersionController.php:14
+ * @see app/Http/Controllers/Admin/VersionController.php:17
  * @route '/editor/files/restore/{version_id}'
  */
 export const restore = (args: { version_id: string | number } | [version_id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -103,7 +103,7 @@ restore.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\VersionController::restore
- * @see app/Http/Controllers/Admin/VersionController.php:14
+ * @see app/Http/Controllers/Admin/VersionController.php:17
  * @route '/editor/files/restore/{version_id}'
  */
 restore.url = (args: { version_id: string | number } | [version_id: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -131,7 +131,7 @@ restore.url = (args: { version_id: string | number } | [version_id: string | num
 
 /**
 * @see \App\Http\Controllers\Admin\VersionController::restore
- * @see app/Http/Controllers/Admin/VersionController.php:14
+ * @see app/Http/Controllers/Admin/VersionController.php:17
  * @route '/editor/files/restore/{version_id}'
  */
 restore.post = (args: { version_id: string | number } | [version_id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'post'> => ({

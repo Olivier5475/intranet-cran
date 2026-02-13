@@ -46,7 +46,7 @@ user.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
 /**
 * @see \App\Http\Controllers\Admin\DepartementController::departements
- * @see app/Http/Controllers/Admin/DepartementController.php:19
+ * @see app/Http/Controllers/Admin/DepartementController.php:20
  * @route '/admin/departements'
  */
 export const departements = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -61,7 +61,7 @@ departements.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\DepartementController::departements
- * @see app/Http/Controllers/Admin/DepartementController.php:19
+ * @see app/Http/Controllers/Admin/DepartementController.php:20
  * @route '/admin/departements'
  */
 departements.url = (options?: RouteQueryOptions) => {
@@ -70,7 +70,7 @@ departements.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\Admin\DepartementController::departements
- * @see app/Http/Controllers/Admin/DepartementController.php:19
+ * @see app/Http/Controllers/Admin/DepartementController.php:20
  * @route '/admin/departements'
  */
 departements.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -79,7 +79,7 @@ departements.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 })
 /**
 * @see \App\Http\Controllers\Admin\DepartementController::departements
- * @see app/Http/Controllers/Admin/DepartementController.php:19
+ * @see app/Http/Controllers/Admin/DepartementController.php:20
  * @route '/admin/departements'
  */
 departements.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({

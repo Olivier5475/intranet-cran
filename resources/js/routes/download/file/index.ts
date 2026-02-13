@@ -1,7 +1,7 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, applyUrlDefaults } from './../../../wayfinder'
 /**
 * @see \App\Http\Controllers\DownloadController::version
- * @see app/Http/Controllers/DownloadController.php:32
+ * @see app/Http/Controllers/DownloadController.php:40
  * @route '/download/version/{id}'
  */
 export const version = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -16,7 +16,7 @@ version.definition = {
 
 /**
 * @see \App\Http\Controllers\DownloadController::version
- * @see app/Http/Controllers/DownloadController.php:32
+ * @see app/Http/Controllers/DownloadController.php:40
  * @route '/download/version/{id}'
  */
 version.url = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -44,7 +44,7 @@ version.url = (args: { id: string | number } | [id: string | number ] | string |
 
 /**
 * @see \App\Http\Controllers\DownloadController::version
- * @see app/Http/Controllers/DownloadController.php:32
+ * @see app/Http/Controllers/DownloadController.php:40
  * @route '/download/version/{id}'
  */
 version.get = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -53,7 +53,7 @@ version.get = (args: { id: string | number } | [id: string | number ] | string |
 })
 /**
 * @see \App\Http\Controllers\DownloadController::version
- * @see app/Http/Controllers/DownloadController.php:32
+ * @see app/Http/Controllers/DownloadController.php:40
  * @route '/download/version/{id}'
  */
 version.head = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'head'> => ({

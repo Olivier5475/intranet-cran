@@ -1,7 +1,7 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, applyUrlDefaults } from './../../../../wayfinder'
 /**
 * @see \App\Http\Controllers\Admin\DocumentController::create
- * @see app/Http/Controllers/Admin/DocumentController.php:28
+ * @see app/Http/Controllers/Admin/DocumentController.php:29
  * @route '/editor/documents/store'
  */
 export const create = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -16,7 +16,7 @@ create.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\DocumentController::create
- * @see app/Http/Controllers/Admin/DocumentController.php:28
+ * @see app/Http/Controllers/Admin/DocumentController.php:29
  * @route '/editor/documents/store'
  */
 create.url = (options?: RouteQueryOptions) => {
@@ -25,7 +25,7 @@ create.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\Admin\DocumentController::create
- * @see app/Http/Controllers/Admin/DocumentController.php:28
+ * @see app/Http/Controllers/Admin/DocumentController.php:29
  * @route '/editor/documents/store'
  */
 create.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -35,7 +35,7 @@ create.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
 
 /**
 * @see \App\Http\Controllers\Admin\DocumentController::update
- * @see app/Http/Controllers/Admin/DocumentController.php:28
+ * @see app/Http/Controllers/Admin/DocumentController.php:29
  * @route '/editor/documents/store/{document_id}'
  */
 export const update = (args: { document_id: string | number } | [document_id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -50,7 +50,7 @@ update.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\DocumentController::update
- * @see app/Http/Controllers/Admin/DocumentController.php:28
+ * @see app/Http/Controllers/Admin/DocumentController.php:29
  * @route '/editor/documents/store/{document_id}'
  */
 update.url = (args: { document_id: string | number } | [document_id: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -78,7 +78,7 @@ update.url = (args: { document_id: string | number } | [document_id: string | nu
 
 /**
 * @see \App\Http\Controllers\Admin\DocumentController::update
- * @see app/Http/Controllers/Admin/DocumentController.php:28
+ * @see app/Http/Controllers/Admin/DocumentController.php:29
  * @route '/editor/documents/store/{document_id}'
  */
 update.post = (args: { document_id: string | number } | [document_id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'post'> => ({

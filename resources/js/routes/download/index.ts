@@ -64,7 +64,7 @@ attachment.head = (args: { id: string | number } | [id: string | number ] | stri
 
 /**
 * @see \App\Http\Controllers\DownloadController::file
- * @see app/Http/Controllers/DownloadController.php:24
+ * @see app/Http/Controllers/DownloadController.php:28
  * @route '/download/file/{id}'
  */
 export const file = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -79,7 +79,7 @@ file.definition = {
 
 /**
 * @see \App\Http\Controllers\DownloadController::file
- * @see app/Http/Controllers/DownloadController.php:24
+ * @see app/Http/Controllers/DownloadController.php:28
  * @route '/download/file/{id}'
  */
 file.url = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -107,7 +107,7 @@ file.url = (args: { id: string | number } | [id: string | number ] | string | nu
 
 /**
 * @see \App\Http\Controllers\DownloadController::file
- * @see app/Http/Controllers/DownloadController.php:24
+ * @see app/Http/Controllers/DownloadController.php:28
  * @route '/download/file/{id}'
  */
 file.get = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -116,7 +116,7 @@ file.get = (args: { id: string | number } | [id: string | number ] | string | nu
 })
 /**
 * @see \App\Http\Controllers\DownloadController::file
- * @see app/Http/Controllers/DownloadController.php:24
+ * @see app/Http/Controllers/DownloadController.php:28
  * @route '/download/file/{id}'
  */
 file.head = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
