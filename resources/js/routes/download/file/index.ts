@@ -1,4 +1,4 @@
-import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition, applyUrlDefaults } from './../../../wayfinder'
+import { queryParams, type RouteQueryOptions, type RouteDefinition, applyUrlDefaults } from './../../../wayfinder'
 /**
 * @see \App\Http\Controllers\DownloadController::version
  * @see app/Http/Controllers/DownloadController.php:32
@@ -60,42 +60,6 @@ version.head = (args: { id: string | number } | [id: string | number ] | string 
     url: version.url(args, options),
     method: 'head',
 })
-
-    /**
-* @see \App\Http\Controllers\DownloadController::version
- * @see app/Http/Controllers/DownloadController.php:32
- * @route '/download/version/{id}'
- */
-    const versionForm = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-        action: version.url(args, options),
-        method: 'get',
-    })
-
-            /**
-* @see \App\Http\Controllers\DownloadController::version
- * @see app/Http/Controllers/DownloadController.php:32
- * @route '/download/version/{id}'
- */
-        versionForm.get = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: version.url(args, options),
-            method: 'get',
-        })
-            /**
-* @see \App\Http\Controllers\DownloadController::version
- * @see app/Http/Controllers/DownloadController.php:32
- * @route '/download/version/{id}'
- */
-        versionForm.head = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: version.url(args, {
-                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                            _method: 'HEAD',
-                            ...(options?.query ?? options?.mergeQuery ?? {}),
-                        }
-                    }),
-            method: 'get',
-        })
-    
-    version.form = versionForm
 const file = {
     version: Object.assign(version, version),
 }

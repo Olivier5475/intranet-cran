@@ -1,4 +1,4 @@
-import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition } from './../wayfinder'
+import { queryParams, type RouteQueryOptions, type RouteDefinition } from './../wayfinder'
 /**
 * @see \App\Http\Controllers\MainController::__invoke
  * @see app/Http/Controllers/MainController.php:12
@@ -42,41 +42,6 @@ home.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     method: 'head',
 })
 
-    /**
-* @see \App\Http\Controllers\MainController::__invoke
- * @see app/Http/Controllers/MainController.php:12
- * @route '/'
- */
-    const homeForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-        action: home.url(options),
-        method: 'get',
-    })
-
-            /**
-* @see \App\Http\Controllers\MainController::__invoke
- * @see app/Http/Controllers/MainController.php:12
- * @route '/'
- */
-        homeForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: home.url(options),
-            method: 'get',
-        })
-            /**
-* @see \App\Http\Controllers\MainController::__invoke
- * @see app/Http/Controllers/MainController.php:12
- * @route '/'
- */
-        homeForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: home.url({
-                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                            _method: 'HEAD',
-                            ...(options?.query ?? options?.mergeQuery ?? {}),
-                        }
-                    }),
-            method: 'get',
-        })
-    
-    home.form = homeForm
 /**
 * @see \App\Http\Controllers\AuthController::logout
  * @see app/Http/Controllers/AuthController.php:8
@@ -119,39 +84,3 @@ logout.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     url: logout.url(options),
     method: 'head',
 })
-
-    /**
-* @see \App\Http\Controllers\AuthController::logout
- * @see app/Http/Controllers/AuthController.php:8
- * @route '/logout'
- */
-    const logoutForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-        action: logout.url(options),
-        method: 'get',
-    })
-
-            /**
-* @see \App\Http\Controllers\AuthController::logout
- * @see app/Http/Controllers/AuthController.php:8
- * @route '/logout'
- */
-        logoutForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: logout.url(options),
-            method: 'get',
-        })
-            /**
-* @see \App\Http\Controllers\AuthController::logout
- * @see app/Http/Controllers/AuthController.php:8
- * @route '/logout'
- */
-        logoutForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: logout.url({
-                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                            _method: 'HEAD',
-                            ...(options?.query ?? options?.mergeQuery ?? {}),
-                        }
-                    }),
-            method: 'get',
-        })
-    
-    logout.form = logoutForm

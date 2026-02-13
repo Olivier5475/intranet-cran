@@ -1,4 +1,4 @@
-import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition, applyUrlDefaults } from './../../../../wayfinder'
+import { queryParams, type RouteQueryOptions, type RouteDefinition, applyUrlDefaults } from './../../../../wayfinder'
 /**
 * @see \App\Http\Controllers\Admin\DocumentController::create
  * @see app/Http/Controllers/Admin/DocumentController.php:28
@@ -33,27 +33,6 @@ create.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
     method: 'post',
 })
 
-    /**
-* @see \App\Http\Controllers\Admin\DocumentController::create
- * @see app/Http/Controllers/Admin/DocumentController.php:28
- * @route '/editor/documents/store'
- */
-    const createForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
-        action: create.url(options),
-        method: 'post',
-    })
-
-            /**
-* @see \App\Http\Controllers\Admin\DocumentController::create
- * @see app/Http/Controllers/Admin/DocumentController.php:28
- * @route '/editor/documents/store'
- */
-        createForm.post = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
-            action: create.url(options),
-            method: 'post',
-        })
-    
-    create.form = createForm
 /**
 * @see \App\Http\Controllers\Admin\DocumentController::update
  * @see app/Http/Controllers/Admin/DocumentController.php:28
@@ -106,28 +85,6 @@ update.post = (args: { document_id: string | number } | [document_id: string | n
     url: update.url(args, options),
     method: 'post',
 })
-
-    /**
-* @see \App\Http\Controllers\Admin\DocumentController::update
- * @see app/Http/Controllers/Admin/DocumentController.php:28
- * @route '/editor/documents/store/{document_id}'
- */
-    const updateForm = (args: { document_id: string | number } | [document_id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
-        action: update.url(args, options),
-        method: 'post',
-    })
-
-            /**
-* @see \App\Http\Controllers\Admin\DocumentController::update
- * @see app/Http/Controllers/Admin/DocumentController.php:28
- * @route '/editor/documents/store/{document_id}'
- */
-        updateForm.post = (args: { document_id: string | number } | [document_id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
-            action: update.url(args, options),
-            method: 'post',
-        })
-    
-    update.form = updateForm
 const post = {
     create: Object.assign(create, create),
 update: Object.assign(update, update),

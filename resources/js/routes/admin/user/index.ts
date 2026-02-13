@@ -1,4 +1,4 @@
-import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition, applyUrlDefaults } from './../../../wayfinder'
+import { queryParams, type RouteQueryOptions, type RouteDefinition, applyUrlDefaults } from './../../../wayfinder'
 import post from './post'
 /**
 * @see \App\Http\Controllers\Admin\UsersController::deleteMethod
@@ -52,38 +52,6 @@ deleteMethod.delete = (args: { id: string | number } | [id: string | number ] | 
     url: deleteMethod.url(args, options),
     method: 'delete',
 })
-
-    /**
-* @see \App\Http\Controllers\Admin\UsersController::deleteMethod
- * @see app/Http/Controllers/Admin/UsersController.php:70
- * @route '/admin/users/{id}'
- */
-    const deleteMethodForm = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
-        action: deleteMethod.url(args, {
-                    [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                        _method: 'DELETE',
-                        ...(options?.query ?? options?.mergeQuery ?? {}),
-                    }
-                }),
-        method: 'post',
-    })
-
-            /**
-* @see \App\Http\Controllers\Admin\UsersController::deleteMethod
- * @see app/Http/Controllers/Admin/UsersController.php:70
- * @route '/admin/users/{id}'
- */
-        deleteMethodForm.delete = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
-            action: deleteMethod.url(args, {
-                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                            _method: 'DELETE',
-                            ...(options?.query ?? options?.mergeQuery ?? {}),
-                        }
-                    }),
-            method: 'post',
-        })
-    
-    deleteMethod.form = deleteMethodForm
 const user = {
     post: Object.assign(post, post),
 delete: Object.assign(deleteMethod, deleteMethod),

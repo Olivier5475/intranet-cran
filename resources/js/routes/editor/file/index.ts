@@ -1,4 +1,4 @@
-import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition, applyUrlDefaults } from './../../../wayfinder'
+import { queryParams, type RouteQueryOptions, type RouteDefinition, applyUrlDefaults } from './../../../wayfinder'
 import post from './post'
 /**
 * @see \App\Http\Controllers\Admin\FileController::create
@@ -62,41 +62,6 @@ create.head = (args: { parent_id: string | number } | [parent_id: string | numbe
     method: 'head',
 })
 
-    /**
-* @see \App\Http\Controllers\Admin\FileController::create
- * @see app/Http/Controllers/Admin/FileController.php:86
- * @route '/editor/files/create/p/{parent_id}'
- */
-    const createForm = (args: { parent_id: string | number } | [parent_id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-        action: create.url(args, options),
-        method: 'get',
-    })
-
-            /**
-* @see \App\Http\Controllers\Admin\FileController::create
- * @see app/Http/Controllers/Admin/FileController.php:86
- * @route '/editor/files/create/p/{parent_id}'
- */
-        createForm.get = (args: { parent_id: string | number } | [parent_id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: create.url(args, options),
-            method: 'get',
-        })
-            /**
-* @see \App\Http\Controllers\Admin\FileController::create
- * @see app/Http/Controllers/Admin/FileController.php:86
- * @route '/editor/files/create/p/{parent_id}'
- */
-        createForm.head = (args: { parent_id: string | number } | [parent_id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: create.url(args, {
-                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                            _method: 'HEAD',
-                            ...(options?.query ?? options?.mergeQuery ?? {}),
-                        }
-                    }),
-            method: 'get',
-        })
-    
-    create.form = createForm
 /**
 * @see \App\Http\Controllers\Admin\FileController::update
  * @see app/Http/Controllers/Admin/FileController.php:94
@@ -159,41 +124,6 @@ update.head = (args: { file_id: string | number } | [file_id: string | number ] 
     method: 'head',
 })
 
-    /**
-* @see \App\Http\Controllers\Admin\FileController::update
- * @see app/Http/Controllers/Admin/FileController.php:94
- * @route '/editor/files/update/{file_id}'
- */
-    const updateForm = (args: { file_id: string | number } | [file_id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-        action: update.url(args, options),
-        method: 'get',
-    })
-
-            /**
-* @see \App\Http\Controllers\Admin\FileController::update
- * @see app/Http/Controllers/Admin/FileController.php:94
- * @route '/editor/files/update/{file_id}'
- */
-        updateForm.get = (args: { file_id: string | number } | [file_id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: update.url(args, options),
-            method: 'get',
-        })
-            /**
-* @see \App\Http\Controllers\Admin\FileController::update
- * @see app/Http/Controllers/Admin/FileController.php:94
- * @route '/editor/files/update/{file_id}'
- */
-        updateForm.head = (args: { file_id: string | number } | [file_id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: update.url(args, {
-                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                            _method: 'HEAD',
-                            ...(options?.query ?? options?.mergeQuery ?? {}),
-                        }
-                    }),
-            method: 'get',
-        })
-    
-    update.form = updateForm
 /**
 * @see \App\Http\Controllers\Admin\VersionController::history
  * @see app/Http/Controllers/Admin/VersionController.php:26
@@ -256,41 +186,6 @@ history.head = (args: { file_id: string | number } | [file_id: string | number ]
     method: 'head',
 })
 
-    /**
-* @see \App\Http\Controllers\Admin\VersionController::history
- * @see app/Http/Controllers/Admin/VersionController.php:26
- * @route '/editor/files/history/{file_id}'
- */
-    const historyForm = (args: { file_id: string | number } | [file_id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-        action: history.url(args, options),
-        method: 'get',
-    })
-
-            /**
-* @see \App\Http\Controllers\Admin\VersionController::history
- * @see app/Http/Controllers/Admin/VersionController.php:26
- * @route '/editor/files/history/{file_id}'
- */
-        historyForm.get = (args: { file_id: string | number } | [file_id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: history.url(args, options),
-            method: 'get',
-        })
-            /**
-* @see \App\Http\Controllers\Admin\VersionController::history
- * @see app/Http/Controllers/Admin/VersionController.php:26
- * @route '/editor/files/history/{file_id}'
- */
-        historyForm.head = (args: { file_id: string | number } | [file_id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: history.url(args, {
-                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                            _method: 'HEAD',
-                            ...(options?.query ?? options?.mergeQuery ?? {}),
-                        }
-                    }),
-            method: 'get',
-        })
-    
-    history.form = historyForm
 /**
 * @see \App\Http\Controllers\Admin\FileController::deleteMethod
  * @see app/Http/Controllers/Admin/FileController.php:111
@@ -343,38 +238,6 @@ deleteMethod.delete = (args: { file_id: string | number } | [file_id: string | n
     url: deleteMethod.url(args, options),
     method: 'delete',
 })
-
-    /**
-* @see \App\Http\Controllers\Admin\FileController::deleteMethod
- * @see app/Http/Controllers/Admin/FileController.php:111
- * @route '/editor/files/delete/{file_id}'
- */
-    const deleteMethodForm = (args: { file_id: string | number } | [file_id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
-        action: deleteMethod.url(args, {
-                    [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                        _method: 'DELETE',
-                        ...(options?.query ?? options?.mergeQuery ?? {}),
-                    }
-                }),
-        method: 'post',
-    })
-
-            /**
-* @see \App\Http\Controllers\Admin\FileController::deleteMethod
- * @see app/Http/Controllers/Admin/FileController.php:111
- * @route '/editor/files/delete/{file_id}'
- */
-        deleteMethodForm.delete = (args: { file_id: string | number } | [file_id: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
-            action: deleteMethod.url(args, {
-                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                            _method: 'DELETE',
-                            ...(options?.query ?? options?.mergeQuery ?? {}),
-                        }
-                    }),
-            method: 'post',
-        })
-    
-    deleteMethod.form = deleteMethodForm
 const file = {
     create: Object.assign(create, create),
 update: Object.assign(update, update),
