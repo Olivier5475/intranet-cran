@@ -62,23 +62,6 @@ class DepartementController extends Controller {
         }
     }
 
-    public function create() {
-        return \Inertia\Inertia::render('Admin/DepartementForm');
-    }
-    public function update($id) {
-        try {
-            return \Inertia\Inertia::render('Admin/DepartementForm', [
-                "departement" => $this->departementsService->readById($id)
-            ]);
-        } catch (BadRequestException $e) {
-            // 400 Bad Request (pour une erreur d'argument si non gérée par la validation)
-            return redirect()->back()->with(['error' => 'Arguments manquants ou invalides.']);
-        } catch (DepartementNotFoundException $e) {
-            // 404 Not Found
-            return redirect()->back()->with(['error' => 'Le departement spécifié est introuvable.']);
-        }
-    }
-
     public function delete($id) {
         try {
             $this->departementsService->delete($id);

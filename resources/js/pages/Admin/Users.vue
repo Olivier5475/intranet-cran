@@ -1,99 +1,98 @@
 <script setup lang="ts">
-import { Link } from '@inertiajs/vue3';
-import { UserPlusIcon, UserMinusIcon } from '@heroicons/vue/20/solid';
-import { ref, watch } from 'vue';
-import route from '@/routes/admin/user';
+import { ref } from 'vue';
+import { UserPlusIcon, TrashIcon, PencilSquareIcon, UserGroupIcon } from '@heroicons/vue/24/outline';
+import Modal from '@/Components/Modal.vue';
+import UserForm from '@/Components/Forms/UserForm.vue'; // Ton formulaire refait
+import { router } from '@inertiajs/vue3';
+import user from '@/routes/admin/user';
+import { User } from '@/types';
+defineProps<{ users: any[]; departements: any[] }>();
 
-interface User {
-    nom: string;
-    prenom: string;
-    email: string;
-    role: string;
-    id: number;
-}
+const showModal = ref(false);
+const selectedUser = ref();
+selectedUser.value = null;
 
-const props = defineProps<{
-    users: User[];
-}>();
-
-// Fonction utilitaire pour colorer les rôles
-const getRoleColor = (role: string) => {
-    switch (role.toLowerCase()) {
-        case 'admin':
-            return 'text-red-500';
-        case 'editeur':
-            return 'text-yellow-500';
-        case 'user':
-        default:
-            return 'text-green-500';
-    }
+const openCreate = () => {
+    selectedUser.value = null;
+    showModal.value = true;
 };
-
-
-
-const lastIndex = ref(props.users.length);
-watch(() => props.users, () => {
-    lastIndex.value = props.users.length;
-});
+const openEdit = (user: User) => {
+    selectedUser.value = user;
+    showModal.value = true;
+};
+const deleteUser = (id: number) => {
+    if (confirm('Supprimer ?')) router.delete(user.delete.url(id));
+};
 </script>
 
 <template>
-    <div class="p-4 max-w-4xl mx-auto min-h-screen">
-        <h1 class="text-3xl font-extrabold text-gray-900 dark:text-white mb-6 text-center">Gestion des Utilisateurs</h1>
-
-        <div class="shadow-2xl rounded-xl bg-white dark:bg-gray-800 overflow-hidden">
-            <!-- Header de la grille -->
-            <div class="bg-indigo-700 text-white font-bold text-sm tracking-wider p-4 shadow-md grid grid-cols-12 uppercase">
-                <p class="sm:col-span-4 col-span-4">Nom Prénom</p>
-                <p class="sm:col-span-4 col-span-4 truncate">Email</p>
-                <p class="sm:col-span-2 col-span-2 text-right">Rôle</p>
-                <p class="sm:col-span-2 col-span-2 text-right">Actions</p>
+    <div class="p-6 max-w-6xl mx-auto">
+        <div class="mb-8 flex items-center justify-between">
+            <div>
+                <h1 class="text-3xl font-black dark:text-white flex items-center gap-3">
+                    <UserGroupIcon class="w-8 h-8 text-sky-500" />
+                    Utilisateurs
+                </h1>
+                <p class="text-zinc-500 text-sm mt-1">Gérez les entités et services de l'intranet</p>
             </div>
-
-            <!-- Lignes de données -->
-            <div v-if="users.length === 0" class="p-6 text-gray-500 dark:text-gray-400 text-center">Aucun utilisateur trouvé.</div>
-
-            <div v-else>
-                <Link
-                    v-for="(user, index) in users"
-                    :key="user.email"
-                    :href="route.update.url(user.id)"
-                    class="p-4 text-sm ease-in-out dark:border-gray-700 grid cursor-pointer grid-cols-12 border-t transition duration-150"
-                    :class="{
-                        'bg-gray-50 dark:bg-gray-700 hover:bg-indigo-100 dark:hover:bg-indigo-900': index % 2 === 0,
-                        'bg-white dark:bg-gray-900 hover:bg-indigo-100 dark:hover:bg-indigo-900': index % 2 !== 0,
-                    }"
-                >
-                    <p class="sm:col-span-4 font-medium text-gray-800 dark:text-gray-200 col-span-4 truncate">{{ user.nom }} {{ user.prenom }}</p>
-
-                    <p class="sm:col-span-4 text-gray-600 dark:text-gray-400 col-span-4 truncate">
-                        {{ user.email }}
-                    </p>
-
-                    <p class="sm:col-span-2 font-semibold col-span-2 text-right" :class="getRoleColor(user.role)">
-                        {{ user.role }}
-                    </p>
-
-                    <Link
-                        :href="route.delete.url(user.id)"
-                        method="delete"
-                        class="sm:col-span-2 end font-semibold col-span-2 text-right"
-                    >
-                        <UserMinusIcon class="w-8 text-red-600 ml-auto"></UserMinusIcon>
-                    </Link>
-                </Link>
-            </div>
-            <Link
-                :href="`/admin/users/create`"
-                class="p-4 text-sm ease-in-out dark:border-gray-700 flex cursor-pointer grid-cols-12 border-t transition duration-150"
-                :class="
-                        lastIndex % 2 !== 0
-                            ? 'bg-white dark:bg-gray-900 hover:bg-indigo-100 dark:hover:bg-indigo-900'
-                            : 'bg-gray-50 dark:bg-gray-700 hover:bg-indigo-100 dark:hover:bg-indigo-900'
-                    "
+            <button
+                @click="openCreate"
+                class="gap-2 bg-sky-600 hover:bg-sky-700 text-white px-4 py-2 rounded-xl shadow-lg shadow-sky-500/20 flex items-center transition-all"
             >
-                <UserPlusIcon class="w-8 mx-auto" />
-            </Link>
+                <UserPlusIcon class="w-5 h-5" />
+                Nouveau
+            </button>
         </div>
+
+        <div class="gap-4 grid">
+            <div
+                v-for="user in users"
+                :key="user.id"
+                class="group bg-white dark:bg-zinc-900 p-4 rounded-2xl border-zinc-100 dark:border-zinc-800 hover:shadow-md flex items-center justify-between border transition-all"
+            >
+                <div class="gap-4 flex items-center">
+                    <div class="w-12 h-12 bg-sky-100 dark:bg-sky-900/30 text-sky-600 font-bold text-xl flex items-center justify-center rounded-full">
+                        {{ user.nom[0] }}
+                    </div>
+                    <div>
+                        <p class="font-bold dark:text-white">{{ user.prenom }} {{ user.nom }}</p>
+                        <p class="text-sm text-zinc-500">{{ user.email }}</p>
+                    </div>
+                </div>
+
+                <div class="gap-6 flex items-center">
+                    <span
+                        class="px-3 py-1 text-xs font-bold tracking-widest mx-auto rounded-full uppercase"
+                        :class="
+                            user.role === 'admin'
+                                ? 'bg-red-100 text-red-600'
+                                : user.role === 'editeur'
+                                  ? 'bg-yellow-100 text-yellow-600'
+                                  : 'bg-emerald-100 text-emerald-600'
+                        "
+                    >
+                        {{ user.role }}
+                    </span>
+                    <div class="gap-2 flex items-center opacity-0 transition-opacity group-hover:opacity-100">
+                        <button
+                            @click="openEdit(user)"
+                            class="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg text-zinc-400 hover:text-sky-500"
+                        >
+                            <PencilSquareIcon class="w-5 h-5" />
+                        </button>
+                        <button
+                            @click="deleteUser(user.id)"
+                            class="p-2 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg text-zinc-400 hover:text-red-500"
+                        >
+                            <TrashIcon class="w-5 h-5" />
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <Modal :show="showModal" :title="selectedUser ? 'Modifier l\'utilisateur' : 'Créer un utilisateur'" @close="showModal = false">
+            <UserForm :user="selectedUser" :departements="departements" @success="showModal = false" />
+        </Modal>
     </div>
 </template>

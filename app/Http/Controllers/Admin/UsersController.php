@@ -67,23 +67,6 @@ class UsersController extends Controller {
         }
     }
 
-    public function create() {
-        return \Inertia\Inertia::render('Admin/UserForm');
-    }
-    public function update($id) {
-        try {
-            return \Inertia\Inertia::render('Admin/UserForm', [
-                "user" => $this->usersService->readById($id)
-            ]);
-        } catch (BadRequestException $e) {
-            // 400 Bad Request (pour une erreur d'argument si non gérée par la validation)
-            return redirect()->back()->with(['error' => 'Arguments manquants ou invalides.']);
-        } catch (FileNotFoundException $e) {
-            // 404 Not Found
-            return redirect()->back()->with(['error' => 'Le document ou un attachement spécifié est introuvable.']);
-        }
-    }
-
     public function delete($id) {
         try {
             $this->usersService->delete($id);

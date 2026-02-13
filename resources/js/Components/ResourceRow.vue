@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { Link } from '@inertiajs/vue3';
-import { ChevronDownIcon, ChevronRightIcon } from '@heroicons/vue/24/solid';
+import { EllipsisHorizontalIcon } from '@heroicons/vue/20/solid';
 import { useResource } from '@/Composables/useResource'; // Import du composable
 import ResourceIcon from '@/Components/ResourceIcon.vue'; // Import de l'icone
-import DeleteModal from '@/Components/DeleteModal.vue'; // Import de la modale
+import DeleteModal from '@/Components/DeleteModal.vue';
+
 // REGEX imports... (tu peux aussi les déplacer dans un helper si tu veux afficher le texte "Image", "Video" etc)
 
 const props = defineProps<{
@@ -15,72 +16,61 @@ const props = defineProps<{
 // Utilisation du composable
 const { links, itemColor, canEdit } = useResource(props);
 
-const isActive = ref(false);
+const isMenuExpend = ref(false);
+const toggleMenu = ref(false);
 const isActiveValidation = ref(false);
+
 </script>
 
 <template>
-    <div class="hover:bg-blue-400 hover:bg-opacity-50 py-1 border-gray-200 relative ml-[1%] grid w-[95%] grid-cols-12 border-t-2 transition-all duration-150">
-
-        <component
-            :is="child.type !== 'file' ? Link : 'a'"
-            :href="links.href"
-            class="gap-2 col-span-4 col-start-1 flex"
-        >
-            <div class="w-8 aspect-square">
-                <ResourceIcon :child="child" :color="itemColor" class="w-full h-full" />
+    <div class="group grid grid-cols-12 items-center py-3 px-4 border-t border-gray-100 dark:border-zinc-800 hover:bg-sky-50/50 dark:hover:bg-slate-900/10 transition-colors duration-150">
+        <component :is="child.type !== 'file' ? Link : 'a'" :href="links.href" class="col-span-5 flex items-center space-x-3 overflow-hidden">
+            <div class="w-9 h-9 flex-shrink-0">
+                <ResourceIcon :child="child" :color="itemColor" class="w-full h-full transform group-hover:scale-110 transition-transform" />
             </div>
-            <p class="text-black dark:text-gray-200 my-auto w-full overflow-hidden">
+            <p class="text-sm font-medium text-gray-700 dark:text-zinc-200 truncate">
                 {{ child.name }}
             </p>
         </component>
 
-        <div class="mx-2 col-span-3 col-start-5 m-auto text-center overflow-hidden">
-            <span v-if="child.type == 'folder'">Dossier</span>
-            <span v-else-if="child.type == 'document'">Document</span>
-            <span v-else>Fichier</span>
+        <div class="col-span-2 text-center text-xs text-gray-500 dark:text-zinc-400">
+            <span class="px-2 py-1 rounded-full bg-gray-100 dark:bg-slate-800">
+                {{ child.type === 'folder' ? 'Dossier' : child.type === 'document' ? 'Document' : 'Fichier' }}
+            </span>
         </div>
 
-        <p class="h-7 col-span-3 col-start-8 m-auto text-center overflow-hidden">
+        <p class="col-span-3 text-center text-xs text-gray-400">
             {{ child.created_at }}
         </p>
 
         <div
+            class="relative  col-start-12 flex justify-end"
             v-if="canEdit"
-            class="col-start-12 m-auto pb-1 aspect-square bg-slate-400 dark:bg-slate-500 w-7 rounded-full text-center cursor-pointer relative"
-            @mouseenter="isActive = true" @mouseleave="isActive = false"
+            @mouseenter="isMenuExpend = true"
+            @mouseleave="isMenuExpend = false"
         >
-            <ChevronDownIcon v-if="isActive" class="w-4 inline" />
-            <ChevronRightIcon v-else class="w-4 inline" />
+            <button
+                @click="toggleMenu = !toggleMenu"
+                class="p-1 rounded-full group-hover:opacity-100
+                hover:bg-gray-100 dark:hover:bg-zinc-700 transition-all"
+            >
+                <EllipsisHorizontalIcon class="w-5 h-5 text-gray-400" />
+            </button>
 
-            <div v-if="isActive && canEdit" class="rounded-xl right-2 top-4 bg-slate-500 absolute z-10">
-                <Link
-                    class="rounded-t-xl text-yellow-500 hover:text-white hover:bg-yellow-500 pb-1 pt-2 px-2 block" :class="links.delete ? '' : 'rounded-b-lg'"
-                    :href="links.update"
-                >
-                    Update
-                </Link>
-                <p
-                    v-if="links.delete"
-                    @click="isActiveValidation = true"
-                    class="rounded-b-xl text-red-600 hover:text-white hover:bg-red-600
-                           pt-1 pb-2 px-2 block cursor-pointer"
-                >
-                    Delete
-                </p>
+            <div
+                v-if="toggleMenu || isMenuExpend"
+                class="absolute top-6 -right-7 w-32 z-50
+                bg-white dark:bg-zinc-900
+                shadow-xl rounded-xl border
+                border-gray-100 dark:border-zinc-700"
+            >
+                <Link :href="links.update" class="block px-4 py-2 text-xs hover:bg-gray-50 dark:hover:bg-yellow-900/50 text-yellow-600">Modifier</Link>
+                <button @click="isActiveValidation = true" class="w-full text-left block px-4 py-2 text-xs hover:bg-red-50 dark:hover:bg-red-900/20 text-red-500">Supprimer</button>
             </div>
         </div>
-
-
     </div>
-
-    <DeleteModal
-        :show="isActiveValidation"
-        :delete-href="links.delete"
-        @close="isActiveValidation = false"
-    />
+    <DeleteModal :show="isActiveValidation" :delete-href="links.delete" @close="isActiveValidation = false" />
 </template>
 
 <style scoped>
-.bottom-negative { bottom: -4.5rem; }
 </style>

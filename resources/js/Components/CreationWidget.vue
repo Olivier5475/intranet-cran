@@ -1,29 +1,64 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
-import { ChevronRightIcon, ChevronDownIcon } from '@heroicons/vue/20/solid';
+import { PlusIcon, FolderPlusIcon, DocumentPlusIcon, ArrowUpTrayIcon } from '@heroicons/vue/20/solid';
 import { ref } from 'vue';
 import editor from '@/routes/editor';
 
 const isActive = ref(false);
-
-defineProps<{folder_id : number}>();
+defineProps<{ folder_id: number }>();
 </script>
 
 <template>
-    <nav class="p-2 text-base font-medium text-gray-500 dark:text-white flex items-center relative w-1/6">
-        <a @click="isActive = !isActive" class="cursor-pointer w-full block text-right">
-            Nouveau
-            <span v-if="isActive">  <ChevronDownIcon class="w-7 inline" />     </span>
-            <span v-else>           <ChevronRightIcon class="w-7 inline" />    </span>
-        </a>
-
-        <div id="menu"
-             :class="isActive ? '' : 'hidden'"
-             class="absolute top-full bg-white dark:bg-gray-800 shadow-lg p-2 rounded-md min-w-[10em]"
+    <div class="relative">
+        <button
+            @click="isActive = !isActive"
+            class="flex items-center gap-2 px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white rounded-lg shadow-md transition-all duration-200 active:scale-95"
         >
-            <Link :href="editor.folder.create.url(folder_id)" class="block hover:bg-gray-100 dark:hover:bg-gray-700 p-1 rounded-sm"> Dossier </Link>
-            <Link :href="editor.document.create.url(folder_id)" class="block hover:bg-gray-100 dark:hover:bg-gray-700 p-1 rounded-sm"> Document </Link>
-            <Link :href="editor.file.create.url(folder_id)" class="block hover:bg-gray-100 dark:hover:bg-gray-700 p-1 rounded-sm"> Fichier importé </Link>
-        </div>
-    </nav>
+            <PlusIcon class="w-5 h-5 transition-transform duration-300" :class="{'rotate-45': isActive}" />
+            <span class="font-semibold text-sm">Nouveau</span>
+        </button>
+
+        <Transition
+            enter-active-class="transition duration-100 ease-out"
+            enter-from-class="transform scale-95 opacity-0"
+            enter-to-class="transform scale-100 opacity-100"
+            leave-active-class="transition duration-75 ease-in"
+            leave-from-class="transform scale-100 opacity-100"
+            leave-to-class="transform scale-95 opacity-0"
+        >
+            <div
+                v-if="isActive"
+                class="absolute right-0 mt-2 w-48 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-xl shadow-xl z-50 py-1 overflow-hidden"
+            >
+                <Link
+                    :href="editor.folder.create.url(folder_id)"
+                    @click="isActive = false"
+                    class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-zinc-200 hover:bg-sky-50 dark:hover:bg-sky-900/20 transition-colors"
+                >
+                    <FolderPlusIcon class="w-5 h-5 text-sky-500" />
+                    Dossier
+                </Link>
+
+                <Link
+                    :href="editor.document.create.url(folder_id)"
+                    @click="isActive = false"
+                    class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-zinc-200 hover:bg-sky-50 dark:hover:bg-sky-900/20 transition-colors"
+                >
+                    <DocumentPlusIcon class="w-5 h-5 text-emerald-500" />
+                    Document
+                </Link>
+
+                <div class="border-t border-gray-100 dark:border-zinc-800 my-1"></div>
+
+                <Link
+                    :href="editor.file.create.url(folder_id)"
+                    @click="isActive = false"
+                    class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-zinc-200 hover:bg-sky-50 dark:hover:bg-sky-900/20 transition-colors"
+                >
+                    <ArrowUpTrayIcon class="w-5 h-5 text-amber-500" />
+                    Fichier importé
+                </Link>
+            </div>
+        </Transition>
+    </div>
 </template>
