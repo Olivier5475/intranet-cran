@@ -11,8 +11,10 @@ use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use phpCAS;
+use Throwable;
 
 readonly class AuthService implements Interfaces\UserServiceInterface {
+
     public function __construct(
         private UserRepositoryInterface $userRepository,
         private DepartementsServiceInterface $departementsService
@@ -22,52 +24,66 @@ readonly class AuthService implements Interfaces\UserServiceInterface {
         $user = $this->userRepository->getUserByEmail($data['email']);
 
         if (!$user) {
-            $data["verified_member_role"] = true;
+            $data["verified_member_role"] = true; // Rôle par défaut à la création
             try {
                 $this->userRepository->createUser($data);
+                Log::info("Nouvel utilisateur créé automatiquement via login", ['email' => $data['email']]);
             } catch (PersistenceException $e) {
-                Log::error("Erreur lors de la persistance des données", ["erreur" => $e]);
+                Log::error("Échec de la création automatique de l'utilisateur", [
+                    'email' => $data['email'],
+                    'error' => $e->getMessage()
+                ]);
                 throw $e;
             }
         }
     }
 
-    public function getUserByEmail(string $string) : ?Authenticatable {
-        return $this->userRepository->getUserByEmail($string);
+    public function getUserByEmail(string $email): ?Authenticatable {
+        return $this->userRepository->getUserByEmail($email);
     }
 
-    public function getCurrentUserId() : int {
-        return Auth::id();
+    public function getCurrentUserId(): int {
+        return Auth::id() ?? 0;
     }
 
-    public function readAll() : array {
+    public function readAll(): array {
         $users = $this->userRepository->readAll();
-        $res = [];
+
+        $authDtos = [];
         foreach ($users as $user) {
-            $res[] = new AuthDTO(
-                email: $user->email,
-                nom: $user->nom,
-                prenom: $user->prenom,
-                departements: $this->departementsService->departementsIDs($user->departements),
-                role: $user->role,
-                id: $user->id
+            $authDtos[] = new AuthDTO(
+                email: $user["email"],
+                nom: $user["nom"],
+                prenom: $user["prenom"],
+                departements: $this->departementsService->departementsIDs($user["departements"]),
+                role: $user["role"],
+                id: $user["id"]
             );
         }
-        return $res;
-    }
-
-    public function delete(int $id): void
-    {
         try {
-            $this->userRepository->delete($id);
-        } catch (PersistenceException $e) {
-            Log::error($e->getMessage());
+            return $authDtos;
+        } catch (Throwable $e) {
+            Log::error("Erreur lors de la conversion des users en AuthDTO",["message" => $e->getMessage(), "line" => $e->getLine(), "file" => $e->getFile()]);
             throw $e;
         }
     }
 
-    public function readById($id) : AuthDTO {
+    public function delete(int $id): void {
+        try {
+            $this->userRepository->delete($id);
+            Log::info("Utilisateur supprimé de la base", ['id' => $id]);
+        } catch (PersistenceException|UserNotFoundException $e) {
+            Log::error("Impossible de supprimer l'utilisateur", [
+                'id' => $id,
+                'error' => $e->getMessage()
+            ]);
+            throw $e;
+        }
+    }
+
+    public function readById(int $id): AuthDTO {
         $user = $this->userRepository->getUserById($id);
+
         return new AuthDTO(
             email: $user->email,
             nom: $user->nom,
@@ -78,30 +94,37 @@ readonly class AuthService implements Interfaces\UserServiceInterface {
         );
     }
 
-    public function update(int $id, array $data) : void {
+    public function update(int $id, array $data): void {
         try {
             $this->userRepository->updateUser($id, $data);
+            Log::info("Profil utilisateur mis à jour", ['id' => $id]);
         } catch(PersistenceException|UserNotFoundException $e) {
-            Log::error($e->getMessage());
+            Log::error("Erreur lors de la mise à jour de l'utilisateur", [
+                'id' => $id,
+                'error' => $e->getMessage()
+            ]);
             throw $e;
         }
     }
 
-    public function getRole() : string {
-        $user_id = $this->getCurrentUserId();
-        $user = $this->userRepository->getUserById($user_id);
-        return $user->role;
+    public function getRole(): string {
+        $userId = $this->getCurrentUserId();
+        if ($userId === 0) return 'guest';
+
+        $user = $this->userRepository->getUserById($userId);
+        return $user->role ?? 'guest';
     }
-    public function isAdmin() : bool {
+
+    public function isAdmin(): bool {
         return $this->getRole() === "admin";
     }
 
-    public function logout(string $returnUrl) : void
-    {
-        // Sécurité : si le referer est la page de logout, on force la racine
+    public function logout(string $returnUrl): void {
         if (str_contains($returnUrl, '/logout')) {
             $returnUrl = url('/');
         }
+
+        Log::info("Déconnexion CAS initiée", ['user_id' => $this->getCurrentUserId()]);
 
         phpCAS::logout([
             "url" => phpCAS::getServerLoginURL(),

@@ -16,11 +16,10 @@ use App\Services\Interfaces\DepartementsServiceInterface;
 use App\Services\Interfaces\UserServiceInterface;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Purifier;
+use Mews\Purifier\Facades\Purifier;
 use Parsedown;
-use Symfony\Component\CssSelector\Exception\InternalErrorException;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
-use Illuminate\Contracts\Filesystem;
+use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Throwable;
 
 readonly class DocumentService implements Interfaces\DocumentsServiceInterface {
@@ -32,198 +31,131 @@ readonly class DocumentService implements Interfaces\DocumentsServiceInterface {
         private DepartementsServiceInterface $departementsService,
     ){}
 
-    public function read($id) : DocumentViewDTO {
-        try {
-            $document = $this->documentRepository->read($id);
-            return $this->makeDocumentViewDto($document);
-        } catch (DocumentNotFoundException $e) {
-            Log::warning("Document was not foud", [
-                "id" => $id,
-            ]);
-            throw $e;
-        }
+    public function read(int $id) : DocumentViewDTO {
+        $document = $this->documentRepository->read($id);
+        return $this->makeDocumentViewDto($document);
     }
 
-
-    public function update(int $id, array $data): DocumentViewDTO|bool {
-        if(empty($id)) {
-            throw new BadRequestException("Missing argument");
-        }
+    public function update(int $id, array $data): DocumentViewDTO {
+        if(empty($id)) throw new BadRequestException("ID manquant");
 
         try {
             DB::beginTransaction();
-            // 1. Extraction des attachments
-            $new_attachment = $data["new_attachments"];
-            unset($data["new_attachments"]); // ON LES RETIRE DES DATA
 
-            $existing_attachments = $data["existing_attachments"];
-            unset($data["existing_attachments"]); // ON LES RETIRE DES DATA
+            $newAttachments = $data["new_attachments"] ?? [];
+            $existingAttachments = $data["existing_attachments"] ?? [];
+            unset($data["new_attachments"], $data["existing_attachments"]);
 
-            // 2. Mise à jour du Document parent
             $document = $this->documentRepository->update($id, $data);
 
-            if ($document instanceof Document) {
-                // 3. Gestion des Attachments
+            // --- Synchronisation des Attachements ---
+            $currentIds = $document->attachments()->pluck('id')->all();
+            $keepIds = collect($existingAttachments)->pluck('id')->all();
 
-                // IDs des attachements que l'utilisateur veut garder
-                $idsToKeep = collect($existing_attachments)->pluck('id')->all();
-
-                // IDs des attachements ACTUELLEMENT liés au document en BD
-                $currentAttachmentIds = $document->attachments()->pluck('id')->all();
-
-                // --- 3. Suppression des Attachements Retirés ---
-                $idsToDelete = array_diff($currentAttachmentIds, $idsToKeep);
-                foreach ($idsToDelete as $deleteId) {
-                    $this->attachmentService->delete($deleteId); // Gère suppression BD et Disque
-                }
-
-                if (!empty($existing_attachments)) {
-                    foreach ($existing_attachments as $attachment) {
-                        $id = $attachment["id"]; unset($attachment["id"]);
-                        if($this->attachmentService->getDocumentId($id) === $document->id) {
-                            // Met à jour l'attachment existant (ou échoue)
-                            $this->attachmentService->update($id, $attachment);
-                        } else {
-                            throw new BadRequestException("Attachment was not found in document", 400);
-                        }
-                    }
-                    foreach ($new_attachment as $attachment) {
-                        $attachment["document_id"] = $document->id;
-                        $this->attachmentService->create($attachment);
-                    }
-                }
-
-                DB::commit(); // Tout a réussi
-                return $this->makeDocumentViewDto($document);
+            // 1. Suppression de ce qui n'est plus listé
+            foreach (array_diff($currentIds, $keepIds) as $deleteId) {
+                $this->attachmentService->delete($deleteId);
             }
 
-            DB::commit(); // Rien n'a changé, on valide
-            return $document;
+            // 2. Mise à jour des existants
+            foreach ($existingAttachments as $attachmentData) {
+                $attachId = $attachmentData["id"];
+                unset($attachmentData["id"]);
 
-        } catch (Throwable $e) { // Attrape toutes les erreurs BD ou Disque
-            Log::warning("Transaction failed during document/attachment update.", [
+                if($this->attachmentService->getDocumentId($attachId) === $document->id) {
+                    $this->attachmentService->update($attachId, $attachmentData);
+                } else {
+                    throw new BadRequestException("Attachement non relié à ce document.");
+                }
+            }
+
+            // 3. Ajout des nouveaux fichiers
+            foreach ($newAttachments as $uploadedFile) {
+                $this->attachmentService->create([
+                    "document_id" => $document->id,
+                    "uploaded_file" => $uploadedFile
+                ]);
+            }
+
+            DB::commit();
+            return $this->makeDocumentViewDto($document);
+
+        } catch (Throwable $e) {
+            DB::rollBack();
+            Log::error("Échec de mise à jour transactionnelle du document", [
                 'id' => $id,
                 'error' => $e->getMessage()
             ]);
-            try {
-                DB::rollBack();
-            } catch (Throwable) {
-                Log::error("Fatal error during rollback", []);
-            }
             throw $e;
         }
     }
 
     public function delete(int $id): bool {
         try {
+            DB::beginTransaction();
             $document = $this->documentRepository->read($id);
-            foreach ($document->attachments() as $attachment) {
+
+            foreach ($document->attachments as $attachment) {
                 $this->attachmentService->delete($attachment->id);
             }
-            return $this->documentRepository->delete($id);
-        } catch (DocumentNotFoundException $e) {
-            Log::warning('Document attempted to delete was not found.', ['id' => $id]);
-            throw $e;
-        } catch (PersistenceException $e) {
-            Log::warning('Document with ID'.$id.'can\'t be deleted', ['id' => $id]);
+
+            $result = $this->documentRepository->delete($id);
+            DB::commit();
+
+            return $result;
+        } catch (Throwable $e) {
+            DB::rollBack();
+            Log::error("Erreur lors de la suppression complète du document", ['id' => $id, 'error' => $e->getMessage()]);
             throw $e;
         }
     }
-
 
     public function create(array $data): DocumentViewDTO {
         if(empty($data['title']) || empty($data['content'])) {
-            throw new BadRequestException("Missing argument(s)");
+            throw new BadRequestException("Titre et contenu obligatoires.");
         }
 
         try {
-            $new_attachments = $data["new_attachments"];
-            unset($data["new_attachments"]);
-            unset($data["existing_attachments"]);
+            DB::beginTransaction();
+
+            $newAttachments = $data["new_attachments"] ?? [];
+            unset($data["new_attachments"], $data["existing_attachments"]);
 
             $data["user_id"] = $this->userService->getCurrentUserId();
-
-            DB::beginTransaction();
-            if(!empty($data["folder_id"]) && is_string($data["folder_id"])) {
-                $data['folder_id'] = intval($data["folder_id"]);
-            }
             $document = $this->documentRepository->create($data);
-            if($document instanceof Document && !empty($new_attachments)) {
-                foreach ($new_attachments as $uploadedFile) {
-                    $attachment_data = [
-                        "document_id" => $document->id,
-                        "uploaded_file" => $uploadedFile
-                    ];
-                    $this->attachmentService->create($attachment_data);
-                }
+
+            foreach ($newAttachments as $file) {
+                $this->attachmentService->create([
+                    "document_id" => $document->id,
+                    "uploaded_file" => $file
+                ]);
             }
-            DB::commit(); // Tout a réussi
+
+            DB::commit();
             return $this->makeDocumentViewDto($document);
-        } catch (PersistenceException $e) {
-            Log::warning('Document attempted to create can\'t be persisted.', [
-                "message" => $e->getMessage()
-            ]);
 
-            try {
-                DB::rollBack();
-            } catch (Throwable) {
-                Log::error("Fatal error during rollback", []);
-            }
-
-            throw $e;
-        } catch (DiskWriteException|FolderNotFoundException $e) {
-            Log::warning('Attachment attempted to create can\'t be persisted.');
-
-            try {
-                DB::rollBack();
-            } catch (Throwable) {
-                Log::error("Fatal error during rollback", []);
-            }
-
-            throw $e;
         } catch (Throwable $e) {
-
-            throw new InternalErrorException("UNEXPECTED FATAL ERROR. ".$e->getMessage());
+            DB::rollBack();
+            Log::error("Erreur création document", ['error' => $e->getMessage()]);
+            throw $e;
         }
     }
 
-    /**
-     * Fonction qui génère
-     * @param Document $document à partir d'un document
-     * @return DocumentViewDTO un DocumentViewDTO
-     * @throws Filesystem\FileNotFoundException si un fichier relié à un attachment n'est pas trouvé
-     */
     private function makeDocumentViewDto(Document $document) : DocumentViewDTO {
-        $attachments = [];
-        foreach ($document->attachments as $attachment) {
-            try {
-            $attachments[] = new AttachmentDTO(
-                id           : $attachment->id,
-                name         : $attachment->name,
-                storage_path : $attachment->storage_path,
-                mimetype    : $attachment->mimetype,
-                size         : $attachment->size,
-            );
-            } catch (Throwable $e) {
-                Log::warning("File was not foud in storage", [
-                    "storage_path" => $attachment->storage_path,
-                ]);
-                throw new Filesystem\FileNotFoundException("File not found.", 404);
-            }
-        }
+        $attachments = $document->attachments->map(fn($a) => new AttachmentDTO(
+            id: $a->id,
+            name: $a->name,
+            storage_path: $a->storage_path,
+            mimetype: $a->mimetype,
+            size: $a->size,
+        ))->all();
 
-        // 1. Initialiser Parsedown
-        $parsedown = new Parsedown();
-
-        // 2. Convertir le Markdown du contenu
-        $renderedHtml = $parsedown->text($document->content);
-
-        // 3. Sanitariser le HTML (Sécurité !)
-        // Assurez-vous d'avoir bien importé la façade Purifier si vous l'utilisez
+        // Rendu Markdown sécurisé
+        $renderedHtml = (new Parsedown())->text($document->content);
         $cleanHtml = Purifier::clean($renderedHtml);
 
         return new DocumentViewDTO(
-            id : $document->id,
+            id: $document->id,
             title: $document->title,
             content: $cleanHtml,
             attachments: $attachments,
@@ -238,24 +170,22 @@ readonly class DocumentService implements Interfaces\DocumentsServiceInterface {
     public function readRacineDoc(): ?DocumentViewDTO {
         try {
             $document = $this->documentRepository->readRacineDoc();
-
+            return $document ? $this->makeDocumentViewDto($document) : null;
         } catch (Throwable $e) {
-            Log::warning("Document attempted to read RacineDoc.");
-            throw new ServerException("Erreur lors de la lecture du document racine");
+            Log::error("Erreur lecture document racine", ['error' => $e->getMessage()]);
+            throw new ServerException("Impossible de charger le document d'accueil.");
         }
-        if(!empty($document)) {
-            return $this->makeDocumentViewDto($document);
-        }
-        return null;
     }
 
-    public function hasEditAccess(int $document_id): bool
-    {
+    public function hasEditAccess(int $document_id): bool {
         $user = $this->userService->readById($this->userService->getCurrentUserId());
-        $document = $this->read($document_id);
-        if($user->role === "admin" || empty($document->folder_id) || $document->departements === []) {
+        $document = $this->documentRepository->read($document_id); // On utilise le repo direct pour la perf
+
+        if($user->role === "admin" || empty($document->folder_id) || count($document->departements) === 0) {
             return true;
         }
-        return (bool) array_intersect($user->departements, $document->departements);
+
+        $docDeptIds = $this->departementsService->departementsIDs($document->departements);
+        return (bool) array_intersect($user->departements, $docDeptIds);
     }
 }

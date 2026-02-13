@@ -6,72 +6,66 @@ use App\DTO\AttachmentDTO;
 use App\Exception\AttachmentNotFoundException;
 use App\Exception\DiskWriteException;
 use App\Exception\DocumentNotFoundException;
-use App\Exception\FolderNotFoundException;
 use App\Exception\PersistenceException;
+use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
-use Illuminate\Contracts\Filesystem ;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 interface AttachmentServiceInterface {
 
     /**
-     * Fonction pour mettre les fichiers de l'Attachment en storage et appeler le Repository pour l'enregistrement en BD
-     * @param array $data données de création de l'Attachment
-     * @return AttachmentDTO retourne un DTO de l'Attachment
-     * @throws PersistenceException en cas d'erreur lors de la persistence en BD
-     * @throws BadRequestException si pas de document_id ou de fichier
-     * @throws FolderNotFoundException si le folder du document n'est pas trouvé
-     * @throws DiskWriteException si une erreur survient lors de l'écriture du fichier
-     * @throws DocumentNotFoundException
+     * Enregistre le fichier physiquement et crée l'entrée en base de données.
+     * * @param array $data {document_id: int, uploaded_file: UploadedFile}
+     * @return AttachmentDTO
+     * @throws BadRequestException Si des données obligatoires manquent ou sont invalides.
+     * @throws DocumentNotFoundException Si le document parent n'existe pas.
+     * @throws DiskWriteException Si l'écriture sur le disque échoue.
+     * @throws PersistenceException En cas d'erreur lors de l'enregistrement SQL.
      */
     public function create(array $data) : AttachmentDTO;
 
     /**
-     * Fonction pour lire un attachment (et avoir un DTO)
-     * @param int $id ID de l'Attachment
-     * @return AttachmentDTO DTO de l'Attachment correspondant
-     * @throws BadRequestException si pas d'ID
-     * @throws AttachmentNotFoundException si l'attachment n'est pas trouvé
-     * @throws Filesystem\FileNotFoundException
+     * Récupère un attachement sous forme de DTO.
+     * * @param int $id
+     * @return AttachmentDTO
+     * @throws AttachmentNotFoundException Si l'ID n'existe pas.
+     * @throws FileNotFoundException Si le fichier est référencé en BD mais absent du disque.
      */
     public function read(int $id) : AttachmentDTO;
 
     /**
-     * Fonction pour la MAJ d'un Attachment dans le Storage et appel du Repository pour la MAJ en BD
-     * @param int $id
+     * Met à jour les métadonnées d'un attachement.
+     * * @param int $id
      * @param array $data
      * @return AttachmentDTO
-     * @throws DiskWriteException si une erreur survient lors de l'écriture du fichier
-     * @throws BadRequestException si pas de document_id ou de fichier
-     * @throws PersistenceException dis les données n'ont pas pu être persisté en BD (throw par le Repository)
-     * @throws AttachmentNotFoundException si l'attachment n'est pas trouvé (throw par le Repository)
-     * @throws FileSystem\FileNotFoundException
+     * @throws AttachmentNotFoundException
+     * @throws PersistenceException
      */
     public function update(int $id, array $data) : AttachmentDTO;
 
     /**
-     * Fonction qui supprime un Attachment du storage et appel le Repository pour la suppression en BD
-     * @param int $id ID de l'Attachment à supprimer
-     * @return bool retourne true si la suppression à fonctionner
-     * @throws BadRequestException si pas d'ID
-     * @throws DiskWriteException si une erreur survient lors de l'écriture du fichier
-     * @throws PersistenceException en cas d'erreur lors de la persistence en BD (throw par le Repository)
-     * @throws AttachmentNotFoundException si Attachment introuvable (throw par le Repository)
+     * Supprime le fichier physique et l'entrée en base de données.
+     * * @param int $id
+     * @return bool
+     * @throws AttachmentNotFoundException
+     * @throws PersistenceException
      */
     public function delete(int $id) : bool;
 
     /**
-     * Fonction pour récupérer le document d'un attachment
-     * @param int $attachment_id ID de l'attachment
-     * @return int id du document lié auquel est relié l'attachment
+     * Récupère l'ID du document lié à l'attachement.
+     * * @param int $attachment_id
+     * @return int
+     * @throws AttachmentNotFoundException
      */
     public function getDocumentId(int $attachment_id) : int;
 
     /**
-     * Lance le telechargement d'un attachment
-     * @param int $id l'ID de l'attachment
-     * @throws Filesystem\FileNotFoundException
+     * Prépare la réponse de téléchargement pour le navigateur.
+     * * @param int $id
+     * @return StreamedResponse
      * @throws AttachmentNotFoundException
+     * @throws FileNotFoundException
      */
-    public function download(int $id);
-
+    public function download(int $id): StreamedResponse;
 }

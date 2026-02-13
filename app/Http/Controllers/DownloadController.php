@@ -5,9 +5,9 @@ namespace App\Http\Controllers;
 use App\Services\Interfaces\AttachmentServiceInterface;
 use App\Services\Interfaces\FilesServiceInterface;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage;
+use Throwable;
 
-readonly class DownloadController {
+class DownloadController extends Controller {
     public function __construct(
         private AttachmentServiceInterface $attachmentService,
         private FilesServiceInterface $filesService,
@@ -16,24 +16,36 @@ readonly class DownloadController {
     public function attachment($id){
         try {
             return $this->attachmentService->download($id);
-        } catch (\Throwable) {
-            return redirect()->back()->with(["error" => "can't download"]);
+        } catch (Throwable $t) {
+            Log::error("Échec du téléchargement de la pièce jointe", [
+                'attachment_id' => $id,
+                'error' => $t->getMessage()
+            ]);
+            return redirect()->back()->with("error", "Impossible de télécharger la pièce jointe.");
         }
     }
 
     public function file($id){
         try {
             return $this->filesService->download($id);
-        } catch (\Throwable $e) {
-            return redirect()->back()->with(["error" => "can't download."]);
+        } catch (Throwable $t) {
+            Log::error("Échec du téléchargement du fichier", [
+                'file_id' => $id,
+                'error' => $t->getMessage()
+            ]);
+            return redirect()->back()->with("error", "Le téléchargement du fichier a échoué.");
         }
     }
 
     public function version($id){
         try {
             return $this->filesService->downloadVersion($id);
-        } catch (\Throwable $e) {
-            return redirect()->back()->with(["error" => "can't download."]);
+        } catch (Throwable $t) {
+            Log::error("Échec du téléchargement de la version spécifique", [
+                'version_id' => $id,
+                'error' => $t->getMessage()
+            ]);
+            return redirect()->back()->with("error", "Impossible de récupérer cette version du fichier.");
         }
     }
 }

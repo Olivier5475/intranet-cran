@@ -1,7 +1,6 @@
 <?php
 
 namespace App\Repositories;
-;
 
 use App\Exception\AlreadyExistsException;
 use App\Exception\DocumentNotFoundException;
@@ -9,138 +8,110 @@ use App\Exception\PersistenceException;
 use App\Models\Document;
 use App\Models\File;
 use Illuminate\Support\Facades\Log;
+use Throwable;
 
 class DocumentRepository implements Interfaces\DocumentRepositoryInterface {
 
-    /**
-     * Créer un document.
-     * @param array $data Les champs et leurs nouvelles valeurs (doivent être "fillable").
-     * @return Document Retourne le Document créé
-     * @throws PersistenceException|AlreadyExistsException En cas d'erreur de base de données.
-     */
     public function create(array $data): Document {
-        if($this->checkName($data['folder_id'], $data['title'])) {
-            throw new AlreadyExistsException();
+        // Vérification de l'unicité du nom dans le dossier
+        if($this->checkName($data['folder_id'] ?? null, $data['title'])) {
+            throw new AlreadyExistsException("Un document ou un fichier porte déjà ce nom dans ce dossier.");
         }
+
         try {
-          $document = new Document();
-          $document->title = e($data['title']);
-          $document->content = clean($data['content']);
-          $document->color = $data['color'];
-          if(!empty($data["folder_id"])) {
-              $document->folder_id = $data['folder_id'];
-          }
-          $document->user_id = $data['user_id'];
-          $document->save();
-          $document->departements()->attach($data['departements']);
-          return $document;
-        } catch (\Throwable $e) {
-            Log::error('Document creation error', [
-                'error' => $e->getMessage(),
+            $document = new Document();
+            $document->title = e($data['title']); // Protection basique XSS sur le titre
+            $document->content = $data['content']; // Le nettoyage est fait dans le Service via Purifier
+            $document->color = $data['color'] ?? '#ffffff';
+            $document->folder_id = $data['folder_id'] ?? null;
+            $document->user_id = $data['user_id'];
+            $document->save();
+
+            if (!empty($data['departements'])) {
+                $document->departements()->attach($data['departements']);
+            }
+
+            return $document->load('departements');
+        } catch (Throwable $e) {
+            Log::error('Échec SQL : Création du document', [
+                'message' => $e->getMessage(),
                 'data' => $data,
             ]);
-
-            throw new PersistenceException(message:"Could not create document.", previous:$e);
+            throw new PersistenceException("Impossible de créer le document.", 0, $e);
         }
     }
 
-    /**
-     * Lit un document existant.
-     * @param int $id L'ID du document à mettre à jour.
-     * @return Document Retourne le Document avec l'ID $id
-     * @throws DocumentNotFoundException Si le document n'est pas trouvé.
-     */
     public function read(int $id) : Document {
         $document = Document::with("departements")->find($id);
 
         if (!$document) {
-            throw new DocumentNotFoundException("Document with ID $id not found.");
+            throw new DocumentNotFoundException("Le document avec l'ID $id est introuvable.");
         }
         return $document;
     }
 
-    /**
-     * Met à jour un document existant.
-     * @param int $id L'ID du document à mettre à jour.
-     * @param array $data Les champs et leurs nouvelles valeurs (doivent être "fillable").
-     * @return Document|bool Retourne le Document mis à jour, ou false si la mise à jour échoue.
-     * @throws DocumentNotFoundException Si le document n'est pas trouvé.
-     * @throws PersistenceException|AlreadyExistsException En cas d'erreur de base de données.
-     */
-    public function update(int $id, array $data): Document|bool {
-        $document = Document::with("departements")->find($id);
-
-        if (!$document) {
-            throw new DocumentNotFoundException("Document with ID $id not found.");
-        }
+    public function update(int $id, array $data): Document {
+        $document = $this->read($id);
 
         if($this->checkName($document->folder_id, $data['title'], $id)) {
-            throw new AlreadyExistsException();
+            throw new AlreadyExistsException("Le nouveau titre est déjà utilisé par un autre élément.");
         }
+
         try {
             $document->title = e($data['title']);
-            $document->content = clean($data['content']);
+            $document->content = $data['content'];
             $document->color = $data['color'];
-            $result = $document->save();
-            $document->departements()->sync($data['departements']);
+            $document->save();
 
-            return $result ? $document : false;
-        } catch (\Throwable $e) {
-            Log::error('Document update failed for ID ' . $id, [
-                'error' => $e->getMessage(),
-                'data' => $data,
+            if (isset($data['departements'])) {
+                $document->departements()->sync($data['departements']);
+            }
+
+            return $document->fresh('departements');
+        } catch (Throwable $e) {
+            Log::error("Échec SQL : Mise à jour du document $id", [
+                'message' => $e->getMessage(),
+                'payload' => $data,
             ]);
-
-            throw new PersistenceException(message : "Could not update document with ID $id.", previous:$e);
+            throw new PersistenceException("Erreur lors de la mise à jour du document.", 0, $e);
         }
     }
 
-    /**
-     * Supprime un document existant.
-     * @param int $id L'ID du document à mettre à jour.
-     * @return bool retourne true si la suppression a réussi
-     * @throws DocumentNotFoundException Si le document n'est pas trouvé.
-     * @throws PersistenceException En cas d'erreur de base de données.
-     */
     public function delete(int $id) : bool {
-        $document = Document::find($id);
-
-        if (!$document) {
-            throw new DocumentNotFoundException("Document with ID $id not found.");
-        }
+        $document = $this->read($id);
 
         try {
-            $document->delete();
-            return true;
-        } catch (\Throwable $e) {
-            Log::error('Document delete failed for ID ' . $id, [
-                'error' => $e->getMessage(),
+            return (bool) $document->delete();
+        } catch (Throwable $e) {
+            Log::error("Échec SQL : Suppression du document $id", [
+                'message' => $e->getMessage(),
             ]);
-
-            throw new PersistenceException(message : "Could not delete document with ID $id.", previous:$e);
+            throw new PersistenceException("Erreur technique lors de la suppression.", 0, $e);
         }
     }
 
     public function readRacineDoc(): ?Document {
         try {
-            $document = Document::where("folder_id", "=", null)->orderBy("created_at")->first();
-            if (!$document) {
-                return null;
-            }
-            return $document;
-        } catch (\Throwable $e) {
-            Log::error('Document read RacineDoc failed', ["message" => $e->getMessage()]);
+            return Document::with('departements')
+                ->whereNull("folder_id")
+                ->orderBy("created_at")
+                ->first();
+        } catch (Throwable $e) {
+            Log::error('Erreur SQL : lecture du document racine', ["message" => $e->getMessage()]);
             throw $e;
         }
     }
 
-    private function checkName(int $folder_id, string $name, ?int $id = null): bool {
-        $fileQuery = File::where('folder_id', "=", $folder_id)
-            ->where('name', "=", $name);
+    /**
+     * Vérifie si le nom existe déjà (soit en Fichier, soit en Document) dans le même dossier.
+     */
+    private function checkName(?int $folderId, string $name, ?int $excludeId = null): bool {
+        // Un document à la racine a un folder_id null
+        $fileQuery = File::where('folder_id', $folderId)->where('name', $name);
 
-        $docQuery = Document::where('folder_id', "=", $folder_id)
-            ->where('title', "=", $name)
-            ->when($id, fn($q) => $q->where('id', '!=', $id));
+        $docQuery = Document::where('folder_id', $folderId)
+            ->where('title', $name)
+            ->when($excludeId, fn($q) => $q->where('id', '!=', $excludeId));
 
         return $fileQuery->exists() || $docQuery->exists();
     }

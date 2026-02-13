@@ -19,14 +19,13 @@ interface DepartementRepositoryInterface {
     /**
      * @param int $id
      * @param array $data
-     * @return void
      * @throws DepartementNotFoundException
      * @throws PersistenceException
      */
     public function update(int $id, array $data) : void;
 
     /**
-     * @return Collection
+     * @return Collection<int, Departement>
      */
     public function readAll() : Collection;
 
@@ -39,8 +38,8 @@ interface DepartementRepositoryInterface {
 
     /**
      * @param int $id
-     * @return void
-     * @throws PersistenceException la suppression n'a pas fonctionné
+     * @throws DepartementNotFoundException
+     * @throws PersistenceException
      */
     public function delete(int $id) : void;
 }

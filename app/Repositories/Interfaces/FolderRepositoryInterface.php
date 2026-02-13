@@ -9,56 +9,37 @@ use Illuminate\Support\Collection;
 
 interface FolderRepositoryInterface
 {
+    /**
+     * Récupère récursivement tous les IDs des dossiers descendants.
+     */
     public function getDescendantFolderIds(int $rootFolderId): array;
 
     /**
-     * fonction qui lit un Folder depuis la BD
-     * @param int $id ID du Folder qu'on recherche
-     * @return Folder retourne le Folder correspondant à l'ID
-     * @throws FolderNotFoundException si le folder n'est pas trouvé
+     * @throws FolderNotFoundException
      */
     public function read(int $id): Folder;
 
     /**
-     * @param array $data
-     * @return Folder
      * @throws PersistenceException
      */
     public function create(array $data): Folder;
 
     /**
-     * @param int $id
-     * @param array $data
-     * @return Folder
-     * @throws PersistenceException
-     * @throws FolderNotFoundException
+     * @throws PersistenceException|FolderNotFoundException
      */
     public function update(int $id, array $data): Folder;
 
     /**
-     * @param int $id
-     * @return void
-     * @throws FolderNotFoundException
-     * @throws PersistenceException
+     * @throws FolderNotFoundException|PersistenceException
      */
     public function delete(int $id): void;
 
     /**
-     * @return Collection
-     * @throws FolderNotFoundException
+     * @return Collection<int, Folder>
      */
     public function getRacineChildren(): Collection;
 
-    /**
-     * @param int $id
-     * @return Folder
-     */
     public function getFolderWithContents(int $id): Folder;
 
-    /**
-     * @param int $id
-     * @return Folder
-     */
     public function getFolderWithParents(int $id): Folder;
-
 }

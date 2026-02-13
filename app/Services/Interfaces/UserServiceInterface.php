@@ -5,40 +5,68 @@ namespace App\Services\Interfaces;
 use App\DTO\AuthDTO;
 use App\Exception\PersistenceException;
 use App\Exception\UserNotFoundException;
+use Illuminate\Contracts\Auth\Authenticatable;
 
 interface UserServiceInterface {
 
     /**
+     * Vérifie si l'utilisateur existe, sinon le crée.
      * @param array $data
-     * @return void
-     * @throws PersistenceException Erreur de persistance du nouvel utilisateur
+     * @throws PersistenceException
      */
-    public function handleUserInDatabase(array $data): void ;
-    public function getUserByEmail(string $string);
+    public function handleUserInDatabase(array $data): void;
 
     /**
-     * Fonction pour obtenir l'id de l'utilisateur connecté
+     * @param string $email
+     * @return Authenticatable|null
+     */
+    public function getUserByEmail(string $email): ?Authenticatable;
+
+    /**
      * @return int
      */
-    public function getCurrentUserId() : int;
+    public function getCurrentUserId(): int;
 
     /**
      * @param int $id
      * @param array $data
-     * @return void
      * @throws UserNotFoundException
      * @throws PersistenceException
      */
-    public function update(int $id, array $data) : void;
-    public function readById($id) : AuthDTO ;
-    public function delete(int $id) : void;
-    public function readAll();
-    public function getRole();
-    public function isAdmin();
+    public function update(int $id, array $data): void;
 
     /**
-     * @param string $returnUrl
-     * @return void
+     * @param int $id
+     * @return AuthDTO
+     * @throws UserNotFoundException
      */
-    public function logout(string $returnUrl) : void ;
+    public function readById(int $id): AuthDTO;
+
+    /**
+     * @param int $id
+     * @throws PersistenceException
+     * @throws UserNotFoundException
+     */
+    public function delete(int $id): void;
+
+    /**
+     * @return AuthDTO[]
+     */
+    public function readAll(): array;
+
+    /**
+     * @return string
+     */
+    public function getRole(): string;
+
+    /**
+     * @return bool
+     */
+    public function isAdmin(): bool;
+
+    /**
+     * Déconnecte l'utilisateur via CAS.
+     * @param string $returnUrl
+     */
+    public function logout(string $returnUrl): void;
 }

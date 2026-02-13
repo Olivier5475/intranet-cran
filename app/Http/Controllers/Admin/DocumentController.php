@@ -16,6 +16,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Throwable;
+use Inertia\Inertia;
 
 class DocumentController extends Controller {
 
@@ -26,149 +27,132 @@ class DocumentController extends Controller {
     ){}
 
     public function store(Request $request, $id = null) {
-        // 1. Validation de la requête
         $validatedData = $request->validate([
             'title' => ['required', 'string', 'max:255'],
             'content' => ['required', 'string'],
-            'color' => ['string', 'max:16'],
-
-            // NOUVEAU CHAMP : Tableau des objets d'attachements existants
+            'color' => ['nullable', 'string', 'max:16'],
             'existing_attachments' => ['sometimes', 'array'],
-
-            // VALIDATION DU TABLEAU D'OBJETS
-            // Chaque élément (index) du tableau doit être un tableau (objet JSON)
             'existing_attachments.*' => ['array'],
-
-            // Validation des PROPRIÉTÉS de chaque objet
             'existing_attachments.*.id' => ['required', 'integer', 'exists:attachments,id'],
             'existing_attachments.*.name' => ['required', 'string', 'max:255'],
-
-            // ... validation des nouveaux fichiers inchangée
             'new_attachments' => ['sometimes', 'array'],
             'new_attachments.*' => ['file', 'max:51200'],
-
             'departements' => ['sometimes', 'array'],
             'parent_id' => ['integer', 'nullable'],
         ]);
-        // 2. Préparation des données pour le Service
-        if(empty($validatedData['color'])) {
-            if(empty($id)) {
-                $validatedData['color'] = '#ffffff';
-            } else {
-                $validatedData['color'] = null;
-            }
-        }
+
+        // Préparation des données
         $data = [
             "title" => $validatedData["title"],
             "content" => $validatedData["content"],
-
-            // Liste des objets {id, name} à CONSERVER et mettre à jour
+            "color" => $validatedData["color"] ?? ($id ? null : '#ffffff'),
             "existing_attachments" => $validatedData["existing_attachments"] ?? [],
-
-            // Objets UploadedFile pour la CRÉATION
             "new_attachments" => $request->file('new_attachments') ?? [],
             "departements" => $validatedData["departements"] ?? [],
+            "folder_id" => $validatedData["parent_id"] ?? null,
         ];
-        if(empty($data['color']) && !empty($validatedData['color'])) {
-            $data['color'] = $validatedData["color"];
+
+        if(empty($data["folder_id"])) {
+            unset($data["folder_id"]);
         }
 
-        if(!is_null($validatedData["parent_id"])) {
-            $data["folder_id"] = $validatedData["parent_id"];
-        }
         try {
             if($id) {
                 $document = $this->documentsService->update($id, $data);
                 return redirect()->route("navigate.folder", ["folder_id" => $document->folder_id])
-                    ->with("success", "Document mis à jour avec success");
+                    ->with("success", "Le document a été mis à jour avec succès.");
             } else {
                 $document = $this->documentsService->create($data);
+                if(empty($document->folder_id)) {
+                    return redirect()->route("navigate.document", ["document_id" => $document->id]);
+                }
                 return redirect()->route("navigate.folder", ["folder_id" => $document->folder_id])
-                    ->with("success", "Document créer avec success");
+                    ->with("success", "Le document a été créé avec succès.");
             }
 
         } catch (BadRequestException $e) {
-            // 400 Bad Request (pour une erreur d'argument si non gérée par la validation)
-            return redirect()->back()->with(['error' => 'Arguments manquants ou invalides.'. $e->getMessage()]);
+            Log::warning("Requête malformée lors de l'enregistrement du document", ['id' => $id, 'error' => $e->getMessage()]);
+            return redirect()->back()->with('error', 'Les données envoyées sont incorrectes.');
 
-        } catch (DocumentNotFoundException|AttachmentNotFoundException|FileNotFoundException) {
-            // 404 Not Found (Ressource à mettre à jour non trouvée)
-            return redirect()->back()->with(['error' => 'Le document ou un attachement spécifié est introuvable.']);
+        } catch (DocumentNotFoundException|AttachmentNotFoundException|FileNotFoundException $e) {
+            Log::error("Ressource introuvable lors de l'enregistrement", ['id' => $id, 'type' => get_class($e)]);
+            return redirect()->back()->with('error', 'Le document ou l’une de ses pièces jointes est introuvable.');
 
         } catch (PersistenceException|DiskWriteException $e) {
-            // 500 Internal Server Error (Erreur BD ou Disque)
-            return redirect()->back()->with(['error' => 'Erreur critique de sauvegarde des données. Veuillez réessayer. ']);
+            Log::error("Erreur de stockage lors de l'enregistrement du document", [
+                'id' => $id,
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString() ?? 'N/A'
+            ]);
+            return redirect()->back()->with('error', 'Une erreur technique est survenue lors de l’écriture des données.');
 
         } catch (AlreadyExistsException $e) {
-            // 400 Internal Server Error (Erreur BD ou Disque)
-            return redirect()->back()->with(['error' => 'Document / Fichier de ce nom déjà existant']);
+            return redirect()->back()->with('error', 'Un document ou un fichier portant ce nom existe déjà.');
+
         } catch (Throwable $t) {
-            // Erreur imprévue (la transaction a été rollback dans le service)
-            Log::critical('Unhandled fatal error during document transaction.', ['error' => $t->getMessage(), 'id' => $id]);
-            return redirect()->back()->with(['error' => 'Une erreur imprévue est survenue, réessayez plus tard.']);
+            Log::critical('Erreur fatale imprévue (Document Store)', [
+                'id' => $id,
+                'title' => $validatedData['title'],
+                'error' => $t->getMessage()
+            ]);
+            return redirect()->back()->with('error', 'Une erreur imprévue est survenue. Veuillez réessayer plus tard.');
         }
     }
 
     public function create($parent_id) {
         if($parent_id != 0 && !$this->foldersService->hasEditAccess($parent_id)) {
-            return redirect()->route("navigate.folder", ["folder_id" => $parent_id])->with("warn" , "Vous n'avez pas le droit de créer dans ce dossier");
+            Log::notice("Tentative de création non autorisée dans un dossier", ['folder_id' => $parent_id, 'user_id' => auth()->id()]);
+            return redirect()->route("navigate.folder", ["folder_id" => $parent_id])
+                ->with("error" , "Vous n'avez pas les permissions nécessaires pour créer un document ici.");
         }
         elseif ($parent_id == 0 && !$this->usersService->isAdmin()) {
-            return redirect()->back()->with(["warn" => "Vous n'avez pas le droit de créer une page d'accueil"]);
+            return redirect()->back()->with("error", "Seul un administrateur peut créer un document à la racine.");
         }
-        return \Inertia\Inertia::render('Admin/DocumentForm', [
-            "parent_id" => $parent_id,
-        ]);
+
+        return Inertia::render('Admin/DocumentForm', ["parent_id" => $parent_id]);
     }
 
-    /**
-     * @throws FileNotFoundException
-     * @throws DocumentNotFoundException
-     */
     public function update($id) {
-        $pass = $this->documentsService->hasEditAccess($id);
-        $document = $this->documentsService->read($id);
-        if(!$pass) {
-            return redirect()
-                ->route("navigate.folder", ["folder_id" => $document->folder_id])
-                ->with(["warn" => "Vous n'avez pas le droit de modifier cette ressource."]);
-        }
         try {
-            return \Inertia\Inertia::render('Admin/DocumentForm', [
-                "document" => $document,
-            ]);
-        } catch (BadRequestException $e) {
-            // 400 Bad Request (pour une erreur d'argument si non gérée par la validation)
-            return redirect()->back()->with(['error' => 'Arguments manquants ou invalides.']);
+            if(!$this->documentsService->hasEditAccess($id)) {
+                $document = $this->documentsService->read($id);
+                Log::notice("Accès refusé en modification de document", ['document_id' => $id, 'user_id' => auth()->id()]);
+                return redirect()->route("navigate.folder", ["folder_id" => $document->folder_id])
+                    ->with("error", "Vous n'avez pas le droit de modifier ce document.");
+            }
+
+            $document = $this->documentsService->read($id);
+            return Inertia::render('Admin/DocumentForm', ["document" => $document]);
+
         } catch (DocumentNotFoundException|FileNotFoundException $e) {
-            // 404 Not Found
-            return redirect()->back()->with(['error' => 'Le document ou un attachement spécifié est introuvable.']);
+            Log::error("Tentative de modification d'un document inexistant", ['id' => $id]);
+            return redirect()->back()->with('error', 'Le document que vous souhaitez modifier est introuvable.');
+        } catch (Throwable $t) {
+            Log::error("Erreur lors du chargement du formulaire d'édition", ['id' => $id, 'error' => $t->getMessage()]);
+            return redirect()->back()->with('error', 'Impossible de charger le document.');
         }
     }
 
     public function delete($id) {
         try {
             if(!$this->documentsService->hasEditAccess($id)) {
-                return redirect()->route("navigate.folder", ["folder_id" => $this->documentsService->read($id)->folder_id]);
+                Log::notice("Tentative de suppression non autorisée", ['id' => $id, 'user_id' => auth()->id()]);
+                return redirect()->back()->with("error", "Vous n'avez pas les permissions pour supprimer ce document.");
             }
+
             $this->documentsService->delete($id);
-            return redirect()->back()->with("success", "Document deleted successfully");
-        } catch (BadRequestException) {
-            // 400 Bad Request (pour une erreur d'argument si non gérée par la validation)
-            return redirect()->back()->with(['error' => 'Arguments manquants ou invalides.']);
+            return redirect()->back()->with("success", "Le document a été supprimé avec succès.");
 
-        } catch (DocumentNotFoundException|AttachmentNotFoundException) {
-            // 404 Not Found (Ressource à mettre à jour non trouvée)
-            return redirect()->back()->with(['error' => 'Le document ou un attachement spécifié est introuvable.']);
+        } catch (DocumentNotFoundException|AttachmentNotFoundException $e) {
+            return redirect()->back()->with('error', 'Le document est déjà supprimé ou introuvable.');
 
-        } catch (PersistenceException|DiskWriteException) {
-            // 500 Internal Server Error (Erreur BD ou Disque)
-            return redirect()->back()->with(['error' => 'Erreur critique de sauvegarde des données. Veuillez réessayer.']);
+        } catch (PersistenceException|DiskWriteException $e) {
+            Log::error("Erreur lors de la suppression physique/logique du document", ['id' => $id, 'error' => $e->getMessage()]);
+            return redirect()->back()->with('error', 'Erreur lors de la suppression du fichier sur le serveur.');
 
         } catch (Throwable $t) {
-            // Erreur imprévue (la transaction a été rollback dans le service)
-            Log::critical('Unhandled fatal error during document transaction.', ['error' => $t->getMessage(), 'id' => $id]);
-            return redirect()->back()->with(['error' => 'Une erreur imprévue est survenue, merci de réessayer plus tard.']);
+            Log::critical('Crash lors de la suppression du document', ['id' => $id, 'error' => $t->getMessage()]);
+            return redirect()->back()->with('error', 'Une erreur imprévue est survenue.');
         }
     }
 }

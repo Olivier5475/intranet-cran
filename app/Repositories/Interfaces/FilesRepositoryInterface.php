@@ -2,6 +2,7 @@
 
 namespace App\Repositories\Interfaces;
 
+use App\Exception\AlreadyExistsException;
 use App\Exception\FileNotFoundException;
 use App\Exception\PersistenceException;
 use App\Models\File;
@@ -11,38 +12,31 @@ use Illuminate\Database\Eloquent\Collection;
 interface FilesRepositoryInterface {
 
     /**
-     * Créer un document.
-     * @param array $data Les champs et leurs nouvelles valeurs (doivent être "fillable").
+     * @param array $data
      * @return File
-     * @throws PersistenceException En cas d'erreur de base de données.
+     * @throws PersistenceException|AlreadyExistsException
      */
     public function create(array $data) : File;
 
     /**
-     * Met à jour un document existant.
-     * @param int $id L'ID du document à mettre à jour.
-     * @param array $data Les champs et leurs nouvelles valeurs (doivent être "fillable").
+     * @param int $id
+     * @param array $data
      * @return File
-     * @throws FileNotFoundException Si le document n'est pas trouvé.
-     * @throws PersistenceException En cas d'erreur de base de données.
+     * @throws FileNotFoundException|PersistenceException|AlreadyExistsException
      */
     public function update(int $id, array $data) : File;
 
     /**
-     * Supprime un document existant.
-     * @param int $id L'ID du document à mettre à jour.
-     * @return bool retourne true si la suppression a réussi
-     * @throws FileNotFoundException Si le file n'est pas trouvé.
-     * @throws PersistenceException En cas d'erreur de base de données.
+     * @param int $id
+     * @return bool
+     * @throws FileNotFoundException|PersistenceException
      */
     public function delete(int $id) : bool;
 
     /**
-     * Récupère un fichier
-     * @param int $id l'id du document à lire
+     * @param int $id
      * @return File
-     * @throws FileNotFoundException Si le file n'est pas trouvé.
-     * @throws \Throwable
+     * @throws FileNotFoundException
      */
     public function read(int $id) : File ;
 
@@ -54,8 +48,7 @@ interface FilesRepositoryInterface {
 
     /**
      * @param int $parent_id
-     * @param $type
-     * @return array
+     * @return Collection<int, Version>
      */
     public function findVersionsFromParent(int $parent_id): Collection;
 }

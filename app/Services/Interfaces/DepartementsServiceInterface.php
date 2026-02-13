@@ -8,35 +8,42 @@ use App\Exception\PersistenceException;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 
 interface DepartementsServiceInterface {
-    public function readAll():array;
-    public function departementsIDs($departements):array;
+    /**
+     * @return DepartementDTO[]
+     */
+    public function readAll(): array;
+
+    /**
+     * Extrait les IDs d'une collection d'objets départements.
+     * @param iterable $departements
+     * @return int[]
+     */
+    public function departementsIDs(iterable $departements): array;
 
     /**
      * @param int $id
      * @param array $data
      * @return DepartementDTO
-     * @throws PersistenceException | DepartementNotFoundException | BadRequestException
+     * @throws PersistenceException|DepartementNotFoundException|BadRequestException
      */
-    public function update(int $id, array $data) : DepartementDTO;
+    public function update(int $id, array $data): DepartementDTO;
 
     /**
      * @param array $data
-     * @return void
-     * @throws PersistenceException | BadRequestException
+     * @throws PersistenceException|BadRequestException
      */
-    public function create(array $data) : void;
+    public function create(array $data): void;
 
     /**
      * @param int $id
-     * @return mixed
-     * @throws DepartementNotFoundException | BadRequestException
+     * @return DepartementDTO
+     * @throws DepartementNotFoundException|BadRequestException
      */
-    public function readById(int $id);
+    public function readById(int $id): DepartementDTO;
 
     /**
      * @param int $id
-     * @return void
-     * @throws PersistenceException | DepartementNotFoundException | BadRequestException
+     * @throws PersistenceException|DepartementNotFoundException|BadRequestException
      */
-    public function delete(int $id) : void;
+    public function delete(int $id): void;
 }

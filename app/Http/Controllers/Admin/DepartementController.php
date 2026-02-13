@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Throwable;
+use Inertia\Inertia;
 
 class DepartementController extends Controller {
     public function __construct(
@@ -18,67 +19,83 @@ class DepartementController extends Controller {
 
     public function readAll() {
         try {
-            return \Inertia\Inertia::render("Admin/Departements");
-        } catch (\Exception) {
-            return redirect()->back()->with("message", "No users found");
+            return Inertia::render("Admin/Departements");
+        } catch (Throwable $t) {
+            Log::error("Erreur lors du rendu de la page des départements", [
+                'exception' => $t->getMessage(),
+                'trace' => $t->getTraceAsString()
+            ]);
+            return redirect()->back()->with("error", "Impossible de charger la page des départements.");
         }
     }
 
     public function store(Request $request, $id = null) {
-        // 1. Validation de la requête
         $validatedData = $request->validate([
             'initials' => ['required', 'string', 'max:255'],
             'name' => ['required', 'string', 'max:255'],
         ]);
+
         try {
             if($id) {
                 $this->departementsService->update($id, $validatedData);
                 return redirect()->route("admin.departements")
-                    ->with("success", "Utilisateur mis à jour avec success");
+                    ->with("success", "Département mis à jour avec succès.");
             } else {
                 $this->departementsService->create($validatedData);
                 return redirect()->route("admin.departements")
-                    ->with("success", "Utilisateur créé avec success");
+                    ->with("success", "Département créé avec succès.");
             }
 
         } catch (BadRequestException $e) {
-            // 400 Bad Request (pour une erreur d'argument si non gérée par la validation)
-            return redirect()->back()->with(['success' => 'Arguments manquants ou invalides.'. $e->getMessage()]);
+            Log::warning("Requête invalide lors de l'enregistrement d'un département", [
+                'id' => $id,
+                'data' => $validatedData,
+                'message' => $e->getMessage()
+            ]);
+            return redirect()->back()->with('error', 'Les données fournies sont invalides.');
 
         } catch (PersistenceException $e) {
-            // 500 Internal Server Error (Erreur BD ou Disque)
-            return redirect()->back()->with(['success' => 'Erreur critique de sauvegarde des données. Veuillez réessayer. '. $e->getMessage()]);
+            Log::error("Erreur de persistance lors de l'enregistrement du département", [
+                'id' => $id,
+                'data' => $validatedData,
+                'exception' => $e->getMessage()
+            ]);
+            return redirect()->back()->with('error', 'Erreur technique lors de la sauvegarde. Veuillez réessayer.');
 
         } catch (Throwable $t) {
-            // Erreur imprévue (la transaction a été rollback dans le service)
-            Log::critical('Fatal Error', [
-                'error' => $t, 'id' => $id,
-                'nom' => $validatedData['nom'],
-                'prenom' => $validatedData['prenom'],
-                'role' => $validatedData['role'],
-                'email' => $validatedData['email'],
+            Log::critical('Erreur non gérée lors de la gestion du département', [
+                'id' => $id,
+                'data' => $validatedData,
+                'error' => $t->getMessage(),
+                'file' => $t->getFile(),
+                'line' => $t->getLine()
             ]);
-            return redirect()->back()->with(['success' => 'Une erreur imprévue est survenue (Code: 500).']);
+            return redirect()->back()->with('error', 'Une erreur imprévue est survenue.');
         }
     }
 
     public function delete($id) {
         try {
             $this->departementsService->delete($id);
-            return redirect()->back()->with("success", "Document deleted successfully");
+            return redirect()->back()->with("success", "Département supprimé avec succès.");
+
         } catch (DepartementNotFoundException $e) {
-            // 404 Not Found
-            return redirect()->back()->with(['error' => 'Le departement spécifié est introuvable.']);
-        } catch (BadRequestException) {
-            // 400 Bad Request (pour une erreur d'argument si non gérée par la validation)
-            return redirect()->back()->with(['error' => 'Arguments manquants ou invalides.']);
-        } catch (PersistenceException) {
-            // 500 Internal Server Error (Erreur BD ou Disque)
-            return redirect()->back()->with(['error' => 'Erreur critique de sauvegarde des données. Veuillez réessayer.']);
+            Log::notice("Tentative de suppression d'un département inexistant", ['id' => $id]);
+            return redirect()->back()->with('error', 'Le département spécifié est introuvable.');
+
+        } catch (PersistenceException $e) {
+            Log::error("Échec de la suppression du département en base de données", [
+                'id' => $id,
+                'exception' => $e->getMessage()
+            ]);
+            return redirect()->back()->with('error', 'Le département ne peut pas être supprimé actuellement.');
+
         } catch (Throwable $t) {
-            // Erreur imprévue (la transaction a été rollback dans le service)
-            Log::critical('Unhandled fatal error during document transaction.', ['error' => $t->getMessage(), 'id' => $id]);
-            return redirect()->back()->with(['error' => 'Une erreur imprévue est survenue (Code: 500).']);
+            Log::critical('Erreur fatale lors de la suppression du département', [
+                'id' => $id,
+                'error' => $t->getMessage()
+            ]);
+            return redirect()->back()->with('error', 'Une erreur imprévue est survenue.');
         }
     }
 }

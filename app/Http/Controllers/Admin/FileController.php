@@ -12,8 +12,8 @@ use App\Services\Interfaces\FoldersServiceInterface;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
-use Illuminate\Contracts\Filesystem;
 use Throwable;
+use Inertia\Inertia;
 
 class FileController extends Controller {
 
@@ -23,7 +23,6 @@ class FileController extends Controller {
     ){}
 
     public function store(Request $request, $file_id = null) {
-        // 1. Validation de la requête
         $validatedData = $request->validate([
             'name' => [
                 $request->hasFile('files') ? 'nullable' : 'required',
@@ -36,101 +35,104 @@ class FileController extends Controller {
             'parent_id' => ['integer', 'nullable'],
         ]);
 
-        // 2. Préparation des données pour le Service
         $data = [
             "name" => $validatedData["name"],
             "file" => $request->file('files')[0] ?? null,
             "departements" => $validatedData["departements"] ?? [],
+            "folder_id" => $validatedData["parent_id"] ?? null,
         ];
 
-        if(!is_null($validatedData["parent_id"])) {
-            $data["folder_id"] = $validatedData["parent_id"];
-        }
         try {
             if($file_id) {
                 if(!$this->filesService->hasEditAccess($file_id)) {
-                    return redirect()->route("navigate.folder", ["folder_id" => $this->filesService->read($file_id)->folder_id]);
+                    Log::notice("Accès refusé pour la mise à jour du fichier", ['file_id' => $file_id, 'user_id' => auth()->id()]);
+                    return redirect()->route("navigate.folder", ["folder_id" => $this->filesService->read($file_id)->folder_id])
+                        ->with("error", "Vous n'avez pas les permissions pour modifier ce fichier.");
                 }
                 $file = $this->filesService->update($file_id, $data);
                 return redirect()->route("navigate.folder", ["folder_id" => $file->folder_id])
-                    ->with("success", "Fichier mis à jour avec success");
+                    ->with("success", "Le fichier a été mis à jour avec succès.");
             } else {
                 $file = $this->filesService->create($data);
                 return redirect()->route("navigate.folder", ["folder_id" => $file->folder_id])
-                    ->with("success", "Fichier créé avec success");
+                    ->with("success", "Le fichier a été créé avec succès.");
             }
 
         } catch (BadRequestException $e) {
-            // 400 Bad Request (pour une erreur d'argument si non gérée par la validation)
-            return redirect()->back()->with(['error' => 'Arguments manquants ou invalides.']);
+            Log::warning("Requête invalide lors du traitement du fichier", ['file_id' => $file_id, 'message' => $e->getMessage()]);
+            return redirect()->back()->with('error', 'Les données du fichier sont incorrectes ou incomplètes.');
 
-        } catch (FileNotFoundException) {
-            // 404 Not Found (Ressource à mettre à jour non trouvée)
-            return redirect()->back()->with(['error' => 'Le fichier spécifié est introuvable.']);
+        } catch (FileNotFoundException $e) {
+            Log::error("Fichier introuvable lors de l'opération", ['file_id' => $file_id]);
+            return redirect()->back()->with('error', 'Le fichier spécifié est introuvable.');
 
         } catch (PersistenceException|DiskWriteException $e) {
-            // 500 Internal Server Error (Erreur BD ou Disque)
-            return redirect()->back()->with(['error' => 'Erreur critique de sauvegarde des données. Veuillez réessayer.']);
+            Log::error("Erreur de stockage ou base de données pour un fichier", [
+                'file_id' => $file_id,
+                'exception' => $e->getMessage(),
+                'data' => array_diff_key($data, ['file' => '']) // On ne logue pas l'objet File
+            ]);
+            return redirect()->back()->with('error', 'Une erreur technique est survenue lors de l’enregistrement.');
 
         } catch (AlreadyExistsException $e) {
-            // 500 Internal Server Error (Erreur BD ou Disque)
-            return redirect()->back()->with(['error' => 'Fichier / Document avec le même nom existant']);
+            return redirect()->back()->with('error', 'Un fichier avec ce nom existe déjà dans ce dossier.');
 
         } catch (Throwable $t) {
-            // Erreur imprévue (la transaction a été rollback dans le service)
-            Log::critical('Unhandled fatal error during file transaction.', ['error' => $t->getMessage(), 'id' => $file_id]);
-            return redirect()->back()->with(['error' => 'Une erreur imprévue est survenue réessayer plus tard.']);
+            Log::critical('Erreur fatale imprévue (File Store)', [
+                'file_id' => $file_id,
+                'error' => $t->getMessage(),
+                'trace' => $t->getTraceAsString()
+            ]);
+            return redirect()->back()->with('error', 'Une erreur imprévue est survenue.');
         }
     }
 
     public function create($parent_id) {
         if(!$this->foldersService->hasEditAccess($parent_id)) {
-            return redirect()->route("navigate.folder", ["folder_id" => $parent_id])->with("warn" , "Vous n'avez pas le droit de modifier ce dossier");
+            Log::notice("Tentative de création de fichier sans droits", ['parent_id' => $parent_id]);
+            return redirect()->route("navigate.folder", ["folder_id" => $parent_id])
+                ->with("error" , "Vous n'avez pas le droit d'ajouter des fichiers dans ce dossier.");
         }
-        return \Inertia\Inertia::render('Admin/FileForm', [
-            "parent_id" => $parent_id
-        ]);
+        return Inertia::render('Admin/FileForm', ["parent_id" => $parent_id]);
     }
+
     public function update($file_id) {
         try {
             if(!$this->filesService->hasEditAccess($file_id)) {
-                return redirect()->route("navigate.folder", ["folder_id" => $this->filesService->read($file_id)->folder_id]);
+                $file = $this->filesService->read($file_id);
+                Log::notice("Accès refusé au formulaire d'édition de fichier", ['file_id' => $file_id]);
+                return redirect()->route("navigate.folder", ["folder_id" => $file->folder_id])
+                    ->with("error", "Vous n'avez pas les droits de modification sur ce fichier.");
             }
-            return \Inertia\Inertia::render('Admin/FileForm', [
-                "file" => $this->filesService->read($file_id),
-            ]);
-        } catch (BadRequestException $e) {
-            // 400 Bad Request (pour une erreur d'argument si non gérée par la validation)
-            return redirect()->back()->with(['error' => 'Arguments manquants ou invalides.']);
+            return Inertia::render('Admin/FileForm', ["file" => $this->filesService->read($file_id)]);
+
         } catch (FileNotFoundException $e) {
-            // 404 Not Found
-            return redirect()->back()->with(['error' => 'Le document ou un attachement spécifié est introuvable.']);
+            return redirect()->back()->with('error', 'Le fichier est introuvable.');
+        } catch (Throwable $t) {
+            Log::error("Erreur chargement formulaire fichier", ['file_id' => $file_id, 'error' => $t->getMessage()]);
+            return redirect()->back()->with('error', 'Impossible de charger le fichier.');
         }
     }
 
     public function delete($file_id) {
         try {
             if(!$this->filesService->hasEditAccess($file_id)) {
-                return redirect()->route("navigate.folder", ["folder_id" => $this->filesService->read($file_id)->folder_id]);
+                Log::notice("Tentative de suppression de fichier non autorisée", ['file_id' => $file_id]);
+                return redirect()->back()->with("error", "Permissions insuffisantes pour supprimer ce fichier.");
             }
             $this->filesService->delete($file_id);
-            return redirect()->back()->with("success", "Document deleted successfully");
-        } catch (BadRequestException) {
-            // 400 Bad Request (pour une erreur d'argument si non gérée par la validation)
-            return redirect()->back()->with(['error' => 'Arguments manquants ou invalides.']);
+            return redirect()->back()->with("success", "Le fichier a été supprimé avec succès.");
 
-        } catch (FileNotFoundException) {
-            // 404 Not Found (Ressource à mettre à jour non trouvée)
-            return redirect()->back()->with(['error' => 'Le document ou un attachement spécifié est introuvable.']);
+        } catch (FileNotFoundException $e) {
+            return redirect()->back()->with('error', 'Le fichier est déjà supprimé ou introuvable.');
 
-        } catch (PersistenceException|DiskWriteException) {
-            // 500 Internal Server Error (Erreur BD ou Disque)
-            return redirect()->back()->with(['error' => 'Erreur critique de sauvegarde des données. Veuillez réessayer.']);
+        } catch (PersistenceException|DiskWriteException $e) {
+            Log::error("Échec de suppression du fichier", ['file_id' => $file_id, 'error' => $e->getMessage()]);
+            return redirect()->back()->with('error', 'Erreur technique lors de la suppression.');
 
         } catch (Throwable $t) {
-            // Erreur imprévue (la transaction a été rollback dans le service)
-            Log::critical('Unhandled fatal error during document transaction.', ['error' => $t->getMessage(), 'id' => $id]);
-            return redirect()->back()->with(['error' => 'Une erreur imprévue est survenue (Code: 500).']);
+            Log::critical('Erreur fatale lors de la suppression du fichier', ['file_id' => $file_id, 'error' => $t->getMessage()]);
+            return redirect()->back()->with('error', 'Une erreur imprévue est survenue (Code 500).');
         }
     }
 }

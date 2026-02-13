@@ -51,15 +51,13 @@ const isActive = (url: string) => page.url.startsWith(url);
                 </div>
             </div>
 
-            <Link
+            <a
                 :href="logout.url()"
-                method="post"
-                as="button"
                 class="group flex items-center gap-2 px-4 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-red-600/20 transition-all duration-200"
             >
                 <span class="text-lg font-medium">Déconnexion</span>
                 <ArrowLeftEndOnRectangleIcon class="w-6 h-6 transition-transform group-hover:translate-x-1" />
-            </Link>
+            </a>
         </div>
     </nav>
 </template>

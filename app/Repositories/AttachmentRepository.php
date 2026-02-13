@@ -6,80 +6,62 @@ use App\Exception\AttachmentNotFoundException;
 use App\Exception\PersistenceException;
 use App\Models\Attachment;
 use Illuminate\Support\Facades\Log;
+use Throwable;
 
-class AttachmentRepository implements interfaces\AttachmentRepositoryInterface {
+class AttachmentRepository implements Interfaces\AttachmentRepositoryInterface {
 
-    /**
-     * @inheritDoc
-     */
     public function create(array $data): Attachment {
         try {
             return Attachment::create($data);
-        } catch (\Throwable $e) {
-            Log::error('Attachment creation error', [
-                'error' => $e->getMessage(),
+        } catch (Throwable $e) {
+            Log::error('Erreur SQL : Création attachement impossible', [
+                'message' => $e->getMessage(),
                 'data' => $data,
             ]);
 
-            throw new PersistenceException(message:"Could not create attachment.", previous:$e);
+            throw new PersistenceException("Impossible de créer l'attachement en base de données.", 0, $e);
         }
     }
 
-    /**
-     * @inheritDoc
-     */
     public function read(int $id): Attachment {
         $attachment = Attachment::find($id);
+
         if (!$attachment) {
-            throw new AttachmentNotFoundException("Attachment with ID $id not found.");
+            throw new AttachmentNotFoundException("L'attachement avec l'ID $id est introuvable.");
         }
+
         return $attachment;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function update(int $id, array $data): Attachment|bool {
-        $attachment = Attachment::find($id);
-
-        if (!$attachment) {
-            throw new AttachmentNotFoundException("Attachment with ID $id not found.");
-        }
+    public function update(int $id, array $data): Attachment {
+        $attachment = $this->read($id); // Réutilise read() pour gérer l'exception 404
 
         try {
-            $attachment->fill($data);
-            $attachment->save();
-
-            return $attachment;
-        } catch (\Throwable $e) {
-            Log::error('Attachment update failed for ID ' . $id, [
-                'error' => $e->getMessage(),
-                'data' => $data,
+            $attachment->update($data);
+            return $attachment->fresh(); // On retourne une instance fraîchement synchronisée
+        } catch (Throwable $e) {
+            Log::error("Erreur SQL : Mise à jour attachement échouée", [
+                'id' => $id,
+                'message' => $e->getMessage(),
+                'payload' => $data,
             ]);
 
-            throw new PersistenceException(message : "Could not update attachment with ID $id.", previous:$e);
+            throw new PersistenceException("Erreur lors de la mise à jour de l'attachement $id.", 0, $e);
         }
     }
 
-    /**
-     * @inheritDoc
-     */
     public function delete(int $id): bool {
-        $attachment = Attachment::find($id);
-
-        if (!$attachment) {
-            throw new AttachmentNotFoundException("Attachment with ID $id not found.");
-        }
+        $attachment = $this->read($id);
 
         try {
-            $attachment->delete();
-            return true;
-        } catch (\Throwable $e) {
-            Log::error('Attachment delete failed for ID ' . $id, [
-                'error' => $e->getMessage(),
+            return (bool) $attachment->delete();
+        } catch (Throwable $e) {
+            Log::error("Erreur SQL : Suppression attachement échouée", [
+                'id' => $id,
+                'message' => $e->getMessage(),
             ]);
 
-            throw new PersistenceException(message : "Could not delete attachment with ID $id.", previous:$e);
+            throw new PersistenceException("Erreur lors de la suppression de l'attachement $id.", 0, $e);
         }
     }
 }

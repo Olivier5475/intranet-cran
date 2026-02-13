@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Exception\FileNotFoundException;
 use App\Exception\PersistenceException;
 use App\Http\Controllers\Controller;
 use App\Services\Interfaces\UserServiceInterface;
@@ -10,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Throwable;
+use Inertia\Inertia;
 
 class UsersController extends Controller {
     public function __construct(
@@ -18,69 +18,80 @@ class UsersController extends Controller {
 
     public function readAll() {
         try {
-            return \Inertia\Inertia::render("Admin/Users", [
-               "users" => $this->usersService->readAll()
+            return Inertia::render("Admin/Users", [
+                "users" => $this->usersService->readAll()
             ]);
-        } catch (\Exception) {
-            return redirect()->back()->with("message", "No users found");
+        } catch (Throwable $t) {
+            Log::error("Erreur lors de la récupération des utilisateurs", [
+                'error' => $t->getMessage()
+            ]);
+            return redirect()->back()->with("error", "Impossible de charger la liste des utilisateurs.");
         }
     }
 
     public function store(Request $request, $id = null) {
-        // 1. Validation de la requête
         $validatedData = $request->validate([
             'nom' => ['required', 'string', 'max:255'],
             'prenom' => ['required', 'string', 'max:255'],
             'role' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'max:255'],
-            'departements' => ['array'],
+            'email' => ['required', 'string', 'max:255', 'email'],
+            'departements' => ['sometimes', 'array'],
         ]);
+
         try {
             if($id) {
                 $this->usersService->update($id, $validatedData);
                 return redirect()->route("admin.user")
-                    ->with("success", "Utilisateur mis à jour avec success");
+                    ->with("success", "Utilisateur mis à jour avec succès.");
             } else {
                 $this->usersService->handleUserInDatabase($validatedData);
                 return redirect()->route("admin.user")
-                    ->with("success", "Utilisateur créé avec success");
+                    ->with("success", "Utilisateur créé avec succès.");
             }
 
         } catch (BadRequestException $e) {
-            // 400 Bad Request (pour une erreur d'argument si non gérée par la validation)
-            return redirect()->back()->with(['success' => 'Arguments manquants ou invalides.'. $e->getMessage()]);
+            Log::warning("Requête invalide lors de la gestion utilisateur", [
+                'id' => $id,
+                'email' => $validatedData['email']
+            ]);
+            return redirect()->back()->with('error', 'Les données fournies sont incorrectes.');
 
         } catch (PersistenceException $e) {
-            // 500 Internal Server Error (Erreur BD ou Disque)
-            return redirect()->back()->with(['success' => 'Erreur critique de sauvegarde des données. Veuillez réessayer. '. $e->getMessage()]);
+            Log::error("Erreur de base de données (User)", [
+                'id' => $id,
+                'email' => $validatedData['email'],
+                'exception' => $e->getMessage()
+            ]);
+            return redirect()->back()->with('error', 'Erreur lors de la sauvegarde. Veuillez réessayer.');
 
         } catch (Throwable $t) {
-            // Erreur imprévue (la transaction a été rollback dans le service)
-            Log::critical('Fatal Error', [
-                'error' => $t, 'id' => $id,
-                'nom' => $validatedData['nom'],
-                'prenom' => $validatedData['prenom'],
-                'role' => $validatedData['role'],
-                'email' => $validatedData['email'],
+            Log::critical('Erreur fatale utilisateur', [
+                'id' => $id,
+                'data' => $validatedData,
+                'error' => $t->getMessage()
             ]);
-            return redirect()->back()->with(['success' => 'Une erreur imprévue est survenue (Code: 500).']);
+            return redirect()->back()->with('error', 'Une erreur imprévue est survenue.');
         }
     }
 
     public function delete($id) {
         try {
             $this->usersService->delete($id);
-            return redirect()->back()->with("success", "Document deleted successfully");
+            return redirect()->back()->with("success", "Utilisateur supprimé avec succès.");
+
         } catch (BadRequestException) {
-            // 400 Bad Request (pour une erreur d'argument si non gérée par la validation)
-            return redirect()->back()->with(['error' => 'Arguments manquants ou invalides.']);
-        } catch (PersistenceException) {
-            // 500 Internal Server Error (Erreur BD ou Disque)
-            return redirect()->back()->with(['error' => 'Erreur critique de sauvegarde des données. Veuillez réessayer.']);
+            return redirect()->back()->with('error', 'Impossible de supprimer cet utilisateur (ID invalide).');
+
+        } catch (PersistenceException $e) {
+            Log::error("Échec de suppression utilisateur", ['id' => $id, 'error' => $e->getMessage()]);
+            return redirect()->back()->with('error', 'Erreur technique lors de la suppression.');
+
         } catch (Throwable $t) {
-            // Erreur imprévue (la transaction a été rollback dans le service)
-            Log::critical('Unhandled fatal error during document transaction.', ['error' => $t->getMessage(), 'id' => $id]);
-            return redirect()->back()->with(['error' => 'Une erreur imprévue est survenue (Code: 500).']);
+            Log::critical('Crash lors de la suppression utilisateur', [
+                'id' => $id,
+                'error' => $t->getMessage()
+            ]);
+            return redirect()->back()->with('error', 'Une erreur imprévue est survenue.');
         }
     }
 }

@@ -9,81 +9,56 @@ use App\Exception\DiskWriteException;
 use App\Exception\FolderNotFoundException;
 use App\Exception\PersistenceException;
 use Illuminate\Support\Collection;
-use Symfony\Component\CssSelector\Exception\InternalErrorException;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
-use Throwable;
 
 interface FoldersServiceInterface {
 
     /**
-     * Récupère les enfants (dossiers, fichiers, documents) du dossier courant.
+     * Récupère les enfants directs (dossiers, fichiers, documents).
      * @return array<FolderDTO|FileDTO|DocumentDTO>
      */
     public function getChildren(int $id) : array;
 
     /**
-     * Récupère le fil d'Ariane (tous les parents) pour un dossier.
-     *
-     * @return array<FolderDTO>
-     * @throws FolderNotFoundException si le folder n'existe pas
+     * Récupère le fil d'Ariane.
+     * @return FolderDTO[]
+     * @throws FolderNotFoundException
      */
     public function getBreadcrumbs(int $id): array;
 
+    /**
+     * @return FolderDTO[]
+     */
     public function getRacineChildren() : array;
 
-
     /**
-     * Récupère le contenu d'un dossier (navigation ou recherche).
-     *
-     * @param int $folderId L'ID du dossier courant
-     * @param string|null $searchQuery Le terme de recherche (optionnel)
-     * @return Collection Une collection de DTOs
+     * Récupère le contenu d'un dossier (navigation ou recherche par pertinence via Scout).
+     * @return Collection<FolderDTO|FileDTO|DocumentDTO>
      */
     public function getFolderContents(int $folderId, ?string $searchQuery): Collection;
 
     /**
-     * @param int $id
-     * @return FolderDTO
-     * @throws FolderNotFoundException si le folder avec l'id n'est pas trouvé
-     * @throws BadRequestException si il n'y a pas d'ID de transmis
+     * @throws FolderNotFoundException|BadRequestException
      */
     public function read(int $id) : FolderDTO;
 
     /**
-     * Fonction de création d'un Document
-     * Vérifie les données
-     * Lance la creation en BD avec le Repository*
-     * Lance la creation attachment
-     * @param array $data
-     * @throws DiskWriteException
-     * @throws FolderNotFoundException
-     * @throws InternalErrorException
-     * @throws PersistenceException
+     * @throws PersistenceException|BadRequestException
      */
     public function create(array $data) : FolderDTO;
 
     /**
-     * @param int $id
-     * @param array $data
-     * @return FolderDTO|bool
-     * @throws PersistenceException
-     * @throws FolderNotFoundException
-     * @throws Throwable
+     * @throws PersistenceException|FolderNotFoundException|BadRequestException
      */
-    public function update(int $id, array $data) : FolderDTO|bool;
+    public function update(int $id, array $data) : FolderDTO;
 
     /**
-     * @param int $id
-     * @return void
-     * @throws BadRequestException si pas d'ID
-     * @throws PersistenceException en cas d'erreur lors de la persistence en BD (throw par le Repository)
-     * @throws FolderNotFoundException
+     * @throws FolderNotFoundException|PersistenceException|BadRequestException
      */
     public function delete(int $id) : void;
 
     /**
-     * @param int $folder_id
-     * @return bool
+     * Vérifie les droits d'édition basés sur les départements.
      */
     public function hasEditAccess(int $folder_id) : bool;
 }

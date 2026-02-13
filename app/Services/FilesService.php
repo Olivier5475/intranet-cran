@@ -13,25 +13,18 @@ use App\Repositories\Interfaces\FilesRepositoryInterface;
 use App\Services\Interfaces\DepartementsServiceInterface;
 use App\Services\Interfaces\FoldersServiceInterface;
 use App\Services\Interfaces\UserServiceInterface;
-use Exception;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
-use Illuminate\Contracts\Filesystem ;
+use Illuminate\Contracts\Filesystem\FileNotFoundException as FilesystemNotFoundException;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Throwable;
 
 readonly class FilesService implements Interfaces\FilesServiceInterface {
 
-    /**
-     * @param FilesRepositoryInterface $filesRepository
-     * @param FoldersServiceInterface $foldersService
-     * @param UserServiceInterface $userService
-     * @param DepartementsServiceInterface $departementsService
-     */
     public function __construct(
         private FilesRepositoryInterface $filesRepository,
         private FoldersServiceInterface $foldersService,
@@ -41,226 +34,179 @@ readonly class FilesService implements Interfaces\FilesServiceInterface {
 
     public function create(array $data): FileDTO {
         if (empty($data["folder_id"]) || !($data['file'] ?? null) instanceof UploadedFile) {
-            throw new BadRequestException("Missing folder ID or uploaded file.");
+            throw new BadRequestException("ID dossier ou fichier manquant.");
         }
 
+        /** @var UploadedFile $uploadedFile */
         $uploadedFile = $data["file"];
 
-        $folders = $this->foldersService->getBreadcrumbs($data["folder_id"]);
+        // Construction simplifiée du chemin : folders/ID_1/ID_2/
+        $breadcrumbs = $this->foldersService->getBreadcrumbs($data["folder_id"]);
+        $folderPath = collect($breadcrumbs)->map(fn($f) => $f->id)->implode('/') . '/';
 
-        $folder_path = "";
-        foreach ($folders as $folder) {
-            if ($data['folder_id'] === $folder->id) {
-                $folder_path = $folder_path . $folder->id;
-            } else {
-                $folder_path = $folder_path . $folder->id . "/";
-            }
-        }
-
-        $secure_name = Str::uuid() . "." . $uploadedFile->getClientOriginalExtension();
+        $secureName = Str::uuid() . "." . $uploadedFile->getClientOriginalExtension();
 
         try {
-            $storage_path = $uploadedFile->storeAs($folder_path, $secure_name, "public");
-        } catch (Throwable $e) {
-            Log::warning("File upload failed" , [
-                "message" => $e->getMessage(),
-                "folder_path" => $folder_path,
-            ]);
+            $storagePath = $uploadedFile->storeAs($folderPath, $secureName, "public");
+            if (!$storagePath) throw new DiskWriteException();
+        } catch (Throwable $t) {
+            Log::error("Échec upload fichier", ["path" => $folderPath, "error" => $t->getMessage()]);
             throw new DiskWriteException();
         }
 
-        $data["user_id"] = $this->userService->getCurrentUserId();
-        $data['storage_path'] = $storage_path;
-        if(empty($data["name"])) {
-            $data['name'] = $uploadedFile->getClientOriginalName(); // Nom affiché à l'utilisateur
-        }
-        if (!str_ends_with($data["name"], "." . $uploadedFile->getClientOriginalExtension())) {
-            $data["name"] = $data["name"] . "." . $uploadedFile->getClientOriginalExtension();
-        }
-        $data['mimetype'] = $uploadedFile->getMimeType();
-        $data['size'] = $uploadedFile->getSize();
-
-        unset($data['file']); // on ne passe pas le fichier au repository
-
         try {
             DB::beginTransaction();
+
+            $data["user_id"] = $this->userService->getCurrentUserId();
+            $data['storage_path'] = $storagePath;
+            $data['mimetype'] = $uploadedFile->getMimeType();
+            $data['size'] = $uploadedFile->getSize();
+
+            // Gestion du nom (priorité au nom saisi, sinon nom d'origine)
+            $displayName = $data["name"] ?? $uploadedFile->getClientOriginalName();
+            $extension = "." . $uploadedFile->getClientOriginalExtension();
+            $data["name"] = str_ends_with($displayName, $extension) ? $displayName : $displayName . $extension;
+
+            unset($data['file']);
+
             $file = $this->filesRepository->create($data);
+
             DB::commit();
             return $this->makeFileDTO($file);
-        } catch (PersistenceException $e) {
-            try {
-                DB::rollBack();
-            } catch (Throwable) {
-                Log::warning("Erreur avec le composant DB ");
-            }
-            Storage::disk('public')->delete($storage_path);
 
-            Log::warning("File creation failed: ", [
-                "message" => $e->getMessage()
-            ]);
-            throw $e;
         } catch (Throwable $e) {
-            try {
-                DB::rollBack();
-            } catch (Throwable) {
-                Log::warning("Erreur avec le composant DB lors du rollback");
-            }
-
-            Storage::disk('public')->delete($storage_path);
-
-            Log::critical("Critical Error during file transaction.", [
-                "message" => $e->getMessage(),
-                "path" => $storage_path
-            ]);
-
-            throw new PersistenceException("A critical error occurred during data processing.", 0, $e);
-        }
-    }
-
-    public function read($id) : FileDTO {
-        if(empty($id)) {
-            $e = new BadRequestException("Missing id.");
-            Log::critical("File read failed: ", ["exception" => $e]);
-            throw $e;
-        }
-        try {
-            $file = $this->filesRepository->read($id);
-            return $this->makeFileDTO($file);
-        } catch (FileNotFoundException $e) {
-            Log::warning("File not found with id: " . $id);
-            throw $e;
-        } catch (Throwable $e) {
-            Log::warning("File read failed: ", ["exception" => $e]);
-            throw new FileNotFoundException();
+            DB::rollBack();
+            Storage::disk('public')->delete($storagePath);
+            Log::error("Échec création fichier en BD. Nettoyage disque effectué.", ["error" => $e->getMessage()]);
+            throw new PersistenceException("Erreur lors de l'enregistrement du fichier.", 0, $e);
         }
     }
 
     public function update(int $id, array $data): FileDTO {
-        if(empty($id)) {
-            throw new BadRequestException();
-        }
-        try {
-            $file = $this->filesRepository->read($id);
-        } catch (FileNotFoundException $e) {
-            Log::warning("File not found with id: " . $id);
-            throw $e;
-        }
+        $file = $this->filesRepository->read($id);
+        $oldPath = $file->storage_path;
+        $newStoragePath = null;
 
-        if(!empty($data["file"])) {
-            $uploadedFile = $data["file"];
-
-            $folders = $this->foldersService->getBreadcrumbs($file->folder_id);
-
-            $folder_path = "";
-            foreach ($folders as $folder) {
-                if ($file->folder_id === $folder->id) {
-                    $folder_path = $folder_path . $folder->id;
-                } else {
-                    $folder_path = $folder_path . $folder->id . "/";
-                }
-            }
-
-            $secure_name = Str::uuid() . "." . $uploadedFile->getClientOriginalExtension();
-
-            try {
-                $storage_path = $uploadedFile->storeAs($folder_path, $secure_name, "public");
-            } catch (Throwable $e) {
-                Log::warning("File upload failed", [
-                    "message" => $e->getMessage(),
-                    "folder_path" => $folder_path,
-                ]);
-                throw new DiskWriteException();
-            }
-
-            $old_path = $file->storage_path;
-            $data['storage_path'] = $storage_path;
-            if(empty($data["name"])) {
-                $data['name'] = $uploadedFile->getClientOriginalName(); // Nom affiché à l'utilisateur
-            }
-            if (!str_ends_with($data["name"], "." . $uploadedFile->getClientOriginalExtension())) {
-                $data["name"] = $data["name"] . "." . $uploadedFile->getClientOriginalExtension();
-            }
-            $data['mimetype'] = $uploadedFile->getMimeType();
-            $data['size'] = $uploadedFile->getSize();
-
-            unset($data['file']);
-        }
         try {
             DB::beginTransaction();
-            $file = $this->filesRepository->update($id, $data);
-            if(!empty($uploadedFile)) {
-                Storage::delete($old_path);
+
+            if (!empty($data["file"]) && $data["file"] instanceof UploadedFile) {
+                $uploadedFile = $data["file"];
+                $folderPath = dirname($oldPath) . '/';
+                $secureName = Str::uuid() . "." . $uploadedFile->getClientOriginalExtension();
+
+                $newStoragePath = $uploadedFile->storeAs($folderPath, $secureName, "public");
+                $data['storage_path'] = $newStoragePath;
+                $data['mimetype'] = $uploadedFile->getMimeType();
+                $data['size'] = $uploadedFile->getSize();
+
+                // On s'assure que le nom garde l'extension
+                if (!empty($data["name"])) {
+                    $ext = "." . $uploadedFile->getClientOriginalExtension();
+                    if (!str_ends_with($data["name"], $ext)) $data["name"] .= $ext;
+                }
+                unset($data['file']);
             }
+
+            $updatedFile = $this->filesRepository->update($id, $data);
+
+            if ($newStoragePath) {
+                Storage::disk('public')->delete($oldPath);
+            }
+
             DB::commit();
-            return $this->makeFileDTO($file);
-        } catch (PersistenceException $e) {
-            DB::rollBack();
-            Log::warning("File attempted to update can\'t be persisted.: ", [
-                "id" => $id,
-                "data" => $data,
-                "message" => $e->getMessage()
-            ]);
-            throw $e;
-        } catch (FileNotFoundException $e) {
-            DB::rollBack();
-            Log::warning("File attempted to update was not found.: ", [
-                "id" => $id,
-                "data" => $data,
-                "message" => $e->getMessage()
-            ]);
-            throw $e;
+            return $this->makeFileDTO($updatedFile);
+
         } catch (Throwable $e) {
             DB::rollBack();
-            Log::warning("DB Transaction failed: ");
-            throw new PersistenceException();
+            if ($newStoragePath) Storage::disk('public')->delete($newStoragePath);
+            Log::error("Échec mise à jour fichier", ["id" => $id, "error" => $e->getMessage()]);
+            throw new PersistenceException("Erreur de mise à jour.");
+        }
+    }
+
+    public function restoreFromVersionId(int $versionId): void {
+        try {
+            DB::beginTransaction();
+
+            $version = $this->filesRepository->findVersionWithParent($versionId);
+            if ($version->versionable_type !== File::class) {
+                throw new \Exception("La version ne concerne pas un fichier.");
+            }
+
+            $payload = $version->payload;
+            $file = $version->versionable;
+
+            // Restauration physique si nécessaire
+            if (isset($payload['archived_path'], $payload['storage_path'])) {
+                if (!Storage::disk('public')->exists($payload['archived_path'])) {
+                    throw new FileNotFoundException("Archive physique introuvable.");
+                }
+                Storage::disk('public')->copy($payload['archived_path'], $payload['storage_path']);
+            }
+
+            $attributes = collect($payload)->except(['archived_path', '_relations'])->toArray();
+
+            // Restauration des relations (départements)
+            if (isset($payload['_relations']['departements'])) {
+                $attributes['departements'] = $payload['_relations']['departements'];
+            }
+
+            $this->filesRepository->update($file->id, $attributes);
+
+            DB::commit();
+            Log::info("Version restaurée avec succès", ["file_id" => $file->id, "version_id" => $versionId]);
+
+        } catch (Throwable $e) {
+            DB::rollBack();
+            Log::error("Échec restauration version", ["version_id" => $versionId, "error" => $e->getMessage()]);
+            throw $e;
         }
     }
 
     public function delete(int $id): bool {
-        if(empty($id)) {
-            throw new BadRequestException("Missing argument", 400);
-        }
+        $file = $this->filesRepository->read($id);
+        $path = $file->storage_path;
 
         try {
-            $file = $this->filesRepository->read($id);
-            $storage_path = $file->storage_path;
-
             DB::beginTransaction();
-
-            $success =  $this->filesRepository->delete($id);
-            Storage::disk('public')->delete($storage_path);
-
+            $this->filesRepository->delete($id);
+            Storage::disk('public')->delete($path);
             DB::commit();
-            return $success;
-        } catch (FileNotFoundException $e) {
-            Log::warning("File attempted to delete was not found.: ", [
-                "id" => $id,
-                "message" => $e->getMessage()
-            ]);
-            throw $e;
+            return true;
         } catch (Throwable $e) {
-            try {
-                DB::rollBack();
-            } catch (Throwable) {
-                Log::warning("Erreur avec le composant DB lors du rollback");
-            }
-            Log::warning("File attempted to delete can't be persisted.: ", [
-                "id" => $id,
-                "message" => $e->getMessage()
-            ]);
-
-            if ($e instanceof PersistenceException) {
-                throw $e;
-            }
-            throw new PersistenceException("An unexpected error occurred during file deletion.", 0, $e);
+            DB::rollBack();
+            Log::critical("Échec suppression fichier", ["id" => $id, "error" => $e->getMessage()]);
+            throw new PersistenceException("Erreur lors de la suppression.");
         }
     }
 
-    /**
-     * Créé un FileDTO à partir d'un File
-     * @param File $file
-     * @return FileDTO
-     */
+    public function download(int $id): StreamedResponse {
+        $file = $this->filesRepository->read($id);
+        if (!Storage::disk('public')->exists($file->storage_path)) {
+            Log::error("Téléchargement impossible : fichier manquant", ["id" => $id, "path" => $file->storage_path]);
+            throw new FilesystemNotFoundException("Fichier physique introuvable.");
+        }
+        return Storage::disk('public')->download($file->storage_path, $file->name);
+    }
+
+    public function readVersionsFromParent(int $parent_id): array {
+        $versions = $this->filesRepository->findVersionsFromParent($parent_id);
+        return array_map(fn($v) => $this->makeVersionDTO($v), $versions);
+    }
+
+    public function downloadVersion($id): StreamedResponse {
+        $version = $this->filesRepository->findVersionWithParent($id);
+        $payload = $version->payload;
+        $path = $payload["archived_path"] ?? $payload["storage_path"] ?? null;
+
+        if (!$path || !Storage::disk('public')->exists($path)) {
+            throw new FilesystemNotFoundException("Fichier de version introuvable.");
+        }
+
+        return Storage::disk('public')->download($path, $payload["name"] ?? "version_".$id);
+    }
+
     private function makeFileDTO(File $file): FileDTO {
         return new FileDTO(
             id: $file->id,
@@ -273,88 +219,28 @@ readonly class FilesService implements Interfaces\FilesServiceInterface {
         );
     }
 
-    public function download(int $id): StreamedResponse {
-        $file = $this->filesRepository->read($id);
-        if (empty($file->storage_path)) {
-            throw new Filesystem\FileNotFoundException("Empty path");
-        }
-        return Storage::disk('public')->download($file->storage_path, $file->name);
-    }
-
-    public function hasEditAccess(int $file_id): bool
-    {
-        $user = $this->userService->readById($this->userService->getCurrentUserId());
-        $file = $this->read($file_id);
-        if($user->role === "admin" || empty($file->folder_id) || $file->departements === []) {
-            return true;
-        }
-        return (bool) array_intersect($user->departements, $file->departements);
-    }
-
-    public function restoreFromVersionId(int $versionId): void
-    {
-        // 1. On récupère la version et son parent
-        $version = $this->filesRepository->findVersionWithParent($versionId);
-
-        // 2. SÉCURITÉ TYPE
-        if ($version->versionable_type !== File::class) {
-            throw new Exception("Cette version ne correspond pas à un fichier.");
-        }
-
-        /** @var File $file */
-        $file = $version->versionable;
-
-        $oldData = $version->payload;
-
-        // Logique physique : Si un fichier archivé existe, on écrase l'actuel
-        if (isset($oldData['archived_path']) && isset($oldData['storage_path'])) {
-            if (!Storage::disk('public')->exists($oldData['archived_path'])) {
-                throw new Exception("Le fichier archivé est introuvable sur le disque.");
-            }
-            Storage::disk('public')->copy($oldData['archived_path'], $oldData['storage_path']);
-        }
-
-        $attributes = collect($oldData)->except(['archived_path', '_relations'])->toArray();
-
-        if (isset($oldData['_relations']['departements'])) {
-            $attributes['departements'] = $oldData['_relations']['departements'];
-        }
-
-        $this->filesRepository->update($file->id, $attributes);
-    }
-
-    public function readVersionsFromParent(int $parent_id): array
-    {
-        try {
-            $versions = $this->filesRepository->findVersionsFromParent($parent_id);
-            $dtos = [];
-            foreach ($versions as $version) {
-                $dtos[] = $this->makeVersionDTO($version);
-            }
-            return $dtos;
-        } catch (Throwable $e) {
-            Log::alert($e->getMessage(), ["exception" => $e]);
-            throw $e;
-        }
-    }
-
-    private function makeVersionDTO(Version $version): VersionDTO
-    {
+    private function makeVersionDTO(Version $version): VersionDTO {
         return new VersionDTO(
             id: $version->id,
-            versionable_id: intval($version->versionable_id),
+            versionable_id: (int)$version->versionable_id,
             versionable_type: $version->versionable_type,
             payload: $version->payload
         );
     }
 
-    public function downloadVersion($id): StreamedResponse {
-        $file = $this->filesRepository->findVersionWithParent($id);
-        $payload = $file->payload;
-        if (empty($payload["storage_path"])) {
-            throw new Filesystem\FileNotFoundException("Empty path");
+    public function read(int $id): FileDTO {
+        return $this->makeFileDTO($this->filesRepository->read($id));
+    }
+
+    public function hasEditAccess(int $file_id): bool {
+        $user = $this->userService->readById($this->userService->getCurrentUserId());
+        $file = $this->filesRepository->read($file_id);
+
+        if($user->role === "admin" || empty($file->folder_id) || count($file->departements) === 0) {
+            return true;
         }
-        Log::alert(Storage::disk('public')->download($payload["storage_path"], $payload["name"]));
-        return Storage::disk('public')->download($payload["storage_path"], $payload["name"]);
+
+        $fileDeptIds = $this->departementsService->departementsIDs($file->departements);
+        return (bool) array_intersect($user->departements, $fileDeptIds);
     }
 }

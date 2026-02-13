@@ -3,83 +3,66 @@
 namespace App\Services\Interfaces;
 
 use App\DTO\FileDTO;
-
+use App\DTO\VersionDTO;
 use App\Exception\AlreadyExistsException;
 use App\Exception\DiskWriteException;
 use App\Exception\FileNotFoundException;
 use App\Exception\FolderNotFoundException;
 use App\Exception\PersistenceException;
-use Illuminate\Contracts\Filesystem ;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Contracts\Filesystem\FileNotFoundException as FilesystemNotFoundException;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 interface FilesServiceInterface
 {
     /**
-     * @param array $data
-     * @return FileDTO
-     * @throws FolderNotFoundException|AlreadyExistsException|DiskWriteException|PersistenceException
+     * @param array $data {folder_id: int, file: UploadedFile, name: string|null, ...}
+     * @throws FolderNotFoundException|AlreadyExistsException|DiskWriteException|PersistenceException|BadRequestException
      */
     public function create(array $data): FileDTO;
 
     /**
-     * Fonction pour obtenir le storage_path d'un fichier selon son ID
-     * @param $id l'id du fichier qu'on recherche
-     * @return FileDTO
-     * @throws FileNotFoundException si le fichier n'est pas trouvé en BD
-     * @throws BadRequestException si pas de folder_id ou de fichier
+     * @param int $id
+     * @throws FileNotFoundException|BadRequestException
      */
-    public function read($id): FileDTO;
+    public function read(int $id): FileDTO;
 
     /**
      * @param int $id
      * @param array $data
-     * @return FileDTO
-     * @throws PersistenceException|AlreadyExistsException|FileNotFoundException|BadRequestException|DiskWriteException
+     * @throws PersistenceException|AlreadyExistsException|FileNotFoundException|DiskWriteException
      */
     public function update(int $id, array $data): FileDTO;
 
     /**
-     * @param int $id ID du fichier
-     * @return bool
-     * @throws BadRequestException
-     * @throws PersistenceException
-     * @throws FileNotFoundException
-     * @throws Filesystem\FileNotFoundException
-     * @throws DiskWriteException si une erreur survient lors de l'écriture du fichier
+     * @param int $id
+     * @throws PersistenceException|FileNotFoundException|DiskWriteException
      */
     public function delete(int $id): bool;
 
     /**
-     * Lance le telechargement d'un fichier
-     * @param int $id l'ID du fichier
-     * @throws Filesystem\FileNotFoundException
-     * @throws FileNotFoundException
+     * @param int $id
+     * @throws FilesystemNotFoundException|FileNotFoundException
      */
-    public function download(int $id);
+    public function download(int $id): StreamedResponse;
 
-    /**
-     * @param int $file_id
-     * @return bool
-     */
     public function hasEditAccess(int $file_id): bool;
 
     /**
+     * Restaure les attributs et le fichier physique d'une version donnée.
      * @param int $versionId
-     * @return void
+     * @throws PersistenceException|FileNotFoundException|\Exception
      */
     public function restoreFromVersionId(int $versionId): void;
 
     /**
-     * @param int $parent_id
-     * @return array
+     * @param int $parent_id ID du fichier parent
+     * @return VersionDTO[]
      */
     public function readVersionsFromParent(int $parent_id): array;
 
     /**
-     * @param $id
-     * @return StreamedResponse
+     * @param int $id ID de la version
      */
-    public function downloadVersion($id): StreamedResponse;
+    public function downloadVersion(int $id): StreamedResponse;
 }

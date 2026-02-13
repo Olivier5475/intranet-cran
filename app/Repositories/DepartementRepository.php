@@ -4,26 +4,26 @@ namespace App\Repositories;
 
 use App\Exception\DepartementNotFoundException;
 use App\Exception\PersistenceException;
-use App\Exception\UserNotFoundException;
 use App\Models\Departement;
-use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Log;
+use Throwable;
 
 class DepartementRepository implements Interfaces\DepartementRepositoryInterface {
 
-    /**
-     * @throws \Exception
-     */
     public function create(array $data): Departement {
         try {
-            $departement = new Departement();
-            $departement->initials = $data['initials'];
-            $departement->name = $data['name'];
-            $departement->save();
-
-            return $departement;
-        } catch (\Exception) {
-            throw new PersistenceException("Error creating departement");
+            // Utilisation de create() pour plus de concision (vérifie le $fillable dans le modèle)
+            return Departement::create([
+                'initials' => $data['initials'],
+                'name' => $data['name'],
+            ]);
+        } catch (Throwable $t) {
+            Log::error("Erreur SQL lors de la création d'un département", [
+                'data' => $data,
+                'message' => $t->getMessage()
+            ]);
+            throw new PersistenceException("Impossible de créer le département.");
         }
     }
 
@@ -31,11 +31,16 @@ class DepartementRepository implements Interfaces\DepartementRepositoryInterface
         $departement = $this->getById($id);
 
         try {
-            $departement->initials = $data['initials'];
-            $departement->name = $data['name'];
-            $departement->save();
-        } catch (\Throwable) {
-            throw new PersistenceException("Erreur lors de la mise à jour de l'utilisateur.");
+            $departement->update([
+                'initials' => $data['initials'] ?? $departement->initials,
+                'name' => $data['name'] ?? $departement->name,
+            ]);
+        } catch (Throwable $t) {
+            Log::error("Erreur SQL lors de la mise à jour du département $id", [
+                'data' => $data,
+                'message' => $t->getMessage()
+            ]);
+            throw new PersistenceException("Erreur lors de la mise à jour des données du département.");
         }
     }
 
@@ -45,18 +50,24 @@ class DepartementRepository implements Interfaces\DepartementRepositoryInterface
 
     public function getById(int $id) : Departement {
         $departement = Departement::find($id);
-        if (empty($departement)) {
-            throw new DepartementNotFoundException();
+
+        if (!$departement) {
+            throw new DepartementNotFoundException("Le département avec l'ID $id est introuvable.");
         }
+
         return $departement;
     }
 
     public function delete(int $id) : void {
+        $departement = $this->getById($id); // Garantit que l'ID existe avant de tenter la suppression
+
         try {
-            $user = Departement::find($id);
-            $user->delete();
-        } catch (\Throwable) {
-           throw new PersistenceException();
+            $departement->delete();
+        } catch (Throwable $t) {
+            Log::error("Échec de suppression du département $id", [
+                'message' => $t->getMessage()
+            ]);
+            throw new PersistenceException("Le département ne peut pas être supprimé actuellement.");
         }
     }
 }

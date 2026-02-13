@@ -25,27 +25,27 @@ interface UserRepositoryInterface {
     /**
      * @param int $id
      * @param array $data
-     * @return void
      * @throws UserNotFoundException
      * @throws PersistenceException
      */
     public function updateUser(int $id, array $data) : void;
 
     /**
-     * @return Collection
+     * @return Collection<int, User>
      */
     public function readAll() : Collection;
 
     /**
      * @param int $id
      * @return User
+     * @throws UserNotFoundException
      */
     public function getUserById(int $id): User;
 
     /**
      * @param int $id
-     * @return void
-     * @throws PersistenceException la suppression n'a pas fonctionné
+     * @throws UserNotFoundException
+     * @throws PersistenceException
      */
     public function delete(int $id) : void;
 }

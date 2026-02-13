@@ -2,6 +2,7 @@
 
 namespace App\Repositories\Interfaces;
 
+use App\Exception\AlreadyExistsException;
 use App\Exception\DocumentNotFoundException;
 use App\Exception\PersistenceException;
 use App\Models\Document;
@@ -9,43 +10,37 @@ use App\Models\Document;
 interface DocumentRepositoryInterface {
 
     /**
-     * Créer un document.
-     * @param array $data Les champs et leurs nouvelles valeurs (doivent être "fillable").
-     * @return Document|bool Retourne le Document mis à jour, ou false si la création échoue.
-     * @throws PersistenceException En cas d'erreur de base de données.
+     * @param array $data
+     * @return Document
+     * @throws PersistenceException|AlreadyExistsException
      */
-    public function create(array $data) : Document|bool;
+    public function create(array $data) : Document;
 
     /**
-     * Lit un document existant.
-     * @param int $id L'ID du document à mettre à jour.
-     * @return Document Retourne le Document avec l'ID $id
-     * @throws DocumentNotFoundException Si le document n'est pas trouvé.
+     * @param int $id
+     * @return Document
+     * @throws DocumentNotFoundException
      */
     public function read(int $id) : Document;
 
     /**
-     * Met à jour un document existant.
-     * @param int $id L'ID du document à mettre à jour.
-     * @param array $data Les champs et leurs nouvelles valeurs (doivent être "fillable").
-     * @return Document|bool Retourne le Document mis à jour, ou false si la mise à jour échoue.
-     * @throws DocumentNotFoundException Si le document n'est pas trouvé.
-     * @throws PersistenceException En cas d'erreur de base de données.
+     * @param int $id
+     * @param array $data
+     * @return Document
+     * @throws DocumentNotFoundException|PersistenceException|AlreadyExistsException
      */
-    public function update(int $id, array $data) : Document|bool;
+    public function update(int $id, array $data) : Document;
 
     /**
-     * Supprime un document existant.
-     * @param int $id L'ID du document à mettre à jour.
-     * @return bool retourne true si la suppression a réussi
-     * @throws DocumentNotFoundException Si le document n'est pas trouvé.
-     * @throws PersistenceException En cas d'erreur de base de données.
+     * @param int $id
+     * @return bool
+     * @throws DocumentNotFoundException|PersistenceException
      */
     public function delete(int $id) : bool;
 
     /**
-     * @return Document|null null, si le document n'existe pas
-     * @throws \Throwable erreur inattendue
+     * @return Document|null
+     * @throws \Throwable
      */
     public function readRacineDoc() : ?Document;
 }
