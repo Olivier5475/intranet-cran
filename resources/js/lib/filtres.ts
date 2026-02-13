@@ -42,7 +42,7 @@ export function useFilteredChildren(
         if (selectedDepartments && selectedDepartments.length > 0) {
             items = items.filter(child =>
                 child.departements &&
-                child.departements.some(dep => selectedDepartments.includes(dep.id))
+                child.departements.some(dep => selectedDepartments.includes(dep))
             );
         }
         // b) Filtre Type de fichier
