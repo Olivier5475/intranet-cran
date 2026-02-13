@@ -2,11 +2,7 @@ export interface NavigationChild {
     id: number;
     name: string;
     type: string;
-    departements?: Array<{
-        id: number;
-        name: string;
-        initials: string;
-    }>;
+    departements?: number[];
     created_at: string;
 }
 
