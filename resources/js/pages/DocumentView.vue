@@ -19,12 +19,18 @@ defineProps<{
         }>
     }
 }>();
+
+const decodeEntities = (str : string) => {
+    const txt = document.createElement("textarea");
+    txt.innerHTML = str;
+    return txt.value;
+};
 </script>
 
 <template>
     <!--    AFFICHAGE TITRE   -->
     <h1 class="relative text-3xl p-3 dark:bg-slate-700 text-center first-letter:uppercase">
-        {{ document.title }}
+        {{ decodeEntities(document.title) }}
         <Link :href="editor_route.document.update.url(document.id)"><PencilIcon class="absolute right-2 top-2 w-6" /></Link>
     </h1>
     <hr class="" />
