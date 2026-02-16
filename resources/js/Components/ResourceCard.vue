@@ -6,6 +6,7 @@ import { useResource } from '@/Composables/useResource';
 import ResourceIcon from '@/Components/ResourceIcon.vue';
 import DeleteModal from '@/Components/DeleteModal.vue';
 import folder_route from '@/routes/editor/folder';
+import { decodeEntities } from '@/lib/utils';
 
 const props = defineProps<{
     child: any;
@@ -27,7 +28,7 @@ const isActiveValidation = ref(false);
                 <ResourceIcon :child="child" :color="itemColor" class="w-full h-full" />
             </div>
             <span class="text-xs font-semibold text-gray-700 dark:text-zinc-200 text-center line-clamp-2 min-h-[2rem] max-w-full">
-                {{ child.name }}
+                {{ decodeEntities(child.name) }}
             </span>
         </component>
 

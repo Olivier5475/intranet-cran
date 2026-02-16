@@ -4,7 +4,7 @@ import { PencilIcon } from "@heroicons/vue/20/solid"
 import { Link } from '@inertiajs/vue3';
 import editor_route from '@/routes/editor';
 import download from '@/routes/download';
-
+import { decodeEntities } from '@/lib/utils';
 defineProps<{
     document : {
         id : number,
@@ -20,11 +20,7 @@ defineProps<{
     }
 }>();
 
-const decodeEntities = (str : string) => {
-    const txt = document.createElement("textarea");
-    txt.innerHTML = str;
-    return txt.value;
-};
+
 </script>
 
 <template>

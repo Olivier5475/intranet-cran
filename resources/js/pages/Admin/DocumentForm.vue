@@ -6,6 +6,7 @@ import route from '@/routes/editor/document';
 import { computed, onMounted } from 'vue';
 import { CloudArrowUpIcon, DocumentTextIcon, CheckIcon, TrashIcon, PaperClipIcon } from '@heroicons/vue/24/solid';
 import WarningPermission from '@/Components/WarningPermission.vue';
+import { decodeEntities } from '@/lib/utils';
 
 interface Attachment { id: number; name: string; }
 interface Document { id: number; title: string; content: string; color: string; attachments: Attachment[]; departements: number[]; }
@@ -14,7 +15,7 @@ const props = defineProps<{ parent_id: number; document?: Document; departements
 const page = usePage();
 
 const form = useForm({
-    title: props.document?.title ?? ((props.parent_id == 0) ? 'Accueil' : ''),
+    title: props.document ? decodeEntities(props.document.title) : ((props.parent_id == 0) ? 'Accueil' : ''),
     content: props.document?.content ?? '',
     existing_attachments: props.document?.attachments ?? [],
     new_attachments: [] as File[],
@@ -52,7 +53,7 @@ const isCheckboxDisabled = (departementId: number) => {
 </script>
 
 <template>
-    <Head :title="document ? `Modifier ${document.title}` : 'Nouveau document'" />
+    <Head :title="document ? `Modifier ${decodeEntities(document.title)}` : 'Nouveau document'" />
 
     <div class="max-w-5xl mx-auto py-6">
         <header class="mb-10 text-center">

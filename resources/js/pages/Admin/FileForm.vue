@@ -5,6 +5,7 @@ import route from '@/routes/editor/file';
 import { computed, onMounted } from 'vue';
 import { CloudArrowUpIcon, DocumentIcon, CheckIcon } from '@heroicons/vue/24/solid';
 import WarningPermission from '@/Components/WarningPermission.vue';
+import { decodeEntities } from '@/lib/utils';
 
 const props = defineProps<{
     parent_id: number;
@@ -17,7 +18,7 @@ const props = defineProps<{
 }>();
 
 const form = useForm({
-    name: props.file?.name ?? '',
+    name: props.file ? decodeEntities(props.file.name) : '',
     files: [] as File[],
     departements: props.file?.departements ?? [],
     parent_id: props.file ? null : (props.parent_id ?? null),
@@ -60,7 +61,7 @@ const isCheckboxDisabled = (departementId: number) => {
 </script>
 
 <template>
-    <Head :title="file ? `Modifier le fichier ${file.name}` : 'Créer un nouveau fichier'" />
+    <Head :title="file ? `Modifier le fichier ${decodeEntities(file.name)}` : 'Créer un nouveau fichier'" />
 
     <div class="max-w-4xl mx-auto py-6">
         <header class="mb-8 text-center">
@@ -92,24 +93,24 @@ const isCheckboxDisabled = (departementId: number) => {
                     class="relative group flex flex-col items-center justify-center p-10 border-2 border-dashed rounded-3xl transition-all cursor-pointer shadow-sm hover:shadow-xl group"
                     :class="form.files.length ? 'border-emerald-500 bg-emerald-500/5' : 'border-sky-200 dark:border-zinc-800 hover:border-sky-400 dark:hover:border-zinc-700'"
                 >
-                    <div class="p-4 rounded-full bg-sky-50 dark:bg-zinc-800 group-hover:scale-110 transition-transform duration-300">
+                    <span class="p-4 rounded-full bg-sky-50 dark:bg-zinc-800 group-hover:scale-110 transition-transform duration-300">
                         <CloudArrowUpIcon class="w-8 h-8 text-sky-600 dark:text-sky-400" />
-                    </div>
+                    </span>
 
-                    <div class="mt-4 text-center">
+                    <span class="mt-4 text-center">
                         <span class="block text-sm font-bold text-gray-700 dark:text-gray-200">
                             {{ form.files.length ? 'Fichier sélectionné' : 'Cliquez ou glissez un fichier ici' }}
                         </span>
                         <span class="text-xs text-gray-400 mt-1 block">
                             {{ file ? '(Laissez vide pour conserver le fichier actuel)' : 'PDF, Image, Word, Excel...' }}
                         </span>
-                    </div>
+                    </span>
 
                     <input id="files_input" type="file" @change="handleNewFileUpload" class="sr-only" />
 
-                    <div v-if="form.files.length" class="absolute top-4 right-4 flex items-center gap-1 bg-emerald-500 text-white px-3 py-1 rounded-full text-[10px] font-black">
+                    <span v-if="form.files.length" class="absolute top-4 right-4 flex items-center gap-1 bg-emerald-500 text-white px-3 py-1 rounded-full text-[10px] font-black">
                         <CheckIcon class="w-3 h-3" /> PRÊT
-                    </div>
+                    </span>
                 </label>
 
                 <div v-if="form.files.length" class="mt-3 flex items-center justify-center gap-2 text-emerald-600 dark:text-emerald-400 font-bold text-sm">
@@ -148,7 +149,7 @@ const isCheckboxDisabled = (departementId: number) => {
                             <CheckIcon v-if="form.departements.includes(departement.id)" class="w-3.5 h-3.5 text-white stroke-[3]" />
                         </span>
                         <span class="text-sm font-bold tracking-tight" :class="form.departements.includes(departement.id) ? 'text-sky-700 dark:text-sky-400' : 'text-gray-500 dark:text-zinc-400'">
-                            {{ departement.name }}
+                            {{ decodeEntities(departement.name) }}
                         </span>
                     </label>
                 </div>

@@ -5,6 +5,7 @@ import { Departement } from '@/departement';
 import { computed, onMounted } from 'vue';
 import WarningPermission from '@/Components/WarningPermission.vue';
 import { FolderIcon, CheckIcon } from '@heroicons/vue/24/solid';
+import { decodeEntities } from '@/lib/utils';
 
 const props = defineProps<{
     parent_id?: number;
@@ -18,7 +19,7 @@ const props = defineProps<{
 }>();
 
 const form = useForm({
-    name: props.folder?.name ?? '',
+    name: props.folder ? decodeEntities(props.folder.name) : '',
     color: props.folder?.color ?? '#d7ac53',
     departements: props.folder?.departements ?? [],
     parent_id: props.folder ? null : (props.parent_id ?? null),
@@ -54,7 +55,7 @@ const isCheckboxDisabled = (departementId: number) => {
 </script>
 
 <template>
-    <Head :title="folder ? `Modifier le dossier ${folder.name}` : 'Créer un nouveau dossier'" />
+    <Head :title="folder ? `Modifier le dossier ${decodeEntities(folder.name)}` : 'Créer un nouveau dossier'" />
 
     <div class="max-w-4xl mx-auto py-6">
         <header class="mb-8 text-center">
@@ -62,7 +63,7 @@ const isCheckboxDisabled = (departementId: number) => {
                 <FolderIcon class="w-8 h-8 text-sky-500" />
             </div>
             <h1 class="text-3xl font-black text-gray-900 dark:text-white uppercase tracking-tight">
-                {{ folder ? `Modifier ${folder.name}` : "Nouveau Dossier" }}
+                {{ folder ? `Modifier ${decodeEntities(folder.name)}` : "Nouveau Dossier" }}
             </h1>
         </header>
 

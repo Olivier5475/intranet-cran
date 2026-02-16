@@ -2,6 +2,7 @@
 import { Link } from '@inertiajs/vue3';
 import { HomeIcon, ChevronRightIcon } from '@heroicons/vue/20/solid';
 import navigate from '@/routes/navigate';
+import { decodeEntities } from '@/lib/utils';
 
 defineProps<{
     parents : Array<{
@@ -32,7 +33,7 @@ defineProps<{
                         : 'text-gray-600 dark:text-zinc-300 hover:bg-white dark:hover:bg-zinc-800 hover:text-sky-600 shadow-sm border border-transparent hover:border-gray-200 dark:hover:border-zinc-700'
                 ]"
             >
-                {{ parent.name }}
+                {{ decodeEntities(parent.name) }}
             </Link>
         </div>
     </nav>

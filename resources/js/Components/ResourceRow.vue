@@ -5,6 +5,7 @@ import { EllipsisHorizontalIcon } from '@heroicons/vue/20/solid';
 import { useResource } from '@/Composables/useResource'; // Import du composable
 import ResourceIcon from '@/Components/ResourceIcon.vue'; // Import de l'icone
 import DeleteModal from '@/Components/DeleteModal.vue';
+import { decodeEntities } from '@/lib/utils';
 
 // REGEX imports... (tu peux aussi les déplacer dans un helper si tu veux afficher le texte "Image", "Video" etc)
 
@@ -29,7 +30,7 @@ const isActiveValidation = ref(false);
                 <ResourceIcon :child="child" :color="itemColor" class="w-full h-full transform group-hover:scale-110 transition-transform" />
             </div>
             <p class="text-sm font-medium text-gray-700 dark:text-zinc-200 truncate">
-                {{ child.name }}
+                {{ decodeEntities(child.name) }}
             </p>
         </component>
 
