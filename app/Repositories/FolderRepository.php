@@ -108,7 +108,8 @@ class FolderRepository implements Interfaces\FolderRepositoryInterface
 
         try {
             // Soft delete manuel via ta colonne isDelete
-            $folder->update(['isDelete' => true]);
+            $folder->isDelete = true;
+            $folder->save();
             Log::info("Dossier marqué comme supprimé", ['id' => $id]);
         } catch (Throwable $e) {
             Log::error("Erreur SQL : Suppression logique du dossier $id échouée", [
