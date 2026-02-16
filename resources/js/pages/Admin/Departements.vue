@@ -11,7 +11,7 @@ interface Departement {
     initials: string;
 }
 
-const props = defineProps<{
+defineProps<{
     departements: Departement[];
 }>();
 
