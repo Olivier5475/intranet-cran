@@ -123,7 +123,7 @@ class FolderRepository implements Interfaces\FolderRepositoryInterface
     {
         return Folder::whereNull('parent_id')
             ->where(fn($q) => $q->where('isDelete', false)->orWhereNull('isDelete'))
-            ->with(['allChildren' => fn($q) => $q->where('isDelete', false)])
+            ->with(['allChildren' => fn($q) => $q->where('isDelete', false)->orWhereNull('isDelete')])
             ->get();
     }
 

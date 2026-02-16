@@ -74,13 +74,27 @@ readonly class FoldersService implements Interfaces\FoldersServiceInterface {
     {
         try {
             $folders = $this->folderRepository->getRacineChildren();
-            return $folders->map(fn($f) => $this->mapToFolderDTO($f))->toArray();
+            return $folders->map(fn($folder) => $this->mapToFolderDTOWithChildren($folder))->toArray();
         } catch (Throwable $e) {
             Log::error("Erreur lors de la récupération de la racine", ['error' => $e->getMessage()]);
             return [];
         }
     }
+    private function mapToFolderDTOWithChildren(Folder $folder): FolderDTO {
+        $children = [];
+        foreach($folder->children as $child) {
+            $children[] = $this->mapToFolderDTOWithChildren($child);
+        }
 
+        return new FolderDTO(
+            id: $folder->id,
+            name: $folder->name,
+            departements: $folder->relationLoaded('departements') ? $folder->departements->pluck('id')->toArray() : [],
+            color: $folder->color,
+            children: $children,
+            created_at: $folder->created_at,
+        );
+    }
     public function getFolderContents(int $folderId, ?string $searchQuery) : Collection
     {
         if ($searchQuery && trim($searchQuery) !== '') {
@@ -115,7 +129,7 @@ readonly class FoldersService implements Interfaces\FoldersServiceInterface {
             color: $d->color,
         ));
 
-        return $fileDTOs->concat($documentDTOs);
+        return $fileDTOs->concat((array)$documentDTOs);
     }
 
     public function read(int $id): FolderDTO
