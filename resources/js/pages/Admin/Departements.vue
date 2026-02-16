@@ -4,6 +4,7 @@ import { router } from '@inertiajs/vue3';
 import { PlusIcon, TrashIcon, PencilSquareIcon, BuildingOfficeIcon } from '@heroicons/vue/24/outline';
 import Modal from '@/Components/Modal.vue';
 import DepartementForm from '@/Components/Forms/DepartementForm.vue';
+import dept_routes from '@/routes/admin/departements';
 
 interface Departement {
     id: number;
@@ -22,7 +23,7 @@ const openCreate = () => { selectedDept.value = null; showModal.value = true; };
 const openEdit = (dept: Departement) => { selectedDept.value = dept; showModal.value = true; };
 const deleteDept = (id: number) => {
     if(confirm('Voulez-vous vraiment supprimer ce département ?')) {
-        router.delete(`/admin/departements/${id}`);
+        router.delete(dept_routes.delete.url(id));
     }
 };
 </script>
