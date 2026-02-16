@@ -7,6 +7,7 @@ import navigate from '@/routes/navigate';
 import folder_route from '@/routes/editor/folder';
 import { EllipsisHorizontalIcon } from '@heroicons/vue/24/solid';
 import DeleteModal from '@/Components/DeleteModal.vue';
+import { decodeEntities } from '@/lib/utils';
 interface Child {
     id: number;
     name: string;
@@ -68,7 +69,7 @@ const isActiveValidation = ref(false);
                     class="text-sm truncate"
                     :class="child.id === currentFolderId ? 'text-sky-600 dark:text-sky-400 font-bold' : 'text-gray-700 dark:text-gray-300'"
                 >
-                    {{ child.name }}
+                    {{ decodeEntities(child.name) }}
                 </Link>
                 <div
                     class="relative flex items-center group-hover:opacity-100 transition-opacity"
