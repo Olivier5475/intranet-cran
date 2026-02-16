@@ -22,9 +22,8 @@ const page = usePage();
 
 // 1. Extraire le folder_id de l'URL (/navigation/f/{id})
 const currentFolderId = computed(() => {
-    const parts = page.url.split('/');
-    const navIndex = parts.indexOf('f');
-    return navIndex !== -1 ? parseInt(parts[navIndex + 1]) : null;
+    const folder = page.props.parents?.at(-1);
+    return folder?.id ?? page.props.document?.folder_id ??  null;
 });
 
 // 2. Fonction récursive pour vérifier si ce nœud ou un descendant est actif
