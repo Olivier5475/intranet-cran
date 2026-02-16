@@ -82,10 +82,9 @@ readonly class FoldersService implements Interfaces\FoldersServiceInterface {
     }
     private function mapToFolderDTOWithChildren(Folder $folder): FolderDTO {
         $children = [];
-        foreach($folder->children as $child) {
-            $children[] = $this->mapToFolderDTOWithChildren($child);
+        foreach($folder->allChildren as $child) {
+                $children[] = $this->mapToFolderDTOWithChildren($child);
         }
-
         return new FolderDTO(
             id: $folder->id,
             name: $folder->name,

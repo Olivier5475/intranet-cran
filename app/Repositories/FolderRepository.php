@@ -132,7 +132,7 @@ class FolderRepository implements Interfaces\FolderRepositoryInterface
         return Folder::where(fn($q) => $q->where('isDelete', false)->orWhereNull('isDelete'))
             ->with([
                 'departements:id',
-                'children' => fn($q) => $q->where('isDelete', false)->with('departements:id'),
+                'children' => fn($q) => $q->where('isDelete', false)->orWhereNull("isDelete")->with('departements:id'),
                 'files.departements:id',
                 'documents.departements:id'
             ])
