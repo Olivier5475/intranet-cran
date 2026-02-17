@@ -65,6 +65,7 @@ const isActiveValidation = ref(false);
                 shadow-xl rounded-xl border
                 border-gray-100 dark:border-zinc-700"
             >
+                <Link v-if="links.history" :href="links.history" class="block px-4 py-2 text-xs hover:bg-gray-50 dark:hover:bg-sky-900/50 text-sky-500">Historique</Link>
                 <Link :href="links.update" class="block px-4 py-2 text-xs hover:bg-gray-50 dark:hover:bg-yellow-900/50 text-yellow-600">Modifier</Link>
                 <button @click="isActiveValidation = true" class="w-full text-left block px-4 py-2 text-xs hover:bg-red-50 dark:hover:bg-red-900/20 text-red-500">Supprimer</button>
             </div>

@@ -15,6 +15,7 @@ export function useResource(props: any) {
                 href: download.file.url(id),
                 update: editor.file.update.url(id),
                 delete: editor.file.delete.url(id),
+                history: editor.file.history.url(id),
             };
         } else if (type === 'folder') {
             return {

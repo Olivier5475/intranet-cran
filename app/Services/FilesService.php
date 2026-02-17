@@ -192,7 +192,7 @@ readonly class FilesService implements Interfaces\FilesServiceInterface {
 
     public function readVersionsFromParent(int $parent_id): array {
         $versions = $this->filesRepository->findVersionsFromParent($parent_id);
-        return array_map(fn($v) => $this->makeVersionDTO($v), $versions);
+        return $versions->map(function ($version) {return $this->makeVersionDTO($version);})->toArray();
     }
 
     public function downloadVersion($id): StreamedResponse {
