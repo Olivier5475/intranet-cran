@@ -32,10 +32,16 @@ const sortPossibilities = ref({
 const fileTypeList = [
     { id: 'all', name: 'Tous les types' },
     { id: 'word', name: 'Word' },
-    { id: 'excel', name: 'Excel' },
+    { id: 'tableur', name: 'Tableur' },
+    { id: 'presentation', name: 'Presentation' },
+    { id: 'pdf', name: 'PDF' },
     { id: 'image', name: 'Image' },
     { id: 'video', name: 'Vidéo' },
-    { id: 'pdf', name: 'PDF' },
+    { id: 'gif', name: 'GIF' },
+    { id: 'audio', name: 'Audio' },
+    { id: 'archive', name: 'Archive' },
+    { id: 'document', name: 'Document' },
+    { id: 'folder', name: 'Dossier' },
 ];
 
 watch(filters, (newFilterValues) => {

@@ -69,3 +69,26 @@ export const isArchiveFile = (mimeType: string): boolean => {
         mimeType.includes('compress')
     );
 };
+
+export const filtre = (mimeType : string, filtreType : string): boolean => {
+    if(filtreType === 'tableur') {
+        return isTabFile(mimeType);
+    } else if (filtreType === 'video') {
+        return isVideoFile(mimeType);
+    } else if (filtreType === 'pdf') {
+        return mimeType.includes('pdf');
+    } else if (filtreType === 'word') {
+        return isDocFile(mimeType);
+    } else if (filtreType === 'archive') {
+        return isArchiveFile(mimeType);
+    } else if (filtreType === 'audio') {
+        return isAudioFile(mimeType);
+    } else if (filtreType === 'image') {
+        return isImageFile(mimeType);
+    } else if (filtreType === 'gif') {
+        return isGifFile(mimeType);
+    } else if (filtreType === 'presentation') {
+        return isPresentationFile(mimeType);
+    }
+    return false;
+}

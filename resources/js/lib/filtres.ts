@@ -1,6 +1,7 @@
 import { computed } from 'vue';
 import type { Ref } from 'vue';
 import { FilterState, NavigationChild } from '@/types/filtres';
+import { filtre } from '@/lib/documentsTypeRegex';
 
 // --- HELPER 1 : Priorité des types ---
 // (Défini ici pour ne pas être recréé à chaque rendu)
@@ -47,7 +48,12 @@ export function useFilteredChildren(
         }
         // b) Filtre Type de fichier
         if (fileType && fileType !== 'all') {
-            items = items.filter(child => child.type === fileType);
+            items = items.filter((child) => {
+                if(child.type === "file" && child.mimetype) {
+                    return filtre(child.mimetype, fileType);
+                }
+                return child.type === fileType;
+            });
         }
         // c) Filtre Date de début
         if (startDate) {

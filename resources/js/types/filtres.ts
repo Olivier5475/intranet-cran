@@ -2,6 +2,7 @@ export interface NavigationChild {
     id: number;
     name: string;
     type: string;
+    mimetype?: string;
     departements?: number[];
     created_at: string;
 }
