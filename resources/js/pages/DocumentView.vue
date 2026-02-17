@@ -32,7 +32,8 @@ defineProps<{
     <hr class="" />
     <!--    AFFICHAGE TEXTE   -->
     <div class="text-xl p-4 text-justify">
-        <div v-html="document.content" class="ckeditor-content-render"></div>    </div>
+        <div v-html="document.content" class="ckeditor-content-render"></div>
+    </div>
 
     <!--    AFFICHAGE FICHIER INTEGRER  -->
 

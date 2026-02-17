@@ -98,12 +98,16 @@ import {
     Underline,
     BalloonToolbar,
     BlockToolbar,
+    SimpleUploadAdapter
 } from 'ckeditor5';
 
 import 'ckeditor5/ckeditor5.css';
+import route from "@/routes/document"
 
 const LICENSE_KEY =
     'GPL';
+
+const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
 
 const isLayoutReady = ref(false);
 
@@ -158,6 +162,7 @@ const config = computed(() => {
             shouldNotGroupWhenFull: false
         },
         plugins: [
+            SimpleUploadAdapter,
             Alignment,
             Autoformat,
             AutoImage,
@@ -214,6 +219,13 @@ const config = computed(() => {
             TodoList,
             Underline
         ],
+        simpleUpload: {
+            uploadUrl: route.uploadImage.url(),
+            headers: {
+                'X-CSRF-TOKEN': csrfToken,
+                'Accept': 'application/json'
+            }
+        },
         balloonToolbar: ['bold', 'italic', '|', 'link', '|', 'bulletedList', 'numberedList'],
         blockToolbar: [
             'fontSize',

@@ -32,13 +32,13 @@ const isActive = ref(true);
             @click="isActive = !isActive"
             class="h-14 cursor-pointer font-bold text-gray-700 dark:text-zinc-300 p-4 flex items-center justify-between bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors border-b border-gray-100 dark:border-slate-800"
         >
-            <div class="flex items-center space-x-3">
+            <span class="flex items-center space-x-3">
                 <component
                     :is="isActive ? ChevronDownIcon : ChevronRightIcon"
                     class="w-5 h-5 text-sky-500 transition-transform duration-300"
                 />
                 <span class="text-sm uppercase tracking-wider">{{ title }}</span>
-            </div>
+            </span>
         </h2>
 
         <Transition
