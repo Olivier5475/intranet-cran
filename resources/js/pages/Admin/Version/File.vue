@@ -23,7 +23,7 @@ defineProps<{
 const restore = (versionId: number) => {
     if (confirm('Êtes-vous sûr de vouloir restaurer cette version ? La version actuelle sera archivée.')) {
         router.post(
-            editor.file.post.restore.url(versionId),
+            editor.model.post.restore.url(["files", versionId]),
             {},
             {
                 preserveState: false,
