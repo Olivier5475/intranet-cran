@@ -3,12 +3,9 @@
 namespace App\Services;
 
 use App\DTO\FileDTO;
-use App\DTO\VersionDTO;
 use App\Exception\DiskWriteException;
-use App\Exception\FileNotFoundException;
 use App\Exception\PersistenceException;
 use App\Models\File;
-use App\Models\Version;
 use App\Repositories\Interfaces\FilesRepositoryInterface;
 use App\Services\Interfaces\DepartementsServiceInterface;
 use App\Services\Interfaces\FoldersServiceInterface;
@@ -125,44 +122,6 @@ readonly class FilesService implements Interfaces\FilesServiceInterface {
         }
     }
 
-    public function restoreFromVersionId(int $versionId): void {
-        try {
-            DB::beginTransaction();
-
-            $version = $this->filesRepository->findVersionWithParent($versionId);
-            if ($version->versionable_type !== File::class) {
-                throw new \Exception("La version ne concerne pas un fichier.");
-            }
-
-            $payload = $version->payload;
-            $file = $version->versionable;
-
-            // Restauration physique si nécessaire
-            if (isset($payload['archived_path'], $payload['storage_path'])) {
-                if (!Storage::disk('public')->exists($payload['archived_path'])) {
-                    throw new FileNotFoundException("Archive physique introuvable.");
-                }
-                Storage::disk('public')->copy($payload['archived_path'], $payload['storage_path']);
-            }
-
-            $attributes = collect($payload)->except(['archived_path', '_relations'])->toArray();
-
-            // Restauration des relations (départements)
-            if (isset($payload['_relations']['departements'])) {
-                $attributes['departements'] = $payload['_relations']['departements'];
-            }
-
-            $this->filesRepository->update($file->id, $attributes);
-
-            DB::commit();
-            Log::info("Version restaurée avec succès", ["file_id" => $file->id, "version_id" => $versionId]);
-
-        } catch (Throwable $e) {
-            DB::rollBack();
-            Log::error("Échec restauration version", ["version_id" => $versionId, "error" => $e->getMessage()]);
-            throw $e;
-        }
-    }
 
     public function delete(int $id): bool {
         $file = $this->filesRepository->read($id);
@@ -190,10 +149,7 @@ readonly class FilesService implements Interfaces\FilesServiceInterface {
         return Storage::disk('public')->download($file->storage_path, $file->name);
     }
 
-    public function readVersionsFromParent(int $parent_id): array {
-        $versions = $this->filesRepository->findVersionsFromParent($parent_id);
-        return $versions->map(function ($version) {return $this->makeVersionDTO($version);})->toArray();
-    }
+
 
     public function downloadVersion($id): StreamedResponse {
         $version = $this->filesRepository->findVersionWithParent($id);
@@ -216,15 +172,6 @@ readonly class FilesService implements Interfaces\FilesServiceInterface {
             folder_id: $file->folder_id,
             storage_path: $file->storage_path,
             mimetype: $file->mimetype
-        );
-    }
-
-    private function makeVersionDTO(Version $version): VersionDTO {
-        return new VersionDTO(
-            id: $version->id,
-            versionable_id: (int)$version->versionable_id,
-            versionable_type: $version->versionable_type,
-            payload: $version->payload
         );
     }
 

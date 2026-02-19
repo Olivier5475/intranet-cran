@@ -49,19 +49,6 @@ interface FilesServiceInterface
     public function hasEditAccess(int $file_id): bool;
 
     /**
-     * Restaure les attributs et le fichier physique d'une version donnée.
-     * @param int $versionId
-     * @throws PersistenceException|FileNotFoundException|\Exception
-     */
-    public function restoreFromVersionId(int $versionId): void;
-
-    /**
-     * @param int $parent_id ID du fichier parent
-     * @return VersionDTO[]
-     */
-    public function readVersionsFromParent(int $parent_id): array;
-
-    /**
      * @param int $id ID de la version
      */
     public function downloadVersion(int $id): StreamedResponse;

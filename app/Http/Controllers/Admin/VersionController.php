@@ -3,22 +3,26 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Services\Interfaces\FilesServiceInterface;
+use App\Services\Interfaces\VersionsServiceInterface;
 use Illuminate\Support\Facades\Log;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Throwable;
 use Inertia\Inertia;
 
 class VersionController extends Controller
 {
     public function __construct(
-        private readonly FilesServiceInterface $filesService
+        private readonly VersionsServiceInterface $versionsService
     ) {}
 
-    public function restore(int $versionId)
+    public function restore(string $model,int $versionId)
     {
+        if($model !== "files" && $model !== "documents"){
+            throw new BadRequestHttpException();
+        }
         try {
             // Le service s'occupe de tout : trouver le fichier parent, vérifier le type, etc.
-            $this->filesService->restoreFromVersionId($versionId);
+            $this->versionsService->restoreFromVersionId($versionId, $model);
 
             return back()->with('success', 'La version du fichier a été restaurée avec succès.');
         } catch (Throwable $t) {
@@ -32,15 +36,26 @@ class VersionController extends Controller
         }
     }
 
-    public function fileHistory(int $file_id)
+    public function history(string $model, int $model_id)
     {
+        if($model !== "files" && $model !== "documents"){
+            throw new BadRequestHttpException();
+        }
         try {
-            return Inertia::render("Admin/Version/File", [
-                "versions" => $this->filesService->readVersionsFromParent($file_id),
-            ]);
+            if($model == "files"){
+                return Inertia::render("Admin/Version/File", [
+                    "versions" => $this->versionsService->readVersionsFromParent($model_id, $model),
+                ]);
+            } elseif($model == "documents"){
+                return Inertia::render("Admin/Version/Document", [
+                    "versions" => $this->versionsService->readVersionsFromParent($model_id, $model),
+                ]);
+            }
+
         } catch (Throwable $t) {
             Log::error("Erreur lors de la lecture de l'historique des versions", [
-                'file_id' => $file_id,
+                'model' => $model,
+                'model_id' => $model_id,
                 'error' => $t->getMessage()
             ]);
 
