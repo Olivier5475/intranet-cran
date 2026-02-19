@@ -12,7 +12,14 @@ class AttachmentRepository implements Interfaces\AttachmentRepositoryInterface {
 
     public function create(array $data): Attachment {
         try {
-            return Attachment::create($data);
+            $attachment = new Attachment();
+            $attachment->fill($data);
+
+            if (isset($data['id'])) {
+                $attachment->id = $data['id'];
+            }
+            $attachment->save();
+            return $attachment;
         } catch (Throwable $e) {
             Log::error('Erreur SQL : Création attachement impossible', [
                 'message' => $e->getMessage(),
