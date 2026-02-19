@@ -17,6 +17,19 @@ class Attachment extends Model
         'mimetype',
         'size',
     ];
+    protected $touches = ['document'];
+
+    protected static function booted()
+    {
+        $triggerHistory = function ($attachment) {
+            if ($attachment->document) {
+                $attachment->document->touch();
+            }
+        };
+
+        static::creating($triggerHistory);
+        static::deleting($triggerHistory);
+    }
 
     /**
      * Le document auquel ce fichier est attaché.
