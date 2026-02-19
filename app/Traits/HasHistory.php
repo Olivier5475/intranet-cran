@@ -27,12 +27,15 @@ trait HasHistory
                     // On charge la relation pour avoir les IDs actuels
                     $model->load($relationName);
                     // On ne stocke que les IDs
-                    $relationsData[$relationName] = $model->$relationName->pluck('id')->toArray();
+                    if($relationName == "attachments") {
+                        $relationsData[$relationName] = $model->$relationName->toArray();
+                    } else {
+                        $relationsData[$relationName] = $model->$relationName->pluck('id')->toArray();
+                    }
                 }
             }
             // On fusionne tout ça
             $payload = array_merge($originalData, ['_relations' => $relationsData]);
-
             // 3. Création de la version en BDD
             $version = $model->versions()->create([
                 'user_id' => Auth::id(),
