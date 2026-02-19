@@ -15,19 +15,20 @@ export function useResource(props: any) {
                 href: download.file.url(id),
                 update: editor.file.update.url(id),
                 delete: editor.file.delete.url(id),
-                history: editor.file.history.url(id),
+                history: editor.model.history.url(["files", id]),
             };
         } else if (type === 'folder') {
             return {
                 href: navigate.folder.url(id),
                 update: editor.folder.update(id),
-                delete: editor.folder.delete(id), // Pas de suppression directe ici selon ton code
+                delete: editor.folder.delete(id),
             };
         } else {
             return {
                 href: navigate.document.url(id),
                 update: editor.document.update(id),
                 delete: editor.document.delete.url(id),
+                history: editor.model.history.url(["documents", id])
             };
         }
     });
