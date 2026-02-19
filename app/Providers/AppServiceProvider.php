@@ -48,6 +48,11 @@ class AppServiceProvider extends ServiceProvider
             Services\AttachmentService::class
         );
 
+        $this->app->bind(
+            Services\Interfaces\VersionsServiceInterface::class,
+            Services\VersionsService::class
+        );
+
 //        REPOSITORY BINDING
         $this->app->bind(
             Repositories\Interfaces\FolderRepositoryInterface::class,
