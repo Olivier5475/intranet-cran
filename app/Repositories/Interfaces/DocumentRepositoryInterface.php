@@ -6,6 +6,8 @@ use App\Exception\AlreadyExistsException;
 use App\Exception\DocumentNotFoundException;
 use App\Exception\PersistenceException;
 use App\Models\Document;
+use App\Models\Version;
+use Illuminate\Database\Eloquent\Collection;
 
 interface DocumentRepositoryInterface {
 
@@ -43,4 +45,17 @@ interface DocumentRepositoryInterface {
      * @throws \Throwable
      */
     public function readRacineDoc() : ?Document;
+
+    /**
+     * @param int $versionId
+     * @return Version
+     */
+    public function findVersionWithParent(int $versionId): Version;
+
+    /**
+     * @param int $parent_id
+     * @return Collection
+     */
+    public function findVersionsFromParent(int $parent_id) : Collection;
+
 }

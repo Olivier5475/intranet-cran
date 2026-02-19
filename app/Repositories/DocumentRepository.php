@@ -7,6 +7,8 @@ use App\Exception\DocumentNotFoundException;
 use App\Exception\PersistenceException;
 use App\Models\Document;
 use App\Models\File;
+use App\Models\Version;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
@@ -114,5 +116,17 @@ class DocumentRepository implements Interfaces\DocumentRepositoryInterface {
             ->when($excludeId, fn($q) => $q->where('id', '!=', $excludeId));
 
         return $fileQuery->exists() || $docQuery->exists();
+    }
+
+    public function findVersionWithParent(int $versionId): Version {
+        return Version::with('versionable')->findOrFail($versionId);
+    }
+
+    public function findVersionsFromParent(int $parent_id): Collection
+    {
+        return Version::where('versionable_id', $parent_id)
+            ->where("versionable_type", Document::class)
+            ->orderByDesc('created_at')
+            ->get();
     }
 }
