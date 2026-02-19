@@ -2,7 +2,7 @@ import { queryParams, type RouteQueryOptions, type RouteDefinition, applyUrlDefa
 /**
 * @see \App\Http\Controllers\DownloadController::version
  * @see app/Http/Controllers/DownloadController.php:40
- * @route '/download/version/{id}'
+ * @route '/download/file/version/{id}'
  */
 export const version = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
     url: version.url(args, options),
@@ -11,13 +11,13 @@ export const version = (args: { id: string | number } | [id: string | number ] |
 
 version.definition = {
     methods: ["get","head"],
-    url: '/download/version/{id}',
+    url: '/download/file/version/{id}',
 } satisfies RouteDefinition<["get","head"]>
 
 /**
 * @see \App\Http\Controllers\DownloadController::version
  * @see app/Http/Controllers/DownloadController.php:40
- * @route '/download/version/{id}'
+ * @route '/download/file/version/{id}'
  */
 version.url = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions) => {
     if (typeof args === 'string' || typeof args === 'number') {
@@ -45,7 +45,7 @@ version.url = (args: { id: string | number } | [id: string | number ] | string |
 /**
 * @see \App\Http\Controllers\DownloadController::version
  * @see app/Http/Controllers/DownloadController.php:40
- * @route '/download/version/{id}'
+ * @route '/download/file/version/{id}'
  */
 version.get = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
     url: version.url(args, options),
@@ -54,7 +54,7 @@ version.get = (args: { id: string | number } | [id: string | number ] | string |
 /**
 * @see \App\Http\Controllers\DownloadController::version
  * @see app/Http/Controllers/DownloadController.php:40
- * @route '/download/version/{id}'
+ * @route '/download/file/version/{id}'
  */
 version.head = (args: { id: string | number } | [id: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     url: version.url(args, options),
