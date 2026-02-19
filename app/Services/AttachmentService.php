@@ -138,7 +138,7 @@ readonly class AttachmentService implements Interfaces\AttachmentServiceInterfac
             throw new FileNotFoundException("Le fichier physique est introuvable.");
         }
 
-        return Storage::disk('public')->download($attachment->storage_path, $attachment->name);
+        return Storage::disk('public')->response($attachment->storage_path, $attachment->name);
     }
 
     private function makeAttachmentDTO(Attachment $attachment): AttachmentDTO {
