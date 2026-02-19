@@ -19,8 +19,6 @@ defineProps<{
         }>
     }
 }>();
-
-
 </script>
 
 <template>
@@ -29,7 +27,7 @@ defineProps<{
         {{ decodeEntities(document.title) }}
         <Link :href="editor_route.document.update.url(document.id)"><PencilIcon class="absolute right-2 top-2 w-6" /></Link>
     </h1>
-    <hr class="" />
+    <hr/>
     <!--    AFFICHAGE TEXTE   -->
     <div class="text-xl p-4 text-justify">
         <div v-html="document.content" class="ckeditor-content-render"></div>
@@ -37,10 +35,15 @@ defineProps<{
 
     <!--    AFFICHAGE FICHIER INTEGRER  -->
 
-    <div v-for="attachment in document.attachments" :key="attachment.id" class="">
+    <div v-for="attachment in document.attachments" :key="attachment.id">
         <!--        PDF         -->
-        <iframe v-if="attachment.name.endsWith('pdf')" :src="download.attachment.url(attachment.id)" height="700px" class="mx-auto w-10/12" />
-
+        <iframe
+            v-if="attachment.name.endsWith('pdf')"
+            :id="'pdf-' + attachment.id"
+            :src="download.attachment.url(attachment.id)"
+            height="700px"
+            class="mx-auto w-10/12 bg-white"
+        />
         <!--        IMAGE       -->
         <img v-else-if="isImageFile(attachment.mimetype)" :src="download.attachment.url(attachment.id)" :alt=attachment.name class="mx-auto w-11/12" />
 
@@ -59,7 +62,7 @@ defineProps<{
                         'bg-violet-400',
                         'p-3 rounded-full'
                     ]">
-                    {{ attachment.name.split('/').at(-1) }}
+                    {{ attachment.name }}
                 </span>
             </a>
         </div>
