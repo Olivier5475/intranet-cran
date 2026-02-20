@@ -81,7 +81,7 @@ class Authentification {
                 ]);
             } catch(UnauthorizedException) {
                 Log::alert("Un utilisateur ne faisant pas partie de 12Plus à voulu s'authentifier");
-                return \Inertia\Inertia::render("Erreur/Unautorized");
+                return \Inertia\Inertia::render("Erreur/Unauthorized");
             } catch (\Exception) {
                 throw new \Exception("Server Error", 500);
             }
