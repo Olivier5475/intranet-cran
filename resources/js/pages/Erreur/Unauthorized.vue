@@ -1,7 +1,6 @@
 <script lang="ts">
-// On utilise un bloc script normal pour définir les options du composant
 export default {
-    layout: null,
+    layout: "",
 }
 </script>
 <template>
@@ -9,8 +8,7 @@ export default {
         <div class="card">
             <span class="emoji">🚫</span>
             <h1>Accès non autorisé</h1>
-            <p>Désolé, vous n'avez pas les droits pour accéder à cette section.</p>
-            <a href="/" class="link">Retourner à l'abri</a>
+            <p>Désolé, Vous n'êtes pas membre du CRAN</p>
         </div>
     </div>
 </template>
