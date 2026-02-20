@@ -26,6 +26,9 @@ class Authentification {
      */
     public function handle(Request $request, Closure $next): Response|\Inertia\Response {
 //         SI ON EST EN LOCAL ALORS ON DEMANDE PAS D'AUTHENTIFICATION
+        if ($request->is('logout') || $request->routeIs('logout')) {
+            return $next($request);
+        }
         if (App::environment('local')) {
             if (!Auth::check()) {
                 $localDevUser = User::find(1);
