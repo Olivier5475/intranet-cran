@@ -28,7 +28,7 @@ readonly class AuthService implements Interfaces\UserServiceInterface {
         if($this->emailExistsIn12Plus($data['email'])) {
             throw new UnauthorizedException();
         }
-        
+
         if (!$user) {
             $data["verified_member_role"] = true; // Rôle par défaut à la création
             try {
@@ -176,7 +176,6 @@ readonly class AuthService implements Interfaces\UserServiceInterface {
 
         // 🔎 Extraction rapide de tous les emails
         $emails = array_map('strtolower', array_column($tab_listeindividu, 'email'));
-        dump($emails);
         return in_array(strtolower($email), $emails, true);
     }
 }
