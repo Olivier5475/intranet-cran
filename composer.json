@@ -10,6 +10,7 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
+        "ext-curl": "*",
         "apereo/phpcas": "^1.6",
         "erusev/parsedown": "^1.7",
         "inertiajs/inertia-laravel": "^2.0",

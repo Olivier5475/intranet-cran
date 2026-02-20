@@ -7,9 +7,11 @@ use App\Exception\PersistenceException;
 use App\Exception\UserNotFoundException;
 use App\Repositories\Interfaces\UserRepositoryInterface;
 use App\Services\Interfaces\DepartementsServiceInterface;
+use Dotenv\Dotenv;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\UnauthorizedException;
 use phpCAS;
 use Throwable;
 
@@ -23,6 +25,10 @@ readonly class AuthService implements Interfaces\UserServiceInterface {
     public function handleUserInDatabase(array $data): void {
         $user = $this->userRepository->getUserByEmail($data['email']);
 
+        if($this->emailExistsIn12Plus($data['email'])) {
+            throw new UnauthorizedException();
+        }
+        
         if (!$user) {
             $data["verified_member_role"] = true; // Rôle par défaut à la création
             try {
@@ -130,5 +136,47 @@ readonly class AuthService implements Interfaces\UserServiceInterface {
             "url" => phpCAS::getServerLoginURL(),
             "service" => $returnUrl
         ]);
+    }
+
+    private function emailExistsIn12Plus(string $email): bool
+    {
+        $url = config('services.12plus.url');
+
+        $tab_post = [
+            'codelangue' => 'fr',
+            'liste' => 'annuaire',
+            'pas_de_session' => 'oui'
+        ];
+
+        $session = curl_init();
+        curl_setopt_array($session, [
+            CURLOPT_URL => $url,
+            CURLOPT_POST => true,
+            CURLOPT_POSTFIELDS => $tab_post,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_SSL_VERIFYHOST => 0,
+            CURLOPT_SSL_VERIFYPEER => 0,
+            CURLOPT_TIMEOUT => 10
+        ]);
+
+        $resultat = curl_exec($session);
+
+        if ($resultat === false) {
+            curl_close($session);
+            return false;
+        }
+
+        curl_close($session);
+
+        $tab_listeindividu = json_decode($resultat, true);
+
+        if (!is_array($tab_listeindividu)) {
+            return false;
+        }
+
+        // 🔎 Extraction rapide de tous les emails
+        $emails = array_map('strtolower', array_column($tab_listeindividu, 'email'));
+        dump($emails);
+        return in_array(strtolower($email), $emails, true);
     }
 }

@@ -8,6 +8,8 @@ use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\UnauthorizedException;
 use phpCAS;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -22,7 +24,7 @@ class Authentification {
      * @param Closure(Request): (Response) $next
      * @throws \Exception
      */
-    public function handle(Request $request, Closure $next): Response {
+    public function handle(Request $request, Closure $next): Response|\Inertia\Response {
 //         SI ON EST EN LOCAL ALORS ON DEMANDE PAS D'AUTHENTIFICATION
         if (App::environment('local')) {
             if (!Auth::check()) {
@@ -77,6 +79,9 @@ class Authentification {
                     'prenom' => $attributes['givenname'] ?? $casUser ,
                     'email' => $attributes['mail'] ?? ($casUser . '@univ-lorraine.fr'), // si vous récupérez des attributs
                 ]);
+            } catch(UnauthorizedException) {
+                Log::alert("Un utilisateur ne faisant pas partie de 12Plus à voulu s'authentifier");
+                return \Inertia\Inertia::render("Erreur/Unautorized");
             } catch (\Exception) {
                 throw new \Exception("Server Error", 500);
             }

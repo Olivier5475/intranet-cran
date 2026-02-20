@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Services\Interfaces\UserServiceInterface;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\UnauthorizedException;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Throwable;
 use Inertia\Inertia;
@@ -44,9 +45,14 @@ class UsersController extends Controller {
                 return redirect()->route("admin.user")
                     ->with("success", "Utilisateur mis à jour avec succès.");
             } else {
-                $this->usersService->handleUserInDatabase($validatedData);
-                return redirect()->route("admin.user")
-                    ->with("success", "Utilisateur créé avec succès.");
+                try {
+                    $this->usersService->handleUserInDatabase($validatedData);
+                    return redirect()->route("admin.user")
+                        ->with("success", "Utilisateur créé avec succès.");
+                } catch (UnauthorizedException) {
+                    return redirect()->back()->with("error", "Cette utilisateur ne fais pas partie de 12Plus");
+                }
+
             }
 
         } catch (BadRequestException $e) {

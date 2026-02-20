@@ -34,5 +34,7 @@ return [
             'channel' => env('SLACK_BOT_USER_DEFAULT_CHANNEL'),
         ],
     ],
-
+    '12plus' => [
+        'url' => env('CAS_URL'),
+    ],
 ];
