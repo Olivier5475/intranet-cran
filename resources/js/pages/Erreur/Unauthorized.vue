@@ -5,13 +5,15 @@ import { ArrowLeftEndOnRectangleIcon } from '@heroicons/vue/20/solid';
 <template>
 
     <div class="forbidden-screen">
-        <a
-            :href="logout.url()"
-            class="group gap-2 px-4 py-2 rounded-lg text-right text-slate-400 hover:text-white hover:bg-red-600/20 flex items-center transition-all duration-200"
-        >
-            <span class="text-lg font-medium">Déconnexion</span>
-            <ArrowLeftEndOnRectangleIcon class="w-6 h-6 group-hover:translate-x-1 transition-transform" />
-        </a>
+        <div>
+            <a
+                :href="logout.url()"
+                class="group gap-2 px-4 py-2 rounded-lg text-right text-slate-400 hover:text-white hover:bg-red-600/20 flex items-center transition-all duration-200"
+            >
+                <span class="text-lg font-medium">Déconnexion</span>
+                <ArrowLeftEndOnRectangleIcon class="w-6 h-6 group-hover:translate-x-1 transition-transform" />
+            </a>
+        </div>
         <div class="card">
             <span class="emoji">🚫</span>
             <h1>Accès non autorisé</h1>
@@ -23,7 +25,6 @@ import { ArrowLeftEndOnRectangleIcon } from '@heroicons/vue/20/solid';
 <style scoped>
 .forbidden-screen {
     height: 100vh;
-    display: flex;
     align-items: center;
     justify-content: center;
     background: #111827; /* Fond sombre pour bien marquer la différence */
@@ -44,10 +45,5 @@ h1 {
 p {
     color: #9ca3af;
     margin-bottom: 2rem;
-}
-.link {
-    color: #3b82f6;
-    text-decoration: none;
-    font-weight: bold;
 }
 </style>
