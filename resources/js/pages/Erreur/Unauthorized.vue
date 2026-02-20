@@ -1,12 +1,6 @@
 <script lang="ts">
 import { logout } from '@/routes';
 import { ArrowLeftEndOnRectangleIcon } from '@heroicons/vue/20/solid';
-
-export default {
-    components: { ArrowLeftEndOnRectangleIcon },
-    methods: { logout },
-    layout: '',
-};
 </script>
 <template>
 
