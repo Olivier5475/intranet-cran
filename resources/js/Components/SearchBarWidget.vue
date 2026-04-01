@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref } from 'vue'
 import { router } from '@inertiajs/vue3'
 import { MagnifyingGlassIcon, XMarkIcon } from '@heroicons/vue/20/solid'
 
