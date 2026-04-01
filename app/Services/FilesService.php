@@ -30,21 +30,26 @@ readonly class FilesService implements Interfaces\FilesServiceInterface {
     ){}
 
     public function create(array $data): FileDTO {
-        if (empty($data["folder_id"]) || !($data['file'] ?? null) instanceof UploadedFile) {
+        if (empty($data["folder_id"]) || !($data['file'] ?? null) instanceof \Symfony\Component\HttpFoundation\File\File) {
             throw new BadRequestException("ID dossier ou fichier manquant.");
         }
 
-        /** @var UploadedFile $uploadedFile */
         $uploadedFile = $data["file"];
+        $isUploaded = $uploadedFile instanceof \Illuminate\Http\UploadedFile;
+        $originalName = $isUploaded ? $uploadedFile->getClientOriginalName() : $uploadedFile->getFilename();
+        $fileExtension = $isUploaded ? $uploadedFile->getClientOriginalExtension() : $uploadedFile->getExtension();
 
         // Construction simplifiée du chemin : folders/ID_1/ID_2/
         $breadcrumbs = $this->foldersService->getBreadcrumbs($data["folder_id"]);
         $folderPath = collect($breadcrumbs)->map(fn($f) => $f->id)->implode('/') . '/';
 
-        $secureName = Str::uuid() . "." . $uploadedFile->getClientOriginalExtension();
-
+        $secureName = Str::uuid() . "." . $fileExtension;
         try {
-            $storagePath = $uploadedFile->storeAs($folderPath, $secureName, "public");
+            $storagePath = Storage::disk('public')->putFileAs(
+                $folderPath,
+                $uploadedFile,
+                $secureName
+            );
             if (!$storagePath) throw new DiskWriteException();
         } catch (Throwable $t) {
             Log::error("Échec upload fichier", ["path" => $folderPath, "error" => $t->getMessage()]);
@@ -54,14 +59,14 @@ readonly class FilesService implements Interfaces\FilesServiceInterface {
         try {
             DB::beginTransaction();
 
-            $data["user_id"] = $this->userService->getCurrentUserId();
+            $data["user_id"] = $data["user_id"] ?? $this->userService->getCurrentUserId();
             $data['storage_path'] = $storagePath;
             $data['mimetype'] = $uploadedFile->getMimeType();
             $data['size'] = $uploadedFile->getSize();
 
             // Gestion du nom (priorité au nom saisi, sinon nom d'origine)
-            $displayName = $data["name"] ?? $uploadedFile->getClientOriginalName();
-            $extension = "." . $uploadedFile->getClientOriginalExtension();
+            $displayName = $data["name"] ?? $originalName;
+            $extension = "." . $fileExtension;
             $data["name"] = str_ends_with($displayName, $extension) ? $displayName : $displayName . $extension;
 
             unset($data['file']);

@@ -149,7 +149,7 @@ readonly class FoldersService implements Interfaces\FoldersServiceInterface {
 
         try {
             DB::beginTransaction();
-            $data["user_id"] = $this->userService->getCurrentUserId();
+            $data["user_id"] = $data["user_id"] ?? $this->userService->getCurrentUserId();
             $folder = $this->folderRepository->create($data);
             DB::commit();
 
