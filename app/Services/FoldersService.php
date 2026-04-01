@@ -128,7 +128,9 @@ readonly class FoldersService implements Interfaces\FoldersServiceInterface {
             color: $d->color,
         ));
 
-        return $fileDTOs->concat((array)$documentDTOs);
+        return $fileDTOs
+            ->merge($documentDTOs) // Fusionne les deux Collection
+            ->values();            // RE-INDEXE de 0 à N (Crucial pour le v-for de Vue)
     }
 
     public function read(int $id): FolderDTO
