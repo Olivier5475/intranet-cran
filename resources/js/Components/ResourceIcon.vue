@@ -36,10 +36,5 @@ const styleObject = computed(() => props.color ? { color: props.color } : {});
             :class="iconConfig.colorClass"
             :style="styleObject"
         />
-
-        <span
-            v-if="child.type === 'folder'"
-            class="absolute top-[20%] left-[20%] w-[40%] h-[15%] bg-white/30 blur-[1px] rounded-full pointer-events-none"
-        ></span>
     </div>
 </template>

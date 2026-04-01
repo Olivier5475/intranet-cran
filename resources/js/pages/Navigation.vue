@@ -5,12 +5,12 @@ import ResourceCard from '@/Components/ResourceCard.vue';
 import CreationWidget from '@/Components/CreationWidget.vue';
 import { ListBulletIcon, ViewColumnsIcon } from '@heroicons/vue/20/solid';
 
-import { computed, DeepReadonly, inject, ref, Ref, toRef } from 'vue';
+import { computed, DeepReadonly, inject, onMounted, onUnmounted, ref, Ref, toRef } from 'vue';
 import { useFilteredChildren } from '@/lib/filtres';
 import ResourceRow from '@/Components/ResourceRow.vue';
 import { useForm, usePage } from '@inertiajs/vue3';
 import route from '@/routes/editor/file';
-import { decodeEntities } from '@/lib/utils';
+import CreateFolderRowWidget from '@/Components/CreateFolderRowWidget.vue';
 
 const page = usePage();
 const props = defineProps<{
@@ -57,38 +57,73 @@ const change_mod = (value: string) => {
     view_mod.value = value;
 };
 
-const canCreate = ref(props.parents.at(-1)?.departements.filter((value) => page.props.auth.user.departements_ids.includes(value)));
+// On récupère les départements de la page
+const parentDpts = props.parents.at(-1)?.departements as number[];
+
+// On récupère l'utilisateur
+const user = page.props.auth.user;
+
+// On récupère les départements de l'utilisateur
+const userDpts = user.departements_ids as number[];
+
+// On récupère les départements en commun
+const compareParentAndUser = parentDpts.filter((value) =>  userDpts.includes(value));
+const canCreate = ref(user.role === "admin" || ( // Si l'utilisateur est un admin, il peut créer.
+            // Si c'est un editeur et qu'il a des roles en commun avec la page, il peut créer.
+            user.role === "editor" &&  (parentDpts.length === 0 || compareParentAndUser.length > 0)
+        )
+);
 
 let dragCounter = 0;
-const isDragging = ref(false); // Si tu utilises Vue, sinon une variable simple
+const isDragging = ref(false);
+const fastFolderCreation = ref(false);
 
-if (canCreate.value && canCreate.value.length > 0) {
+if (canCreate.value) {
+    // On retire les actions par défaut de dragover
+    // (évite que ça ouvre le fichier au lieu de le traiter dans le site)
     window.addEventListener('dragover', (e) => {
         e.preventDefault();
     });
 
     window.addEventListener('dragenter', (e) => {
+        // On retire les actions par défaut de dragover
         e.preventDefault();
+
+        // on met isDragging à true si un drag arrive sur la fenêtre
         dragCounter++;
         if (dragCounter === 1) isDragging.value = true;
     });
 
     window.addEventListener('dragleave', (e) => {
+        // On retire les actions par défaut de dragover
         e.preventDefault();
+
+        // on met isDragging à false si le drag part de la fenêtre
         dragCounter--;
         if (dragCounter === 0) isDragging.value = false;
     });
 
     window.addEventListener('drop', (e) => {
+        // On retire les actions par défaut de dragover
         e.preventDefault();
+
+        // on met isDragging à false si le fichier est drop sur fenêtre
         dragCounter = 0;
         isDragging.value = false;
+
+        // on lance l'enregistrement du fichier
         catchFile(e);
     });
 
+    /**
+     * Methode pour lancer la requete d'enregistrement d'un fichier venant d'être drop en BD
+     * @param e
+     */
     const catchFile = (e: any) => {
+        // on récupère le fichier
         const file = e.dataTransfer.files;
 
+        // on créait un formulaire avec le fichier et des valeurs par défauts
         const form = useForm({
             name: '',
             files: file,
@@ -96,11 +131,44 @@ if (canCreate.value && canCreate.value.length > 0) {
             parent_id: props.parents.at(-1)?.id ?? null,
         });
 
+        // on envoie le formulaire
         form.post(route.post.create.url());
+
+        // on s'assure que isDragging est à false
         dragCounter = 0;
-        console.log(file);
         isDragging.value = false;
     };
+
+
+    /**
+     * Méthode pour setup un raccourci pour l'ouverture de la creation rapide de dossier
+     * @param event
+     */
+    const handleGlobalKeyDown = (event: KeyboardEvent) => {
+        // on récupère l'élément actif
+        const activeEl = document.activeElement;
+
+        // On vérifie si l'élément focus est un champ de saisie
+        const isInput = activeEl instanceof HTMLInputElement ||
+            activeEl instanceof HTMLTextAreaElement;
+
+        // On vérifie si l'élément est éditable (en le castant en HTMLElement).
+        const isEditable = activeEl instanceof HTMLElement && activeEl.isContentEditable;
+
+        // si l'utilisateur appuie sur N et qu'il n'est pas dans un editable ou une zone de saisie,
+        // on ouvre la création rapide de dossier
+        if (event.key.toLowerCase() === 'n' && !isInput && !isEditable) {
+            fastFolderCreation.value = !fastFolderCreation.value;
+        }
+    };
+
+    onMounted(() => {
+        window.addEventListener('keydown', handleGlobalKeyDown);
+    });
+
+    onUnmounted(() => {
+        window.removeEventListener('keydown', handleGlobalKeyDown);
+    });
 }
 </script>
 
@@ -132,7 +200,12 @@ if (canCreate.value && canCreate.value.length > 0) {
                 </button>
             </div>
 
-            <CreationWidget v-if="(canCreate?.length && canCreate?.length > 0) || parents.at(-1)?.departements.length === 0" :folder_id="folder_id" />
+            <CreationWidget
+                v-if="canCreate"
+                v-model="fastFolderCreation"
+                :folder_id="folder_id"
+                :is-active-fast-creation="fastFolderCreation"
+            />
         </div>
     </div>
 
@@ -152,6 +225,9 @@ if (canCreate.value && canCreate.value.length > 0) {
             <p class="col-span-2 text-right">Actions</p>
         </div>
         <ResourceRow v-for="child in filteredChildren" :key="child.name" :child="child" :folder_id="folder_id" />
+        <div v-if="fastFolderCreation && canCreate">
+            <CreateFolderRowWidget :parent="parents.at(-1)" v-model="fastFolderCreation" :folder_id="folder_id" />
+        </div>
     </div>
 </template>
 

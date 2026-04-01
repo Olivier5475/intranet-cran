@@ -3,10 +3,17 @@ import { Link } from '@inertiajs/vue3';
 import { PlusIcon, FolderPlusIcon, DocumentPlusIcon, ArrowUpTrayIcon } from '@heroicons/vue/20/solid';
 import { ref } from 'vue';
 import editor from '@/routes/editor';
-
 const isActive = ref(false);
-defineProps<{ folder_id: number }>();
+defineProps<{
+    folder_id: number
+}>();
+const model = defineModel<boolean>();
+
+const toggleMode = () => {
+    model.value = !model.value;
+}
 </script>
+
 
 <template>
     <div class="relative">
@@ -38,6 +45,14 @@ defineProps<{ folder_id: number }>();
                     <FolderPlusIcon class="w-5 h-5 text-sky-500" />
                     Dossier
                 </Link>
+
+                <button
+                    class="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-zinc-200 hover:bg-sky-50 dark:hover:bg-sky-900/20 transition-colors"
+                    @click="toggleMode"
+                >
+                    <FolderPlusIcon class="w-5 h-5 text-violet-500" />
+                    Dossier Rapide
+                </button>
 
                 <Link
                     :href="editor.document.create.url(folder_id)"
