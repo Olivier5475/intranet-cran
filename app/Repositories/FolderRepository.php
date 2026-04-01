@@ -142,6 +142,7 @@ class FolderRepository implements Interfaces\FolderRepositoryInterface
     public function getFolderWithParents(int $id): Folder
     {
         return Folder::where(fn($q) => $q->where('isDelete', false)->orWhereNull('isDelete'))
+            ->with('departements:id')
             ->with('parent.parent.parent.parent.parent')
             ->findOrFail($id);
     }
