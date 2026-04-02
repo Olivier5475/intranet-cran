@@ -1,6 +1,9 @@
 <script setup lang="ts">
+// 1. Vue & Core
 import { computed } from 'vue';
-import { isDocFile, isGifFile, isImageFile, isPresentationFile, isTabFile, isVideoFile } from '@/lib/documentsTypeRegex';
+
+// 2. Librairies tierces (Icônes)
+import { isDocFile, isGifFile, isImageFile, isPresentationFile, isTabFile, isVideoFile } from '@/Composables/useDocumentsTypeRegex';
 import * as SolidIcons from '@heroicons/vue/20/solid';
 
 const props = defineProps<{
@@ -24,15 +27,15 @@ const iconConfig = computed(() => {
     return { icon: SolidIcons.PaperClipIcon, colorClass: 'text-slate-400' };
 });
 
-const styleObject = computed(() => props.color ? { color: props.color } : {});
+const styleObject = computed(() => (props.color ? { color: props.color } : {}));
 </script>
 
 <template>
-    <div class="relative w-full h-full flex items-center justify-center">
+    <div class="relative flex h-full w-full items-center justify-center">
         <component
             :is="iconConfig.icon"
             :key="child.id + child.type"
-            class="w-full h-full drop-shadow-sm"
+            class="drop-shadow-sm h-full w-full"
             :class="iconConfig.colorClass"
             :style="styleObject"
         />

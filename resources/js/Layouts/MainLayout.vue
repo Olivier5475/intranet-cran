@@ -1,37 +1,34 @@
 <script setup lang="ts">
-import SidebarWidget from '@/Components/SidebarWidget.vue';
-import MainNav from '@/Components/MainNav.vue';
+// 1. Vue & Core
+import { provide, readonly, ref } from 'vue';
+
+// 2. Librairies & Utilitaires tiers
+import timeout from '@/autologout';
+
+// 3. Types
+import { Departement } from '@/types/departement';
+import { Folder } from '@/types/folder';
+
+// 4. Composants
 import FilterWidget from '@/Components/FilterWidget.vue';
 import FlashMessage from '@/Components/FlashMessage.vue';
 import LogoWidget from '@/Components/LogoWidget.vue';
-import { provide, readonly, ref } from 'vue';
-import timeout from "@/autologout"
+import MainNav from '@/Components/MainNav.vue';
+import SidebarWidget from '@/Components/SidebarWidget.vue';
 
 timeout.setup();
 const activeFilters = ref({});
 
-function handleFilterChange(newFilters : any) {
+function handleFilterChange(newFilters: any) {
     activeFilters.value = newFilters;
     console.log(newFilters);
 }
 
 provide('activeFilters', readonly(activeFilters));
 
-interface Child {
-    id: number;
-    name: string;
-    children: Array<Child> | null;
-}
-
-interface Departement {
-    id: number;
-    name: string;
-    initials: string;
-}
-
 defineProps<{
-    racineChildren: Array<Child> | null;
-    departements: Array<Departement> | null;
+    racineChildren?: Folder[];
+    departements: Departement[];
     racineDocument: {
         id: number;
         title: string;
@@ -41,7 +38,7 @@ defineProps<{
 
 <template>
     <FlashMessage />
-    <div class="flex-grow w-full">
+    <div class="w-full flex-grow">
         <header>
             <MainNav :racineChildren="racineChildren" />
         </header>
@@ -52,12 +49,14 @@ defineProps<{
                     <SidebarWidget title="Navigation" :children="racineChildren" :racine-document="racineDocument" />
                 </aside>
 
-                <main class="lg:col-span-3 bg-white dark:bg-slate-800 dark:text-white shadow-lg rounded-lg overflow-hidden pb-12 pt-2 px-2 min-h-[75vh]">
+                <main
+                    class="lg:col-span-3 bg-white dark:bg-slate-800 dark:text-white shadow-lg rounded-lg pb-12 pt-2 px-2 min-h-[75vh] overflow-hidden"
+                >
                     <slot />
                 </main>
 
                 <aside class="lg:col-span-1 space-y-6">
-                    <FilterWidget :departements=departements @filters-updated=handleFilterChange />
+                    <FilterWidget :departements="departements" @filters-updated="handleFilterChange" />
                 </aside>
             </div>
         </div>

@@ -1,26 +1,44 @@
 <script setup lang="ts">
-import { isDocFile, isImageFile, isPresentationFile, isTabFile, isVideoFile } from '@/lib/documentsTypeRegex';
-import { PencilIcon, ArrowDownTrayIcon } from '@heroicons/vue/24/outline'; // Utilisation de v24 pour plus de finesse
+// 1. Vue & Core
+import { ref } from 'vue';
 import { Link, useForm, usePage } from '@inertiajs/vue3';
-import editor_route from '@/routes/editor';
+
+// 2. Librairies tierces (Icônes)
+import { PencilIcon, ArrowDownTrayIcon } from '@heroicons/vue/24/outline';
+
+// 3. Composables & Utilitaires (Logique)
+import { useDragAndDrop } from '@/Composables/useDragAndDrop';
+import { decodeEntities } from '@/Composables/useDecodeModule';
+import {
+    isDocFile,
+    isImageFile,
+    isPresentationFile,
+    isTabFile,
+    isVideoFile
+} from '@/Composables/useDocumentsTypeRegex';
+
+// 4. Routes
 import download from '@/routes/download';
-import { decodeEntities } from '@/lib/utils';
+import editor_route from '@/routes/editor';
 import route from '@/routes/editor/document';
-import { onMounted, onUnmounted, ref } from 'vue';
+
+// Initialisation
 const page = usePage();
 
 const props = defineProps<{
     document: {
+        // Document courant
         id: number;
         folder_id: number;
         title: string;
         content: string;
         attachments?: Array<{
+            // Liste des pièces jointes
             id: number;
             name: string;
-            storage_path: string;
-            mimetype: string;
-            size: number;
+            storage_path: string; // chemin d'accès de la piece jointe
+            mimetype: string; // Type de fichier de la pièce jointe (ex pdf, image, video etc ...)
+            size: number; // taille du fichier en octet
         }>;
         departements: number[];
         color: string;
@@ -44,105 +62,29 @@ const canEdit = ref(
         (user.role === 'editor' && (parentDpts.length === 0 || compareParentAndUser.length > 0)),
 );
 
-let dragCounter = 0;
-const isDragging = ref(false);
-const fastFolderCreation = ref(false);
-
-if (canEdit.value) {
-    // On retire les actions par défaut de dragover
-    // (évite que ça ouvre le fichier au lieu de le traiter dans le site)
-    window.addEventListener('dragover', (e) => {
-        e.preventDefault();
-    });
-
-    window.addEventListener('dragenter', (e) => {
-        // On retire les actions par défaut de dragover
-        e.preventDefault();
-
-        // on met isDragging à true si un drag arrive sur la fenêtre
-        dragCounter++;
-        if (dragCounter === 1) isDragging.value = true;
-    });
-
-    window.addEventListener('dragleave', (e) => {
-        // On retire les actions par défaut de dragover
-        e.preventDefault();
-
-        // on met isDragging à false si le drag part de la fenêtre
-        dragCounter--;
-        if (dragCounter === 0) isDragging.value = false;
-    });
-
-    window.addEventListener('drop', (e) => {
-        // On retire les actions par défaut de dragover
-        e.preventDefault();
-
-        // on met isDragging à false si le fichier est drop sur fenêtre
-        dragCounter = 0;
-        isDragging.value = false;
-
-        // on lance l'enregistrement du fichier
-        catchFile(e);
-    });
-
-    /**
-     * Methode pour lancer la requete d'enregistrement d'un fichier venant d'être drop en BD
-     * @param e
-     */
-    const catchFile = (e: any) => {
-        // on récupère le fichier
-        const file = e.dataTransfer.files;
-
-        // on créait un formulaire avec le fichier et des valeurs par défauts
+// Logique du Drag & Drop pour les fichiers
+const { isDragging } = useDragAndDrop({
+    canDrop: canEdit.value,
+    onDrop: (file) => {
+        // Formulaire à envoyer au contrôleur Laravel
         const form = useForm({
-            title: decodeEntities(props.document.title),
-            content: props.document.content ?? '',
-            existing_attachments: props.document?.attachments ?? [],
-            new_attachments: [] as File[],
-            departements: props.document?.departements ?? [],
+            title: decodeEntities(props.document.title), // On récupère renvoie le meme titre
+            content: props.document.content ?? '', // On récupère renvoie le meme contenu
+            existing_attachments: props.document?.attachments ?? [], // On renvoie les piece jointe deja existante
+            new_attachments: [] as File[], // On prépare l'envoie de la nouvelle pièce jointe
+            departements: props.document?.departements ?? [], // On renvoie les meme departements
+            // On renvoie la meme couleur et du blanc si on ne trouve pas de couleur
             color: props.document.color ?? '#ffffff',
-            parent_id: props.document.folder_id ?? null,
+            parent_id: props.document.folder_id ?? null, // on renvoie le même parent
         });
 
+        // On met le fichier dans une liste pour rendre compatible avec le type attendu par le contrôleur Laravel
         form.new_attachments = Array.from(file);
 
         // on envoie le formulaire
         form.post(route.post.update.url(props.document.id), { method: 'patch' });
-
-        // on s'assure que isDragging est à false
-        dragCounter = 0;
-        isDragging.value = false;
-    };
-
-    /**
-     * Méthode pour setup un raccourci pour l'ouverture de la creation rapide de dossier
-     * @param event
-     */
-    const handleGlobalKeyDown = (event: KeyboardEvent) => {
-        // on récupère l'élément actif
-        const activeEl = document.activeElement;
-
-        // On vérifie si l'élément focus est un champ de saisie
-        const isInput = activeEl instanceof HTMLInputElement || activeEl instanceof HTMLTextAreaElement;
-
-        // On vérifie si l'élément est éditable (en le castant en HTMLElement).
-        const isEditable = activeEl instanceof HTMLElement && activeEl.isContentEditable;
-
-        // si l'utilisateur appuie sur N et qu'il n'est pas dans un editable ou une zone de saisie,
-        // on ouvre la création rapide de dossier
-        if (event.key.toLowerCase() === 'n' && !isInput && !isEditable) {
-            fastFolderCreation.value = !fastFolderCreation.value;
-        }
-    };
-
-    onMounted(() => {
-        window.addEventListener('keydown', handleGlobalKeyDown);
-    });
-
-    onUnmounted(() => {
-        window.removeEventListener('keydown', handleGlobalKeyDown);
-    });
-}
+    },
+});
 </script>
 
 <template>

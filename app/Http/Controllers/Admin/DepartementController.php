@@ -19,6 +19,8 @@ class DepartementController extends Controller {
 
     public function readAll() {
         try {
+            // Départements déjà passer en tant que variable global,
+            // on ne les repasse ici ne pas faire d'overfetching ou de requête inutile
             return Inertia::render("Admin/Departements");
         } catch (Throwable $t) {
             Log::error("Erreur lors du rendu de la page des départements", [

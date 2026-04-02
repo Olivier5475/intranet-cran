@@ -1,6 +1,6 @@
 /**
  * Ce fichier contient des fonctions utilitaires pour vérifier le type de fichier
- * basé sur son MIME type (plutôt que son extension).
+ * basé sur son MIME type.
  *
  * @param mimeType Le MIME type du fichier (ex: 'application/pdf', 'image/jpeg').
  */

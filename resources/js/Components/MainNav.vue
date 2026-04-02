@@ -1,14 +1,19 @@
 <script setup lang="ts">
+// 1. Vue & Core
 import { Link, usePage } from '@inertiajs/vue3';
+
+// 2. Librairie Tierce (Icon)
 import { UserIcon,UserGroupIcon, BuildingOfficeIcon, ArrowLeftEndOnRectangleIcon } from '@heroicons/vue/20/solid';
+
+// 3. Routes
 import admin_routes from '@/routes/admin'
 import {logout} from '@/routes';
 
+// 4. Types
+import { Folder } from '@/types/folder';
+
 defineProps<{
-    racineChildren: Array<{
-        id: number;
-        name: string;
-    }> | null;
+    racineChildren?: Folder[]
 }>();
 const page = usePage();
 const isActive = (url: string) => page.url.startsWith(url);

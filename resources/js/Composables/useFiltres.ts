@@ -1,7 +1,8 @@
 import { computed } from 'vue';
 import type { Ref } from 'vue';
-import { FilterState, NavigationChild } from '@/types/filtres';
-import { filtre } from '@/lib/documentsTypeRegex';
+import { FilterState } from '@/types/filtres';
+import { Child } from '@/types/child'
+import { filtre } from '@/Composables/useDocumentsTypeRegex';
 
 // --- HELPER 1 : Priorité des types ---
 // (Défini ici pour ne pas être recréé à chaque rendu)
@@ -25,7 +26,7 @@ const getExtension = (name: string): string => {
 };
 
 export function useFilteredChildren(
-    children: Ref<NavigationChild[]>,
+    children: Ref<Child[]>,
     filters: Ref<FilterState | null>
 ) {
     return computed(() => {

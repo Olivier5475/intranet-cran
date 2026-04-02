@@ -12,7 +12,8 @@ const emit = defineEmits(['close']);
 <template>
     <div
         v-if="show && deleteHref"
-        class="fixed inset-0 bg-opacity-70 bg-gray-900 w-full h-full z-50 flex items-start justify-center pt-[10%]"
+        class="fixed inset-0 bg-opacity-70 bg-gray-900 w-full h-full z-50
+        flex items-start justify-center pt-[10%]"
         @click.self="emit('close')"
     >
         <div class="w-full max-w-lg bg-slate-900 text-white p-6 rounded-lg shadow-2xl">
@@ -27,13 +28,15 @@ const emit = defineEmits(['close']);
                     method="delete"
                     :href="deleteHref"
                     as="button"
-                    class="text-white bg-red-600 w-1/3 py-2 rounded-md hover:bg-red-700 transition duration-150 text-center font-semibold"
+                    class="text-white bg-red-600 w-1/3 py-2 rounded-md hover:bg-red-700
+                    transition duration-150 text-center font-semibold"
                 >
                     SUPPRIMER
                 </Link>
                 <button
                     @click="emit('close')"
-                    class="text-white bg-green-600 w-1/3 py-2 rounded-md hover:bg-green-700 transition duration-150 font-semibold"
+                    class="text-white bg-green-600 w-1/3 py-2 rounded-md hover:bg-green-700
+                     transition duration-150 font-semibold"
                 >
                     ANNULER
                 </button>

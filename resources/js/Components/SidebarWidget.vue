@@ -1,22 +1,32 @@
 <script setup lang="ts">
+// 1. Vue & Core
 import { ref } from 'vue';
-import TreeViewItem from '@/Components/TreeViewItem.vue';
 import { Link, usePage } from '@inertiajs/vue3';
+
+// 2. Librairies tierces (Icônes)
+import {
+    ChevronDownIcon,
+    ChevronRightIcon,
+    HomeIcon,
+    PlusIcon
+} from '@heroicons/vue/20/solid';
+
+// 3. Routes
 import editor from '@/routes/editor';
-import { home } from '@/routes';
 import folder_route from '@/routes/editor/folder';
-import { ChevronDownIcon, ChevronRightIcon, HomeIcon, PlusIcon } from '@heroicons/vue/20/solid';
+import { home } from '@/routes';
+
+// 4. Composants
+import TreeViewItem from '@/Components/TreeViewItem.vue';
+
+// 5. Types
+import { Folder } from '@/types/folder';
 
 const page = usePage();
-interface Child {
-    id: number;
-    name: string;
-    children: Array<Child> | null;
-}
 
 defineProps<{
     title: string;
-    children: Array<Child> | null;
+    children?: Array<Folder>;
     racineDocument: {
         id: number;
         title: string;

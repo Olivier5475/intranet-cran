@@ -1,33 +1,44 @@
 <script setup lang="ts">
+// 1. Vue & Core
 import { ref, computed, watch } from 'vue';
-import { ChevronRightIcon, ChevronDownIcon } from '@heroicons/vue/20/solid';
-import TreeViewItem from './TreeViewItem.vue';
 import { Link, usePage } from '@inertiajs/vue3';
-import navigate from '@/routes/navigate';
-import folder_route from '@/routes/editor/folder';
+
+// 2. Librairies tierces (Icônes)
+import { ChevronRightIcon, ChevronDownIcon } from '@heroicons/vue/20/solid';
 import { EllipsisHorizontalIcon } from '@heroicons/vue/24/solid';
+
+// 3. Composables, Routes & Utilitaires
+import { decodeEntities } from '@/Composables/useDecodeModule';
+import folder_route from '@/routes/editor/folder';
+import navigate from '@/routes/navigate';
+
+// 4. Composants
 import DeleteModal from '@/Components/DeleteModal.vue';
-import { decodeEntities } from '@/lib/utils';
-interface Child {
-    id: number;
-    name: string;
-    children: Array<Child> | null;
-}
+import TreeViewItem from './TreeViewItem.vue';
+
+// 5. Types
+import { Folder } from '@/types/folder';
 
 const props = defineProps<{
-    child: Child;
+    child: Folder;
 }>();
 
 const page = usePage();
 
-// 1. Extraire le folder_id de l'URL (/navigation/f/{id})
+/**
+ * Extraire le folder_id de l'URL (/navigation/f/{id})
+ */
 const currentFolderId = computed(() => {
     const folder = page.props.parents?.at(-1);
-    return folder?.id ?? page.props.document?.folder_id ??  null;
+    return folder?.id ?? page.props.document?.folder_id ?? null;
 });
 
-// 2. Fonction récursive pour vérifier si ce nœud ou un descendant est actif
-const checkShouldExpand = (item: Child, targetId: number | null): boolean => {
+/**
+ * Fonction récursive pour vérifier si ce nœud ou un descendant est actif
+ * @param item
+ * @param targetId
+ */
+const checkShouldExpand = (item: Folder, targetId: number | null): boolean => {
     if (!targetId) return false;
     if (item.id === targetId) return true;
     if (item.children) {
@@ -36,33 +47,35 @@ const checkShouldExpand = (item: Child, targetId: number | null): boolean => {
     return false;
 };
 
-// 3. État initial : true si le dossier actuel (ou un enfant) est détecté
+// État initial : true si le dossier actuel (ou un enfant) est détecté
 const isExpanded = ref(checkShouldExpand(props.child, currentFolderId.value));
 
 watch(currentFolderId, (newId) => {
     isExpanded.value = checkShouldExpand(props.child, newId);
 });
 
+// Menu = Menu dropdown d'action d'un dossier (avec bouton modifier et supprimer)
+// pour savoir si le menu est étendu. sert pour quand on passe dessus
 const isMenuExpend = ref(false);
-const toggleMenu = ref(false);
-const isActiveValidation = ref(false);
 
+// pour garder le menu ouvert même quand la souris n'est pas dessus
+const toggleMenu = ref(false);
+
+// savoir si le Modal de validation de suppression est ouvert
+const isActiveValidation = ref(false);
 </script>
 
 <template>
     <li :id="child.id.toString()" class="select-none">
         <div
-            class="group flex items-center p-1 rounded-md transition-colors duration-150 hover:bg-slate-100 dark:hover:bg-sky-900/50"
+            class="group p-1 rounded-md hover:bg-slate-100 dark:hover:bg-sky-900/50 flex items-center transition-colors duration-150"
             :class="{ 'bg-sky-50 dark:bg-sky-900/20': child.id === currentFolderId }"
         >
             <div @click="isExpanded = !isExpanded" class="p-1 cursor-pointer">
-                <component
-                    :is="isExpanded ? ChevronDownIcon : ChevronRightIcon"
-                    class="w-4 h-4 text-gray-500"
-                />
+                <component :is="isExpanded ? ChevronDownIcon : ChevronRightIcon" class="w-4 h-4 text-gray-500" />
             </div>
 
-            <div class="flex flex-1 items-center justify-between ml-1">
+            <div class="ml-1 flex flex-1 items-center justify-between">
                 <Link
                     :href="navigate.folder.url(child.id)"
                     class="text-sm truncate"
@@ -71,24 +84,27 @@ const isActiveValidation = ref(false);
                     {{ decodeEntities(child.name) }}
                 </Link>
                 <div
-                    class="relative flex items-center group-hover:opacity-100 transition-opacity"
+                    class="relative flex items-center transition-opacity group-hover:opacity-100"
                     @mouseover="isMenuExpend = true"
                     @mouseleave="isMenuExpend = false"
                 >
-                    <button @click="toggleMenu = !toggleMenu" class="p-1 rounded-full hover:bg-gray-200 dark:hover:bg-zinc-700">
+                    <button @click="toggleMenu = !toggleMenu" class="p-1 hover:bg-gray-200 dark:hover:bg-zinc-700 rounded-full">
                         <EllipsisHorizontalIcon class="h-5 w-5 text-gray-500" />
                     </button>
 
-                    <div v-if="isMenuExpend || toggleMenu" class="absolute right-0 top-5 z-20 w-32 rounded-lg opacity-25 group-hover:opacity-100 shadow-xl bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 py-1">
+                    <div
+                        v-if="isMenuExpend || toggleMenu"
+                        class="right-0 top-5 w-32 rounded-lg shadow-xl bg-white dark:bg-zinc-900 border-gray-200 dark:border-zinc-700 py-1 absolute z-20 border opacity-25 group-hover:opacity-100"
+                    >
                         <Link
                             :href="folder_route.update.url(child.id)"
-                            class="block px-4 py-2 text-xs hover:bg-gray-100 dark:hover:bg-yellow-900/50 text-yellow-600"
+                            class="px-4 py-2 text-xs hover:bg-gray-100 dark:hover:bg-yellow-900/50 text-yellow-600 block"
                         >
                             Modifier
                         </Link>
                         <button
                             @click="isActiveValidation = true"
-                            class="w-full text-left block px-4 py-2 text-xs hover:bg-red-50 dark:hover:bg-red-900/50 text-red-500"
+                            class="px-4 py-2 text-xs hover:bg-red-50 dark:hover:bg-red-900/50 text-red-500 block w-full text-left"
                         >
                             Supprimer
                         </button>
@@ -105,12 +121,12 @@ const isActiveValidation = ref(false);
             leave-from-class="max-h-[1000px] opacity-100"
             leave-to-class="max-h-0 opacity-0 overflow-hidden"
         >
-            <ul v-if="isExpanded" class="pl-4 ml-3 border-l border-gray-200 dark:border-zinc-700 mt-1 space-y-1">
+            <ul v-if="isExpanded" class="pl-4 ml-3 border-gray-200 dark:border-zinc-700 mt-1 space-y-1 border-l">
                 <TreeViewItem v-for="subChild in child.children" :key="subChild.id" :child="subChild" />
 
                 <li>
                     <Link
-                        class="text-xs flex items-center text-gray-400 hover:text-yellow-600 py-1 transition-colors"
+                        class="text-xs text-gray-400 hover:text-yellow-600 py-1 flex items-center transition-colors"
                         :href="folder_route.create.url(child.id)"
                     >
                         <span class="mr-2 text-lg">+</span>
@@ -121,9 +137,5 @@ const isActiveValidation = ref(false);
         </Transition>
     </li>
 
-    <DeleteModal
-        :show="isActiveValidation"
-        :delete-href="folder_route.delete.url(child.id)"
-        @close="isActiveValidation = false"
-    />
+    <DeleteModal :show="isActiveValidation" :delete-href="folder_route.delete.url(child.id)" @close="isActiveValidation = false" />
 </template>

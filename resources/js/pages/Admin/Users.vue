@@ -1,12 +1,29 @@
 <script setup lang="ts">
+// 1. Vue & Core
 import { ref } from 'vue';
-import { UserPlusIcon, TrashIcon, PencilSquareIcon, UserGroupIcon } from '@heroicons/vue/24/outline';
-import Modal from '@/Components/Modal.vue';
-import UserForm from '@/Components/Forms/UserForm.vue'; // Ton formulaire refait
 import { router } from '@inertiajs/vue3';
-import user from '@/routes/admin/user';
+
+// 2. Librairies tierces (Icônes)
+import {
+    UserPlusIcon,
+    TrashIcon,
+    PencilSquareIcon,
+    UserGroupIcon
+} from '@heroicons/vue/24/outline';
+
+// 3. Types & Routes
 import { User } from '@/types';
-defineProps<{ users: any[]; departements: any[] }>();
+import { Departement } from '@/types/departement';
+import user from '@/routes/admin/user';
+
+// 4. Composants
+import Modal from '@/Components/Modal.vue';
+import UserForm from '@/Components/Forms/UserForm.vue';
+
+defineProps<{
+    users: User[];
+    departements: Departement[];
+}>();
 
 const showModal = ref(false);
 const selectedUser = ref();
@@ -29,7 +46,7 @@ const deleteUser = (id: number) => {
     <div class="p-6 max-w-6xl mx-auto">
         <div class="mb-8 flex items-center justify-between">
             <div>
-                <h1 class="text-3xl font-black dark:text-white flex items-center gap-3">
+                <h1 class="text-3xl font-black dark:text-white gap-3 flex items-center">
                     <UserGroupIcon class="w-8 h-8 text-sky-500" />
                     Utilisateurs
                 </h1>

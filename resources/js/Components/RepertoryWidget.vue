@@ -1,8 +1,15 @@
 <script setup lang="ts">
+// 1. Vue & Core
 import { Link } from '@inertiajs/vue3';
+
+// 2. Librairies Tierces (Icon)
 import { HomeIcon, ChevronRightIcon } from '@heroicons/vue/20/solid';
+
+// 3. Routes
 import navigate from '@/routes/navigate';
-import { decodeEntities } from '@/lib/utils';
+
+// 4. Librairies internes
+import { decodeEntities } from '@/Composables/useDecodeModule';
 
 defineProps<{
     parents : Array<{

@@ -1,16 +1,24 @@
 <script setup lang="ts">
+// 1. Vue & Core
 import { ref } from 'vue';
 import { router } from '@inertiajs/vue3';
-import { PlusIcon, TrashIcon, PencilSquareIcon, BuildingOfficeIcon } from '@heroicons/vue/24/outline';
-import Modal from '@/Components/Modal.vue';
-import DepartementForm from '@/Components/Forms/DepartementForm.vue';
+
+// 2. Librairies tierces (Icônes)
+import {
+    PlusIcon,
+    TrashIcon,
+    PencilSquareIcon,
+    BuildingOfficeIcon
+} from '@heroicons/vue/24/outline';
+
+// 3. Types & Routes
+import { Departement } from '@/types/departement';
 import dept_routes from '@/routes/admin/departements';
 
-interface Departement {
-    id: number;
-    name: string;
-    initials: string;
-}
+// 4. Composants
+import DepartementForm from '@/Components/Forms/DepartementForm.vue';
+import Modal from '@/Components/Modal.vue';
+
 
 defineProps<{
     departements: Departement[];

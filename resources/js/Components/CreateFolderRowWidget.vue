@@ -27,10 +27,12 @@ const submit = () => {
 </script>
 
 <template>
-    <div class="group grid grid-cols-12 items-center py-3 px-4 border-t border-gray-100 dark:border-zinc-800 hover:bg-sky-50/50 dark:hover:bg-slate-900/10 transition-colors duration-150">
+    <div class="group grid grid-cols-12 items-center py-3 px-4 border-t border-gray-100
+    dark:border-zinc-800 hover:bg-sky-50/50 dark:hover:bg-slate-900/10 transition-colors duration-150">
         <div class="col-span-5 flex items-center space-x-3 overflow-hidden">
             <div class="w-9 h-9 flex-shrink-0">
-                <FolderIcon class="w-full h-full transform group-hover:scale-110 transition-transform text-[#d7ac53]" />
+                <FolderIcon class="w-full h-full transform group-hover:scale-110
+                transition-transform text-[#d7ac53]" />
             </div>
             <form @submit.prevent="submit" class="flex gap-2">
                 <input
@@ -49,7 +51,8 @@ const submit = () => {
                     aria-label="Envoyer"
                 >
                     <ArrowTurnDownRightIcon
-                        class="w-5 h-5 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                        class="w-5 h-5 transition-transform duration-200 group-hover:translate-x-0.5
+                        group-hover:-translate-y-0.5"
                     />
                 </button>
             </form>
