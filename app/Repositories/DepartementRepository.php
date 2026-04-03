@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Exception\DepartementNotFoundException;
 use App\Exception\PersistenceException;
+use App\Exception\UserNotFoundException;
 use App\Models\Departement;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Log;
@@ -68,6 +69,26 @@ class DepartementRepository implements Interfaces\DepartementRepositoryInterface
                 'message' => $t->getMessage()
             ]);
             throw new PersistenceException("Le département ne peut pas être supprimé actuellement.");
+        }
+    }
+
+    public function readUsers($id) : Collection
+    {
+        $departement = $this->getById($id);
+        return $departement->users;
+    }
+
+    public function removeUser(string $id, string $user_id): void
+    {
+        $departement = $this->getById($id);
+        $user = $departement->users()->where('user_id', $user_id)->first();
+        if (!$user) {
+            throw new UserNotFoundException("L'utilisateur $user_id n'existe pas dans le departement $id.");
+        }
+        try {
+            $departement->users()->detach($user_id);
+        } catch (\Throwable) {
+            throw new PersistenceException("Impossible de détacher l'utilisateur $user_id du departement $id.");
         }
     }
 }

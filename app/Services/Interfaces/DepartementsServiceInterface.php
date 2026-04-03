@@ -5,6 +5,8 @@ namespace App\Services\Interfaces;
 use App\DTO\DepartementDTO;
 use App\Exception\DepartementNotFoundException;
 use App\Exception\PersistenceException;
+use App\Exception\UserNotFoundException;
+use Illuminate\Support\Collection;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 
 interface DepartementsServiceInterface {
@@ -30,7 +32,7 @@ interface DepartementsServiceInterface {
 
     /**
      * @param array $data
-     * @throws PersistenceException|BadRequestException
+     * @throws PersistenceException
      */
     public function create(array $data): void;
 
@@ -46,4 +48,21 @@ interface DepartementsServiceInterface {
      * @throws PersistenceException|DepartementNotFoundException|BadRequestException
      */
     public function delete(int $id): void;
+
+    /**
+     * @param $id
+     * @return array
+     * @throws DepartementNotFoundException
+     */
+    public function getUsers($id): array;
+
+    /**
+     * @param string $id
+     * @param string $user_id
+     * @return void
+     * @throws UserNotFoundException
+     * @throws DepartementNotFoundException
+     * @throws PersistenceException
+     */
+    public function removeUser(string $id, string $user_id): void;
 }

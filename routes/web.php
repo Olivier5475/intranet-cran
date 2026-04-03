@@ -85,6 +85,7 @@ Route::prefix("admin")
     Route::prefix("departements")->group(function () {
         // GET
         Route::get("", [Controllers\Admin\DepartementController::class, "readAll"])->name("admin.departements");
+        Route::get("/{id}/users", [Controllers\Admin\DepartementController::class, "users"])->name("admin.departements.users");
 
         // POST
         Route::post("/", [Controllers\Admin\DepartementController::class, "store"])->name("admin.departements.post.create");
@@ -94,6 +95,7 @@ Route::prefix("admin")
 
         // DELETE
         Route::delete("/{id}", [Controllers\Admin\DepartementController::class, "delete"])->name("admin.departements.delete");
+        Route::delete("/{id}/user/{user_id}", [Controllers\Admin\DepartementController::class, "removeUser"])->name("admin.departements.users.remove");
     });
 });
 

@@ -1,15 +1,10 @@
 <script setup lang="ts">
 // 1. Vue & Core
 import { ref } from 'vue';
-import { router } from '@inertiajs/vue3';
+import { Link, router } from '@inertiajs/vue3';
 
 // 2. Librairies tierces (Icônes)
-import {
-    PlusIcon,
-    TrashIcon,
-    PencilSquareIcon,
-    BuildingOfficeIcon
-} from '@heroicons/vue/24/outline';
+import { PlusIcon, TrashIcon, PencilSquareIcon, BuildingOfficeIcon } from '@heroicons/vue/24/outline';
 
 // 3. Types & Routes
 import { Departement } from '@/types/departement';
@@ -19,7 +14,6 @@ import dept_routes from '@/routes/admin/departements';
 import DepartementForm from '@/Components/Forms/DepartementForm.vue';
 import Modal from '@/Components/Modal.vue';
 
-
 defineProps<{
     departements: Departement[];
 }>();
@@ -27,10 +21,16 @@ defineProps<{
 const showModal = ref(false);
 const selectedDept = ref<Departement | null>(null);
 
-const openCreate = () => { selectedDept.value = null; showModal.value = true; };
-const openEdit = (dept: Departement) => { selectedDept.value = dept; showModal.value = true; };
+const openCreate = () => {
+    selectedDept.value = null;
+    showModal.value = true;
+};
+const openEdit = (dept: Departement) => {
+    selectedDept.value = dept;
+    showModal.value = true;
+};
 const deleteDept = (id: number) => {
-    if(confirm('Voulez-vous vraiment supprimer ce département ?')) {
+    if (confirm('Voulez-vous vraiment supprimer ce département ?')) {
         router.delete(dept_routes.delete.url(id));
     }
 };
@@ -38,9 +38,9 @@ const deleteDept = (id: number) => {
 
 <template>
     <div class="p-6 max-w-5xl mx-auto">
-        <div class="flex flex-col sm:flex-row justify-between items-center mb-10 gap-4">
+        <div class="sm:flex-row mb-10 gap-4 flex flex-col items-center justify-between">
             <div>
-                <h1 class="text-3xl font-black dark:text-white flex items-center gap-3">
+                <h1 class="text-3xl font-black dark:text-white gap-3 flex items-center">
                     <BuildingOfficeIcon class="w-8 h-8 text-sky-500" />
                     Départements
                 </h1>
@@ -49,26 +49,31 @@ const deleteDept = (id: number) => {
 
             <button
                 @click="openCreate"
-                class="flex items-center gap-2 bg-sky-600 hover:bg-sky-700 text-white px-5 py-2.5 rounded-xl transition-all shadow-lg shadow-sky-500/20 active:scale-95"
+                class="gap-2 bg-sky-600 hover:bg-sky-700 text-white px-5 py-2.5 rounded-xl shadow-lg shadow-sky-500/20 flex items-center transition-all active:scale-95"
             >
                 <PlusIcon class="w-5 h-5 stroke-[3]" />
                 <span class="font-bold">Nouveau département</span>
             </button>
         </div>
 
-        <div v-if="departements.length === 0" class="text-center py-20 bg-zinc-50 dark:bg-zinc-900/50 rounded-3xl border-2 border-dashed border-zinc-200 dark:border-zinc-800">
-            <BuildingOfficeIcon class="w-12 h-12 mx-auto text-zinc-300 mb-4" />
+        <div
+            v-if="departements.length === 0"
+            class="py-20 bg-zinc-50 dark:bg-zinc-900/50 rounded-3xl border-zinc-200 dark:border-zinc-800 border-2 border-dashed text-center"
+        >
+            <BuildingOfficeIcon class="w-12 h-12 text-zinc-300 mb-4 mx-auto" />
             <p class="text-zinc-500">Aucun département n'a encore été créé.</p>
         </div>
 
-        <div v-else class="grid gap-4">
+        <div v-else class="gap-4 grid">
             <div
                 v-for="dept in departements"
                 :key="dept.id"
-                class="group bg-white dark:bg-zinc-900 p-5 rounded-2xl border border-zinc-100 dark:border-zinc-800 flex items-center justify-between hover:shadow-xl hover:border-sky-200 dark:hover:border-sky-900/50 transition-all duration-200"
+                class="group bg-white dark:bg-zinc-900 p-5 rounded-2xl border-zinc-100 dark:border-zinc-800 hover:shadow-xl hover:border-sky-200 dark:hover:border-sky-900/50 flex items-center justify-between border transition-all duration-200"
             >
-                <div class="flex items-center gap-5">
-                    <div class="w-14 h-14 bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 rounded-2xl flex items-center justify-center font-black text-lg tracking-tighter border border-zinc-200 dark:border-zinc-700 transition-colors group-hover:bg-sky-500 group-hover:text-white group-hover:border-sky-400">
+                <Link class="gap-5 flex items-center" :href="dept_routes.users(dept.id)">
+                    <div
+                        class="w-14 h-14 bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 rounded-2xl font-black text-lg tracking-tighter border-zinc-200 dark:border-zinc-700 group-hover:bg-sky-500 group-hover:text-white group-hover:border-sky-400 flex items-center justify-center border transition-colors"
+                    >
                         {{ dept.initials }}
                     </div>
 
@@ -76,11 +81,11 @@ const deleteDept = (id: number) => {
                         <h3 class="font-bold text-lg dark:text-white group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors">
                             {{ dept.name }}
                         </h3>
-                        <p class="text-xs text-zinc-400 uppercase tracking-widest font-semibold mt-0.5">Entité active</p>
+                        <p class="text-xs text-zinc-400 tracking-widest font-semibold mt-0.5 uppercase">Entité active</p>
                     </div>
-                </div>
+                </Link>
 
-                <div class="flex items-center gap-2">
+                <div class="gap-2 flex items-center">
                     <button
                         @click="openEdit(dept)"
                         class="p-2.5 hover:bg-sky-50 dark:hover:bg-sky-900/30 rounded-xl text-zinc-400 hover:text-sky-600 transition-all"
@@ -99,15 +104,8 @@ const deleteDept = (id: number) => {
             </div>
         </div>
 
-        <Modal
-            :show="showModal"
-            :title="selectedDept ? 'Modifier le département' : 'Créer un département'"
-            @close="showModal = false"
-        >
-            <DepartementForm
-                :departement="selectedDept"
-                @success="showModal = false"
-            />
+        <Modal :show="showModal" :title="selectedDept ? 'Modifier le département' : 'Créer un département'" @close="showModal = false">
+            <DepartementForm :departement="selectedDept" @success="showModal = false" />
         </Modal>
     </div>
 </template>
