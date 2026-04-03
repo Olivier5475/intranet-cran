@@ -102,7 +102,7 @@ readonly class AuthService implements Interfaces\UserServiceInterface {
 
     public function update(int $id, array $data): void {
         try {
-            $this->userRepository->updateUser($id, $data);
+            $this->userRepository->update($id, $data);
             Log::info("Profil utilisateur mis à jour", ['id' => $id]);
         } catch(PersistenceException|UserNotFoundException $e) {
             Log::error("Erreur lors de la mise à jour de l'utilisateur", [

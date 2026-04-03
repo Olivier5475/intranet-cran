@@ -28,7 +28,7 @@ interface UserRepositoryInterface {
      * @throws UserNotFoundException
      * @throws PersistenceException
      */
-    public function updateUser(int $id, array $data) : void;
+    public function update(int $id, array $data) : void;
 
     /**
      * @return Collection<int, User>

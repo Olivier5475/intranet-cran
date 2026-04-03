@@ -38,7 +38,7 @@ class UserRepository implements Interfaces\UserRepositoryInterface {
         }
     }
 
-    public function updateUser(int $id, array $data): void {
+    public function update(int $id, array $data): void {
         $user = User::find($id);
 
         if (!$user) {
@@ -46,12 +46,20 @@ class UserRepository implements Interfaces\UserRepositoryInterface {
         }
 
         try {
-            $user->update([
-                'nom'    => $data['nom'],
-                'prenom' => $data['prenom'],
-                'email'  => $data['email'],
-                'role'   => $data['role'],
-            ]);
+            if(!empty($data['nom'])) {
+                $user->nom = $data['nom'];
+            }
+            if(!empty($data['prenom'])) {
+                $user->prenom = $data['prenom'];
+            }
+            if(!empty($data['email'])) {
+                $user->email = $data['email'];
+            }
+            if(!empty($data['role'])) {
+                $user->role = $data['role'];
+            }
+
+            $user->save();
 
             if (isset($data['departements'])) {
                 $user->departements()->sync($data['departements']);
