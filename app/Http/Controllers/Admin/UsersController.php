@@ -17,10 +17,12 @@ class UsersController extends Controller {
         private readonly UserServiceInterface $usersService,
     ){}
 
-    public function readAll() {
+    public function readAll(Request $request) {
+        $searchQuery = $request->input('q');
+
         try {
             return Inertia::render("Admin/Users", [
-                "users" => $this->usersService->readAll()
+                "users" => $this->usersService->getUsers($searchQuery)
             ]);
         } catch (Throwable $t) {
             Log::error("Erreur lors de la récupération des utilisateurs", [

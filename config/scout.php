@@ -139,15 +139,18 @@ return [
     'meilisearch' => [
         'host' => env('MEILISEARCH_HOST', 'http://localhost:7700'),
         'key' => env('MEILISEARCH_KEY'),
-        'index-settings' => [// Configuration pour le modèle File
+        'index-settings' => [
             \App\Models\File::class => [
                 'filterableAttributes' => ['folder_id', 'id', 'departements'], // Ajoute 'folder_id' ici
                 'sortableAttributes' => ['created_at', 'name'],
             ],
-            // Fais pareil pour Document tant que tu y es
             \App\Models\Document::class => [
                 'filterableAttributes' => ['folder_id', 'id', 'departements'],
                 'sortableAttributes' => ['created_at', 'title'],
+            ],
+            \App\Models\User::class => [
+                'filterableAttributes' => ['id', 'departements'],
+                'sortableAttributes' => ['prenom', 'nom'],
             ],
         ],
     ],

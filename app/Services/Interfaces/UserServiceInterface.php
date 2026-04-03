@@ -6,6 +6,7 @@ use App\DTO\AuthDTO;
 use App\Exception\PersistenceException;
 use App\Exception\UserNotFoundException;
 use Illuminate\Contracts\Auth\Authenticatable;
+use Throwable;
 
 interface UserServiceInterface {
 
@@ -49,10 +50,13 @@ interface UserServiceInterface {
      */
     public function delete(int $id): void;
 
+
     /**
+     * @param ?string $searchQuery
      * @return AuthDTO[]
+     * @throws Throwable
      */
-    public function readAll(): array;
+    public function getUsers(?string $searchQuery): array;
 
     /**
      * @return string

@@ -9,10 +9,11 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Laravel\Scout\Searchable;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable; // ... (traits existants)
+    use HasFactory, Notifiable, Searchable; // ... (traits existants)
 
     // ... ($fillable, $hidden, $casts)
     protected $fillable = [

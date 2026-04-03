@@ -48,4 +48,9 @@ interface UserRepositoryInterface {
      * @throws PersistenceException
      */
     public function delete(int $id) : void;
+
+    /**
+     * @param string $query
+     */
+    public function performSearch(string $query);
 }

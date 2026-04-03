@@ -19,10 +19,12 @@ import user from '@/routes/admin/user';
 // 4. Composants
 import Modal from '@/Components/Modal.vue';
 import UserForm from '@/Components/Forms/UserForm.vue';
+import SearchBarWidget from '@/Components/SearchBarWidget.vue';
 
 defineProps<{
     users: User[];
     departements: Departement[];
+    currentSearch: string;
 }>();
 
 const showModal = ref(false);
@@ -60,6 +62,8 @@ const deleteUser = (id: number) => {
                 Nouveau
             </button>
         </div>
+
+        <SearchBarWidget :current-search="currentSearch" placeholder="Rechercher un utilisateur..." class="my-3"></SearchBarWidget>
 
         <div class="gap-4 grid">
             <div

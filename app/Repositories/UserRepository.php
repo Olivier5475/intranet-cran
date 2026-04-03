@@ -101,4 +101,9 @@ class UserRepository implements Interfaces\UserRepositoryInterface {
             throw new PersistenceException("Erreur technique lors de la suppression de l'utilisateur.");
         }
     }
+
+    public function performSearch(string $query)
+    {
+        return User::search($query)->get();
+    }
 }

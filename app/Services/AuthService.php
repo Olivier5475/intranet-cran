@@ -52,9 +52,12 @@ readonly class AuthService implements Interfaces\UserServiceInterface {
         return Auth::id() ?? 0;
     }
 
-    public function readAll(): array {
-        $users = $this->userRepository->readAll();
-
+    public function getUsers(?string $searchQuery): array {
+        if ($searchQuery && trim($searchQuery) !== '') {
+            $users = $this->userRepository->performSearch($searchQuery);
+        } else {
+            $users = $this->userRepository->readAll();
+        }
         $authDtos = [];
         foreach ($users as $user) {
             $authDtos[] = new AuthDTO(
