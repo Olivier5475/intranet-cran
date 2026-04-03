@@ -128,6 +128,9 @@ readonly class FoldersService implements Interfaces\FoldersServiceInterface {
             color: $d->color,
         ));
 
+        if($fileDTOs->isEmpty()) {
+            return $documentDTOs;
+        }
         return $fileDTOs
             ->merge($documentDTOs) // Fusionne les deux Collection
             ->values();            // RE-INDEXE de 0 à N (Crucial pour le v-for de Vue)
