@@ -17,6 +17,7 @@ interface UserServiceInterface {
      */
     public function handleUserInDatabase(array $data): void;
 
+    public function emailExistIn12Plus(string $email): bool;
     /**
      * @param string $email
      * @return Authenticatable|null
