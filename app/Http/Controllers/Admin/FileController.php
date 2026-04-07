@@ -135,4 +135,27 @@ class FileController extends Controller {
             return redirect()->back()->with('error', 'Une erreur imprévue est survenue (Code 500).');
         }
     }
+
+    public function restore(string $file_id)
+    {
+        try {
+            if(!$this->filesService->hasEditAccess($file_id)) {
+                Log::notice("Tentative de suppression de fichier non autorisée", ['file_id' => $file_id]);
+                return redirect()->back()->with("error", "Permissions insuffisantes pour supprimer ce fichier.");
+            }
+            $this->filesService->restore($file_id);
+            return redirect()->back()->with("success", "Le fichier a été supprimé avec succès.");
+
+        } catch (FileNotFoundException $e) {
+            return redirect()->back()->with('error', 'Le fichier est déjà supprimé ou introuvable.');
+
+        } catch (PersistenceException|DiskWriteException $e) {
+            Log::error("Échec de suppression du fichier", ['file_id' => $file_id, 'error' => $e->getMessage()]);
+            return redirect()->back()->with('error', 'Erreur technique lors de la suppression.');
+
+        } catch (Throwable $t) {
+            Log::critical('Erreur fatale lors de la suppression du fichier', ['file_id' => $file_id, 'error' => $t->getMessage()]);
+            return redirect()->back()->with('error', 'Une erreur imprévue est survenue (Code 500).');
+        }
+    }
 }

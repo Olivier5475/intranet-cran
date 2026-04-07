@@ -20,7 +20,7 @@ const emit = defineEmits(['close']);
             <h1 class="text-2xl font-bold mb-4 text-center">Êtes-vous sûr de vouloir supprimer cet élément ?</h1>
             <hr class="border-b border-gray-700 mb-4" />
             <p class="text-md text-gray-300 text-center mb-6">
-                La suppression sera définitive. Voulez-vous continuer ?
+                Cet élément sera archivé et ne sera plus visible.
             </p>
             <hr class="border-b border-gray-700 mt-1" />
             <div class="flex justify-evenly mt-4">
@@ -31,7 +31,7 @@ const emit = defineEmits(['close']);
                     class="text-white bg-red-600 w-1/3 py-2 rounded-md hover:bg-red-700
                     transition duration-150 text-center font-semibold"
                 >
-                    SUPPRIMER
+                    ARCHIVER
                 </Link>
                 <button
                     @click="emit('close')"

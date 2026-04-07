@@ -16,19 +16,22 @@ export function useResource(props: any) {
                 update: editor.file.update.url(id),
                 delete: editor.file.delete.url(id),
                 history: editor.model.history.url(["files", id]),
+                restore: editor.file.post.restore.url(id)
             };
         } else if (type === 'folder') {
             return {
                 href: navigate.folder.url(id),
                 update: editor.folder.update(id),
                 delete: editor.folder.delete(id),
+                restore: editor.folder.post.restore(id),
             };
         } else {
             return {
                 href: navigate.document.url(id),
                 update: editor.document.update(id),
                 delete: editor.document.delete.url(id),
-                history: editor.model.history.url(["documents", id])
+                history: editor.model.history.url(["documents", id]),
+                restore: editor.document.post.restore.url(id),
             };
         }
     });

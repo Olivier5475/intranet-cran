@@ -129,15 +129,29 @@ readonly class FilesService implements Interfaces\FilesServiceInterface {
 
 
     public function delete(int $id): bool {
-        $file = $this->filesRepository->read($id);
-        $path = $file->storage_path;
+//        $file = $this->filesRepository->read($id);
+//        $path = $file->storage_path;
 
         try {
             DB::beginTransaction();
-            $this->filesRepository->delete($id);
-            Storage::disk('public')->delete($path);
+            $res = $this->filesRepository->delete($id);
+//            Storage::disk('public')->delete($path);
             DB::commit();
-            return true;
+            return $res;
+        } catch (Throwable $e) {
+            DB::rollBack();
+            Log::critical("Échec suppression fichier", ["id" => $id, "error" => $e->getMessage()]);
+            throw new PersistenceException("Erreur lors de la suppression.");
+        }
+    }
+
+    public function restore(int $file_id): bool
+    {
+        try {
+            DB::beginTransaction();
+            $res = $this->filesRepository->restore($file_id);
+            DB::commit();
+            return $res;
         } catch (Throwable $e) {
             DB::rollBack();
             Log::critical("Échec suppression fichier", ["id" => $id, "error" => $e->getMessage()]);

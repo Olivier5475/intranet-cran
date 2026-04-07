@@ -14,9 +14,6 @@ use Laravel\Scout\Searchable;
 use Purifier;
 use Parsedown;
 
-/**
- * @method static where(string $param1, string $symbol, string $param2)
- */
 class Document extends Model {
     use HasFactory, Searchable, HasHistory;
 

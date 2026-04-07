@@ -10,6 +10,7 @@ readonly class FolderDTO {
         public ?string $color,
         public ?array $children = null,
         public ?string $created_at = null,
+        public ?bool $is_archived = null,
         public string $type = "folder",
     ) {}
 }

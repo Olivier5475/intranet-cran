@@ -19,11 +19,11 @@ class FolderRepository implements Interfaces\FolderRepositoryInterface
     {
         $query = <<<SQL
             WITH RECURSIVE all_folders (id) AS (
-              SELECT id FROM folders WHERE id = ? AND (isDelete = 0 OR isDelete IS NULL)
+              SELECT id FROM folders WHERE id = ? AND is_archived = 0
               UNION ALL
               SELECT f.id FROM folders f
               INNER JOIN all_folders af ON f.parent_id = af.id
-              WHERE (f.isDelete = 0 OR f.isDelete IS NULL)
+              WHERE f.is_archived = 0
             )
             SELECT id FROM all_folders;
         SQL;
@@ -34,10 +34,10 @@ class FolderRepository implements Interfaces\FolderRepositoryInterface
 
     public function read(int $id): Folder
     {
-        $folder = Folder::where(fn($q) => $q->where('isDelete', false)->orWhereNull('isDelete'))
+        $folder = Folder::where(fn($q) => $q->where('is_archived', false)->orWhereNull('is_archived'))
             ->with([
                 'departements:id',
-                'children' => fn($q) => $q->where('isDelete', false)->with('departements:id'),
+                'children' => fn($q) => $q->where('is_archived', false)->with('departements:id'),
                 'files.departements:id',
                 'documents.departements:id'
             ])->find($id);
@@ -57,7 +57,7 @@ class FolderRepository implements Interfaces\FolderRepositoryInterface
             $folder->parent_id = $data['parent_id'] ?? null;
             $folder->user_id = $data['user_id'];
             $folder->color = $data['color'] ?? '#f5be51';
-            $folder->isDelete = false;
+            $folder->is_archived = false;
             $folder->save();
 
             if (!empty($data['departements'])) {
@@ -98,8 +98,11 @@ class FolderRepository implements Interfaces\FolderRepositoryInterface
         }
     }
 
-    public function delete(int $id): void
-    {
+    /**
+     * @throws FolderNotFoundException
+     * @throws PersistenceException
+     */
+    private function setIsArchived($id, $isArchived){
         $folder = Folder::find($id);
 
         if (!$folder) {
@@ -107,10 +110,10 @@ class FolderRepository implements Interfaces\FolderRepositoryInterface
         }
 
         try {
-            // Soft delete manuel via ta colonne isDelete
-            $folder->isDelete = true;
-            $folder->save();
+            $folder->is_archived = $isArchived;
+            $res = $folder->save();
             Log::info("Dossier marqué comme supprimé", ['id' => $id]);
+            return $res;
         } catch (Throwable $e) {
             Log::error("Erreur SQL : Suppression logique du dossier $id échouée", [
                 'message' => $e->getMessage()
@@ -118,30 +121,40 @@ class FolderRepository implements Interfaces\FolderRepositoryInterface
             throw new PersistenceException("Erreur technique lors de la suppression.", 0, $e);
         }
     }
+    public function delete(int $id): bool
+    {
+        return $this->setIsArchived($id, true);
+    }
+
+    public function restore(int $folder_id): bool
+    {
+        return $this->setIsArchived($folder_id, false);
+    }
 
     public function getRacineChildren(): Collection
     {
         return Folder::whereNull('parent_id')
-            ->where(fn($q) => $q->where('isDelete', false)->orWhereNull('isDelete'))
-            ->with(['allChildren' => fn($q) => $q->where('isDelete', false)->orWhereNull('isDelete')])
+            ->where('is_archived', false)
+            ->with(['allChildren' => fn($q) => $q->where('is_archived', false)])
             ->get();
     }
 
-    public function getFolderWithContents(int $id): Folder
+    public function getFolderWithContents(int $id, bool $archived): Folder
     {
-        return Folder::where(fn($q) => $q->where('isDelete', false)->orWhereNull('isDelete'))
-            ->with([
-                'departements:id',
-                'children' => fn($q) => $q->where('isDelete', false)->orWhereNull("isDelete")->with('departements:id'),
-                'files.departements:id',
-                'documents.departements:id'
-            ])
-            ->findOrFail($id);
+        // On récupère le dossier "conteneur" sans condition sur son propre is_archived
+        return Folder::with([
+            'departements:id',
+            // On ne filtre QUE ce qui est à l'intérieur
+            'children' => fn($q) => $q->where('is_archived', $archived),
+            'files' => fn($q) => $q->where('is_archived', $archived),
+            'documents' => fn($q) => $q->where('is_archived', $archived)
+        ])
+            ->findOrFail($id); // Trouve le dossier 2, peu importe son état
     }
 
     public function getFolderWithParents(int $id): Folder
     {
-        return Folder::where(fn($q) => $q->where('isDelete', false)->orWhereNull('isDelete'))
+        return Folder::where(fn($q) => $q->where('is_archived', false))
             ->with('departements:id')
             ->with('parent.parent.parent.parent.parent')
             ->findOrFail($id);

@@ -52,4 +52,10 @@ interface FilesServiceInterface
      * @param int $id ID de la version
      */
     public function downloadVersion(int $id): StreamedResponse;
+
+    /**
+     * @param int $file_id
+     * @return bool
+     */
+    public function restore(int $file_id): bool;
 }

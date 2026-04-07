@@ -8,7 +8,7 @@ import { MagnifyingGlassIcon, XMarkIcon } from '@heroicons/vue/20/solid';
 
 const props = defineProps<{
     currentSearch: string | null;
-    placeholder: string | null
+    placeholder: string
 }>();
 
 const searchQuery = ref(props.currentSearch || '');
@@ -46,7 +46,7 @@ function clearSearch() {
             type="text"
             v-model="searchQuery"
             @keyup.enter="search"
-            :placeholder="placeholder ?? 'Rechercher un fichier, un document...'"
+            :placeholder="placeholder"
             class="pl-11 pr-20 py-2.5 rounded shadow-sm text-sm bg-white dark:bg-zinc-800/50
             border-gray-200 dark:border-zinc-700 text-gray-900 dark:text-gray-100
             placeholder-gray-400 dark:placeholder-zinc-500 focus:ring-sky-500/20

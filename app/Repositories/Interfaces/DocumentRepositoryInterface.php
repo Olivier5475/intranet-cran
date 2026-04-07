@@ -58,4 +58,11 @@ interface DocumentRepositoryInterface {
      */
     public function findVersionsFromParent(int $parent_id) : Collection;
 
+    /**
+     * @param int $document_id
+     * @return bool
+     * @throws DocumentNotFoundException
+     * @throws PersistenceException
+     */
+    public function restore(int $document_id): bool;
 }

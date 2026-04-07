@@ -30,16 +30,26 @@ interface FolderRepositoryInterface
     public function update(int $id, array $data): Folder;
 
     /**
+     * @param int $id
+     * @return bool
      * @throws FolderNotFoundException|PersistenceException
      */
-    public function delete(int $id): void;
+    public function delete(int $id): bool;
 
     /**
      * @return Collection<int, Folder>
      */
     public function getRacineChildren(): Collection;
 
-    public function getFolderWithContents(int $id): Folder;
+    public function getFolderWithContents(int $id, bool $archived): Folder;
 
     public function getFolderWithParents(int $id): Folder;
+
+    /**
+     * @param int $folder_id
+     * @return bool
+     * @throws FolderNotFoundException
+     * @throws PersistenceException
+     */
+    public function restore(int $folder_id): bool;
 }

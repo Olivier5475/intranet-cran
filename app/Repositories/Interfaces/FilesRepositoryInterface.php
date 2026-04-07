@@ -51,4 +51,12 @@ interface FilesRepositoryInterface {
      * @return Collection<int, Version>
      */
     public function findVersionsFromParent(int $parent_id): Collection;
+
+    /**
+     * @param int $file_id
+     * @return bool
+     * @throws PersistenceException
+     * @throws FileNotFoundException
+     */
+    public function restore(int $file_id): bool;
 }

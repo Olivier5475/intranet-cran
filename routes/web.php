@@ -12,6 +12,7 @@ Route::get("/download/file/version/{id}", [Controllers\DownloadController::class
 
 Route::prefix('/navigation')->group(function () {
     Route::get('/f/{folder_id}', Controllers\NavigationController::class)->name('navigate.folder');
+    Route::get('/f/{folder_id}/archived', Controllers\NavigationController::class)->name('navigate.archived');
     Route::get("/d/{document_id}", Controllers\DocumentViewController::class)->name('navigate.document');
 });
 
@@ -30,6 +31,7 @@ Route::prefix("editor")
 
             // PATCH (submit)
             Route::patch("/store/{folder_id}", [Controllers\Admin\FolderController::class, "store"])->name("editor.folder.post.update");
+            Route::patch("/restore/{folder_id}", [Controllers\Admin\FolderController::class, "restore"])->name("editor.folder.post.restore");
 
             // DELETE
             Route ::delete("/delete/{folder_id}", [Controllers\Admin\FolderController::class, "delete"])->name("editor.folder.delete");
@@ -44,6 +46,9 @@ Route::prefix("editor")
             Route::post("/store", [Controllers\Admin\DocumentController::class, "store"])->name('editor.document.post.create');
             Route::post("/store/{document_id}", [Controllers\Admin\DocumentController::class, "store"])->name('editor.document.post.update');
 
+            // PATCH (submit)
+            Route::patch("/restore/{document_id}", [Controllers\Admin\DocumentController::class, "restore"])->name("editor.document.post.restore");
+
             // DELETE
             Route::delete("/delete/{document_id}", [Controllers\Admin\DocumentController::class, "delete"])->name('editor.document.delete');
         });
@@ -56,6 +61,9 @@ Route::prefix("editor")
             // POST (submit)
             Route::post("/store", [Controllers\Admin\FileController::class, "store"])->name('editor.file.post.create');
             Route::post("/store/{file_id}", [Controllers\Admin\FileController::class, "store"])->name('editor.file.post.update');
+
+            // PATCH (submit)
+            Route::patch("/restore/{file_id}", [Controllers\Admin\FileController::class, "restore"])->name("editor.file.post.restore");
 
             // DELETE
             Route::delete("/delete/{file_id}", [Controllers\Admin\FileController::class, "delete"])->name('editor.file.delete');

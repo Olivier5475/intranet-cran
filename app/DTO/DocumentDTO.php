@@ -9,6 +9,7 @@ readonly class DocumentDTO {
         public array $departements,
         public string $created_at,
         public ?string $color,
+        public ?bool $is_archived = null,
         public string $type = "document",
     ) {}
 }

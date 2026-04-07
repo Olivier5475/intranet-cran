@@ -79,17 +79,31 @@ class DocumentRepository implements Interfaces\DocumentRepositoryInterface {
         }
     }
 
-    public function delete(int $id) : bool {
-        $document = $this->read($id);
+    /**
+     * @throws DocumentNotFoundException
+     * @throws PersistenceException
+     */
+    private function setIsArchived(int $document_id, $is_archived): bool {
+        $document = $this->read($document_id);
 
         try {
-            return (bool) $document->delete();
+            $document->is_archived = $is_archived;
+            return $document->save();
         } catch (Throwable $e) {
-            Log::error("Échec SQL : Suppression du document $id", [
+            Log::error("Échec SQL : Suppression du document $document_id", [
                 'message' => $e->getMessage(),
             ]);
             throw new PersistenceException("Erreur technique lors de la suppression.", 0, $e);
         }
+    }
+    public function delete(int $id) : bool
+    {
+        return $this->setIsArchived($id, true);
+    }
+
+    public function restore(int $document_id): bool
+    {
+        return $this->setIsArchived($document_id, false);
     }
 
     public function readRacineDoc(): ?Document {

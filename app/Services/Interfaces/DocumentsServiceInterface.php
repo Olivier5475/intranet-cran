@@ -59,4 +59,11 @@ interface DocumentsServiceInterface {
      * @return bool
      */
     public function hasEditAccess(int $document_id) : bool;
+
+    /**
+     * @param int $document_id
+     * @return bool
+     * @throws DocumentNotFoundException|PersistenceException
+     */
+    public function restore(int $document_id): bool;
 }

@@ -20,6 +20,7 @@ const props = defineProps<{
         id: number;
         name: string;
         departements: number[];
+        is_private: boolean
     };
     departements?: Departement[];
 }>();
@@ -29,6 +30,7 @@ const form = useForm({
     files: [] as File[],
     departements: props.file?.departements ?? [],
     parent_id: props.file ? null : (props.parent_id ?? null),
+    is_private : props.file?.is_private ?? false,
 });
 
 const page = usePage();
@@ -137,6 +139,7 @@ const isCheckboxDisabled = (departementId: number) => {
 
                 <div v-if="form.errors.files" class="text-xs text-red-500 font-bold mt-2 text-center">{{ form.errors.files }}</div>
             </div>
+
 
             <div class="space-y-4">
                 <label class="font-black text-gray-400 ml-1 block text-center text-[10px] tracking-[0.2em] uppercase">Accès au fichier</label>

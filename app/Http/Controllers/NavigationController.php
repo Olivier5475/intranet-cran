@@ -14,17 +14,19 @@ class NavigationController extends Controller
         private readonly FoldersServiceInterface $foldersService,
     ) {}
 
-    public function __invoke(int $folder_id, Request $request) {
+    public function __invoke(int $folder_id, Request $request)
+    {
         // Redirection vers l'accueil si on tente d'accéder à la racine via l'ID 0
-        if($folder_id === 0) {
+        if ($folder_id === 0) {
             return redirect()->route("home");
         }
 
         $searchQuery = $request->input('q');
+        $isArchived = $request->routeIs('navigate.archived');
 
         try {
-            // Récupération du contenu et du fil d'ariane
-            $items = $this->foldersService->getFolderContents($folder_id, $searchQuery);
+            // Récupération du contenu et du fil d'Ariane
+            $items = $this->foldersService->getFolderContents($folder_id, $searchQuery, $isArchived);
             $breadcrumbs = $this->foldersService->getBreadcrumbs($folder_id);
 
             return Inertia::render('Navigation', [

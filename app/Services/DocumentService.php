@@ -93,11 +93,11 @@ readonly class DocumentService implements Interfaces\DocumentsServiceInterface {
     public function delete(int $id): bool {
         try {
             DB::beginTransaction();
-            $document = $this->documentRepository->read($id);
+//            $document = $this->documentRepository->read($id);
 
-            foreach ($document->attachments as $attachment) {
-                $this->attachmentService->delete($attachment->id);
-            }
+//            foreach ($document->attachments as $attachment) {
+//                $this->attachmentService->delete($attachment->id);
+//            }
 
             $result = $this->documentRepository->delete($id);
             DB::commit();
@@ -109,6 +109,26 @@ readonly class DocumentService implements Interfaces\DocumentsServiceInterface {
             throw $e;
         }
     }
+
+    public function restore(int $document_id): bool
+    {
+        try {
+            DB::beginTransaction();
+//            $document = $this->documentRepository->read($id);
+
+//            foreach ($document->attachments as $attachment) {
+//                $this->attachmentService->delete($attachment->id);
+//            }
+
+            $result = $this->documentRepository->restore($document_id);
+            DB::commit();
+
+            return $result;
+        } catch (Throwable $e) {
+            DB::rollBack();
+            Log::error("Erreur lors de la suppression complète du document", ['id' => $document_id, 'error' => $e->getMessage()]);
+            throw $e;
+        }    }
 
     public function create(array $data): DocumentViewDTO {
         if(empty($data['title']) || empty($data['content'])) {

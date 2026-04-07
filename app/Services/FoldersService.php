@@ -25,10 +25,10 @@ readonly class FoldersService implements Interfaces\FoldersServiceInterface {
         private UserServiceInterface $userService,
     ) {}
 
-    public function getChildren(int $id): array
+    private function getChildren(int $id, bool $archived): array
     {
         // Utilisation du repository pour charger les relations proprement
-        $current = $this->folderRepository->getFolderWithContents($id);
+        $current = $this->folderRepository->getFolderWithContents($id, $archived);
 
         $res = [];
         foreach ($current->children as $child) {
@@ -43,6 +43,7 @@ readonly class FoldersService implements Interfaces\FoldersServiceInterface {
                 folder_id: $file->folder_id,
                 storage_path: $file->storage_path,
                 mimetype: $file->mimetype,
+                is_archived: $file->is_archived,
             );
         }
         foreach ($current->documents as $document) {
@@ -52,6 +53,7 @@ readonly class FoldersService implements Interfaces\FoldersServiceInterface {
                 departements: $document->departements->pluck('id')->toArray(),
                 created_at: $document->created_at,
                 color: $document->color,
+                is_archived: $document->is_archived,
             );
         }
         return $res;
@@ -94,23 +96,23 @@ readonly class FoldersService implements Interfaces\FoldersServiceInterface {
             created_at: $folder->created_at,
         );
     }
-    public function getFolderContents(int $folderId, ?string $searchQuery) : Collection
+    public function getFolderContents(int $folderId, ?string $searchQuery, bool $archived) : Collection
     {
         if ($searchQuery && trim($searchQuery) !== '') {
-            return $this->performSearch($folderId, $searchQuery);
+            return $this->performSearch($folderId, $searchQuery, $archived);
         }
-        return collect($this->getChildren($folderId))->sortBy('name')->values();
+        return collect($this->getChildren($folderId, $archived))->sortBy('name')->values();
     }
 
-    private function performSearch(int $rootFolderId, string $query) : Collection
+    private function performSearch(int $rootFolderId, string $query, bool $archived) : Collection
     {
         $folderIds = $this->folderRepository->getDescendantFolderIds($rootFolderId);
 
         // Recherche via Scout (Meilisearch)
-        $files = File::search($query)->whereIn('folder_id', $folderIds)->get(); // ON RECHERCHE LES FICHIERS
-        $documents = Document::search($query)->whereIn('folder_id', $folderIds)->get(); // ON RECHERCHE LES DOCUMENTS
+        $files = File::search($query)->whereIn('folder_id', $folderIds)->where("is_archived", $archived)->get(); // ON RECHERCHE LES FICHIERS
+        $documents = Document::search($query)->whereIn('folder_id', $folderIds)->where("is_archived", $archived)->get(); // ON RECHERCHE LES DOCUMENTS
 
-        // ON TRANSFORME EN Collection DE DTO POUR EVITER DE COMMUNIQUER LE MODEL AU CONTROLLER
+        // ON TRANSFORME EN Collection DE DTO POUR ÉVITER DE COMMUNIQUER LE MODEL AU CONTROLLER
         $fileDTOs = $files->map(fn($f) => new FileDTO(
             id: $f->id,
             name: $f->name,
@@ -119,6 +121,7 @@ readonly class FoldersService implements Interfaces\FoldersServiceInterface {
             folder_id: $f->folder_id,
             storage_path: $f->storage_path,
             mimetype: $f->mimetype,
+            is_archived: $f->is_archived,
         ));
 
         // ON TRANSFORME EN Collection DE DTO POUR ÉVITER DE COMMUNIQUER LE MODEL AU CONTROLLER
@@ -128,9 +131,10 @@ readonly class FoldersService implements Interfaces\FoldersServiceInterface {
             departements: $d->departements->pluck('id')->toArray(),
             created_at: $d->created_at,
             color: $d->color,
+            is_archived: $d->is_archived,
         ));
 
-        // SECURITE : Si il ne trouve que des documents, on renvoie directement les documents, sinon le merge plante
+        // SECURITE : S'il ne trouve que des documents, on renvoie directement les documents, sinon le merge plante
         if($fileDTOs->isEmpty()) {
             return $documentDTOs;
         }
@@ -198,10 +202,24 @@ readonly class FoldersService implements Interfaces\FoldersServiceInterface {
             DB::beginTransaction();
             $this->folderRepository->delete($id);
             DB::commit();
-            Log::info("Dossier supprimé avec succès", ['id' => $id]);
+            Log::info("Dossier archivé avec succès", ['id' => $id]);
         } catch (Throwable $e) {
             DB::rollBack();
             Log::error("Erreur lors de la suppression du dossier", ['id' => $id, 'error' => $e->getMessage()]);
+            throw $e;
+        }
+    }
+
+    public function restore(int $folder_id): void
+    {
+        try {
+            DB::beginTransaction();
+            $this->folderRepository->restore($folder_id);
+            DB::commit();
+            Log::info("Dossier restauré avec succèss", ['id' => $folder_id]);
+        } catch (Throwable $e) {
+            DB::rollBack();
+            Log::error("Erreur lors ed la suppression du dossier", ['id' => $folder_id, 'error' => $e->getMessage()]);
             throw $e;
         }
     }
@@ -228,7 +246,8 @@ readonly class FoldersService implements Interfaces\FoldersServiceInterface {
             name: $folder->name,
             departements: $folder->relationLoaded('departements') ? $folder->departements->pluck('id')->toArray() : [],
             color: $folder->color,
-            created_at: $folder->created_at
+            created_at: $folder->created_at,
+            is_archived: $folder->is_archived,
         );
     }
 }

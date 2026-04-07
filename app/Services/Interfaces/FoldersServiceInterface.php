@@ -12,13 +12,6 @@ use Illuminate\Support\Collection;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 
 interface FoldersServiceInterface {
-
-    /**
-     * Récupère les enfants directs (dossiers, fichiers, documents).
-     * @return array<FolderDTO|FileDTO|DocumentDTO>
-     */
-    public function getChildren(int $id) : array;
-
     /**
      * Récupère le fil d'Ariane.
      * @return FolderDTO[]
@@ -35,7 +28,7 @@ interface FoldersServiceInterface {
      * Récupère le contenu d'un dossier (navigation ou recherche par pertinence via Scout).
      * @return Collection<FolderDTO|FileDTO|DocumentDTO>
      */
-    public function getFolderContents(int $folderId, ?string $searchQuery): Collection;
+    public function getFolderContents(int $folderId, ?string $searchQuery, bool $archived): Collection;
 
     /**
      * @throws FolderNotFoundException|BadRequestException
@@ -59,6 +52,14 @@ interface FoldersServiceInterface {
 
     /**
      * Vérifie les droits d'édition basés sur les départements.
+     * @param int $folder_id
+     * @return bool
      */
     public function hasEditAccess(int $folder_id) : bool;
+
+    /**
+     * @param int $folder_id
+     * @return void
+     */
+    public function restore(int $folder_id): void;
 }

@@ -109,13 +109,36 @@ class FolderController extends Controller
 
     public function delete(int $folder_id)
     {
+        if (!$this->foldersService->hasEditAccess($folder_id)) {
+            Log::notice("Tentative de suppression de dossier non autorisée", ['id' => $folder_id]);
+            return redirect()->back()->with("error", "Vous n'avez pas les permissions pour supprimer ce dossier.");
+        }
         try {
-            if (!$this->foldersService->hasEditAccess($folder_id)) {
-                Log::notice("Tentative de suppression de dossier non autorisée", ['id' => $folder_id]);
-                return redirect()->back()->with("error", "Vous n'avez pas les permissions pour supprimer ce dossier.");
-            }
-
             $this->foldersService->delete($folder_id);
+            return redirect()->back()->with("success", "Le dossier a été supprimé avec succès.");
+
+        } catch (FolderNotFoundException) {
+            return redirect()->back()->with("error", "Ce dossier n'existe plus ou a déjà été supprimé.");
+
+        } catch (PersistenceException $e) {
+            Log::error("Erreur lors de la suppression du dossier", ['id' => $folder_id, 'error' => $e->getMessage()]);
+            return redirect()->back()->with("error", "Le dossier ne peut pas être supprimé (vérifiez s'il est vide).");
+
+        } catch (Throwable $t) {
+            Log::critical('Erreur fatale lors de la suppression du dossier', ['id' => $folder_id, 'error' => $t->getMessage()]);
+            return redirect()->back()->with("error", "Une erreur technique est survenue.");
+        }
+    }
+
+    public function restore(string $folder_id)
+    {
+        if (!$this->foldersService->hasEditAccess($folder_id)) {
+            Log::notice("Tentative de suppression de dossier non autorisée", ['id' => $folder_id]);
+            return redirect()->back()->with("error", "Vous n'avez pas les permissions pour supprimer ce dossier.");
+        }
+
+        try {
+            $this->foldersService->restore($folder_id);
             return redirect()->back()->with("success", "Le dossier a été supprimé avec succès.");
 
         } catch (FolderNotFoundException) {

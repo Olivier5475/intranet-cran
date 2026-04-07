@@ -11,6 +11,7 @@ readonly class FileDTO {
         public int $folder_id,
         public ?string $storage_path,
         public ?string $mimetype,
+        public ?bool $is_archived = null,
         public string $type = "file",
     ) {}
 }

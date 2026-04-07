@@ -81,17 +81,31 @@ class FilesRepository implements Interfaces\FilesRepositoryInterface {
         }
     }
 
-    public function delete(int $id) : bool {
+    /**
+     * @throws PersistenceException
+     * @throws FileNotFoundException
+     */
+    private function setIsArchived(int $id, bool $is_archived) : bool {
         $file = $this->read($id);
 
         try {
-            return (bool) $file->delete();
+            $file->is_archived = $is_archived;
+            return $file->save();
         } catch (Throwable $e) {
             Log::error("Erreur SQL : Suppression du fichier $id échouée", [
                 'message' => $e->getMessage(),
             ]);
             throw new PersistenceException("Erreur technique lors de la suppression en base de données.", 0, $e);
         }
+    }
+
+    public function delete(int $id) : bool {
+        return $this->setIsArchived($id, true);
+    }
+
+    public function restore(int $file_id): bool
+    {
+        return $this->setIsArchived($file_id, false);
     }
 
     private function checkName(?int $folder_id, string $name, ?int $id = null): bool {

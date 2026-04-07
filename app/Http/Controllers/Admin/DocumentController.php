@@ -156,4 +156,28 @@ class DocumentController extends Controller {
             return redirect()->back()->with('error', 'Une erreur imprévue est survenue.');
         }
     }
+
+    public function restore(int $document_id)
+    {
+        try {
+            if(!$this->documentsService->hasEditAccess($document_id)) {
+                Log::notice("Tentative de suppression non autorisée", ['id' => $document_id, 'user_id' => auth()->id()]);
+                return redirect()->back()->with("error", "Vous n'avez pas les permissions pour supprimer ce document.");
+            }
+
+            $this->documentsService->restore($document_id);
+            return redirect()->back()->with("success", "Le document a été supprimé avec succès.");
+
+        } catch (DocumentNotFoundException|AttachmentNotFoundException $e) {
+            return redirect()->back()->with('error', 'Le document est déjà supprimé ou introuvable.');
+
+        } catch (PersistenceException|DiskWriteException $e) {
+            Log::error("Erreur lors de la suppression physique/logique du document", ['id' => $document_id, 'error' => $e->getMessage()]);
+            return redirect()->back()->with('error', 'Erreur lors de la suppression du fichier sur le serveur.');
+
+        } catch (Throwable $t) {
+            Log::critical('Crash lors de la suppression du document', ['id' => $document_id, 'error' => $t->getMessage()]);
+            return redirect()->back()->with('error', 'Une erreur imprévue est survenue.');
+        }
+    }
 }
