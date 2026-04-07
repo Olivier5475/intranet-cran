@@ -107,9 +107,10 @@ readonly class FoldersService implements Interfaces\FoldersServiceInterface {
         $folderIds = $this->folderRepository->getDescendantFolderIds($rootFolderId);
 
         // Recherche via Scout (Meilisearch)
-        $files = File::search($query)->whereIn('folder_id', $folderIds)->get();
-        $documents = Document::search($query)->whereIn('folder_id', $folderIds)->get();
+        $files = File::search($query)->whereIn('folder_id', $folderIds)->get(); // ON RECHERCHE LES FICHIERS
+        $documents = Document::search($query)->whereIn('folder_id', $folderIds)->get(); // ON RECHERCHE LES DOCUMENTS
 
+        // ON TRANSFORME EN Collection DE DTO POUR EVITER DE COMMUNIQUER LE MODEL AU CONTROLLER
         $fileDTOs = $files->map(fn($f) => new FileDTO(
             id: $f->id,
             name: $f->name,
@@ -120,6 +121,7 @@ readonly class FoldersService implements Interfaces\FoldersServiceInterface {
             mimetype: $f->mimetype,
         ));
 
+        // ON TRANSFORME EN Collection DE DTO POUR ÉVITER DE COMMUNIQUER LE MODEL AU CONTROLLER
         $documentDTOs = $documents->map(fn($d) => new DocumentDTO(
             id: $d->id,
             name: $d->title,
@@ -128,9 +130,11 @@ readonly class FoldersService implements Interfaces\FoldersServiceInterface {
             color: $d->color,
         ));
 
+        // SECURITE : Si il ne trouve que des documents, on renvoie directement les documents, sinon le merge plante
         if($fileDTOs->isEmpty()) {
             return $documentDTOs;
         }
+
         return $fileDTOs
             ->merge($documentDTOs) // Fusionne les deux Collection
             ->values();            // RE-INDEXE de 0 à N (Crucial pour le v-for de Vue)
