@@ -73,6 +73,10 @@ class Authentification {
             }
         }
 
+        if(!$this->userService->emailExistIn12Plus($attributes['mail'] ?? ($casUser . '@univ-lorraine.fr'))) {
+            Log::alert("Un utilisateur ne faisant pas partie de 12Plus à voulu s'authentifier");
+            return \Inertia\Inertia::render("Erreur/Unauthorized");
+        }
         $user = $this->userService->getUserByEmail($email);
 
         if (!$user)  {

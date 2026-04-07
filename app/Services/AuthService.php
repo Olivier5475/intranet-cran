@@ -25,7 +25,7 @@ readonly class AuthService implements Interfaces\UserServiceInterface {
     public function handleUserInDatabase(array $data): void {
         $user = $this->userRepository->getUserByEmail($data['email']);
 
-        if(!$this->emailExistsIn12Plus($data['email'])) {
+        if(!$this->emailExistIn12Plus($data['email'])) {
             throw new UnauthorizedException();
         }
 
@@ -141,7 +141,7 @@ readonly class AuthService implements Interfaces\UserServiceInterface {
         ]);
     }
 
-    private function emailExistsIn12Plus(string $email): bool
+    public function emailExistIn12Plus(string $email): bool
     {
         $url = config('services.12plus.url');
 
