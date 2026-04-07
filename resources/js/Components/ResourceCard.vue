@@ -112,6 +112,7 @@ const isActiveValidation = ref(false);
                 <Link
                     v-if="child.is_archived"
                     :href="links.restore"
+                    method="patch"
                     class="px-4 py-2 text-xs hover:bg-emerald-400
                     dark:hover:bg-emerald-900/50 text-emerald-600
                     dark:text-emerald-500 block w-full text-left"
