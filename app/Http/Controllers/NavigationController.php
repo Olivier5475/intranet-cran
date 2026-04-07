@@ -33,6 +33,7 @@ class NavigationController extends Controller
                 "parents" => $breadcrumbs,
                 "children" => $items,
                 "currentSearch" => $searchQuery,
+                "isArchived" => $isArchived,
             ]);
 
         } catch (Throwable $t) {

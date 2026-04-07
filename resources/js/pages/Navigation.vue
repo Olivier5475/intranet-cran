@@ -8,6 +8,7 @@ import {
     ListBulletIcon,
     ViewColumnsIcon,
     ArchiveBoxIcon,
+    ArrowUturnLeftIcon
 } from "@heroicons/vue/20/solid";
 
 // 3. Composables & Fonctions Utilitaires
@@ -41,6 +42,7 @@ const props = defineProps<{
         departements: number[];
     }>;
     currentSearch: string;
+    isArchived: boolean
 }>();
 
 const folder_id = computed(() => {
@@ -179,6 +181,15 @@ const { isDragging } = useDragAndDrop({
             placeholder="Rechercher un fichier, un document..."
         />
         <Link
+            v-if="isArchived"
+            :href="navigate_route.folder(folder_id)"
+            class="mx-auto mt-4"
+            title="Retourner au dossier"
+        >
+            <ArrowUturnLeftIcon class="w-10"></ArrowUturnLeftIcon>
+        </Link>
+        <Link
+            v-else
             :href="navigate_route.archived(folder_id)"
             class="mx-auto mt-4"
             title="Voir les archives"
