@@ -25,8 +25,9 @@ class NavigationController extends Controller
         $isArchived = $request->routeIs('navigate.archived');
 
         try {
-            // Récupération du contenu et du fil d'Ariane
+            // Récupération du contenu
             $items = $this->foldersService->getFolderContents($folder_id, $searchQuery, $isArchived);
+            // Récupération du fil d'Ariane
             $breadcrumbs = $this->foldersService->getBreadcrumbs($folder_id);
 
             return Inertia::render('Navigation', [

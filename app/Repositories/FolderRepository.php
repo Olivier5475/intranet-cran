@@ -34,8 +34,7 @@ class FolderRepository implements Interfaces\FolderRepositoryInterface
 
     public function read(int $id): Folder
     {
-        $folder = Folder::where(fn($q) => $q->where('is_archived', false)->orWhereNull('is_archived'))
-            ->with([
+        $folder = Folder::with([
                 'departements:id',
                 'children' => fn($q) => $q->where('is_archived', false)->with('departements:id'),
                 'files.departements:id',
@@ -142,6 +141,7 @@ class FolderRepository implements Interfaces\FolderRepositoryInterface
     public function getFolderWithContents(int $id, bool $archived): Folder
     {
         // On récupère le dossier "conteneur" sans condition sur son propre is_archived
+
         return Folder::with([
             'departements:id',
             // On ne filtre QUE ce qui est à l'intérieur
@@ -154,8 +154,7 @@ class FolderRepository implements Interfaces\FolderRepositoryInterface
 
     public function getFolderWithParents(int $id): Folder
     {
-        return Folder::where(fn($q) => $q->where('is_archived', false))
-            ->with('departements:id')
+        return Folder::with('departements:id')
             ->with('parent.parent.parent.parent.parent')
             ->findOrFail($id);
     }
