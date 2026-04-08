@@ -187,7 +187,7 @@ const { isDragging } = useDragAndDrop({
         <Link
             v-else
             :href="navigate_route.archived(folder_id)"
-            class="mx-auto mt-4"
+            class="mx-auto mt-4 text-sky-600"
             title="Voir les archives"
         >
             <ArchiveBoxIcon class="w-10"></ArchiveBoxIcon>

@@ -37,7 +37,7 @@ const submit = () => {
             <form @submit.prevent="submit" class="flex gap-2">
                 <input
                     v-model="form.name"
-                    class="text-sm font-medium bg-slate-700 w-full rounded-lg focus:ring-0
+                    class="text-sm font-medium dark:bg-slate-700 w-full rounded-lg focus:ring-0
         hover:border-violet-300 hover:border-1 focus:border-violet-500 focus:border-2
         text-gray-700 dark:text-zinc-200 truncate"
                 >
