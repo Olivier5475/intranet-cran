@@ -31,16 +31,12 @@ import navigate_route from "@/routes/navigate";
 
 // 6. Types
 import { Child } from "@/types/child";
+import { Folder } from "@/types/folder";
 
 const page = usePage();
 const props = defineProps<{
     children: Array<Child>;
-    parents: Array<{
-        // dossier courant
-        id: number; //
-        name: string;
-        departements: number[];
-    }>;
+    parents: Folder[];
     currentSearch: string;
     isArchived: boolean
 }>();

@@ -1,34 +1,41 @@
 <script setup lang="ts">
 // 1. Vue & Core
-import { Link } from '@inertiajs/vue3';
+import { Link } from "@inertiajs/vue3";
 
 // 2. Librairies Tierces (Icon)
-import { HomeIcon, ChevronRightIcon } from '@heroicons/vue/20/solid';
+import { HomeIcon, ChevronRightIcon } from "@heroicons/vue/20/solid";
 
 // 3. Routes
-import navigate from '@/routes/navigate';
+import navigate from "@/routes/navigate";
 
 // 4. Librairies internes
-import { decodeEntities } from '@/Composables/useDecodeModule';
+import { decodeEntities } from "@/Composables/useDecodeModule";
+import { Folder } from "@/types/folder";
 
 defineProps<{
-    parents : Array<{
-        id : number,
-        name : string
-    }>,
+    parents: Folder[];
 }>();
 </script>
 
 <template>
-    <nav class="flex items-center space-x-1 text-sm font-medium p-1 overflow-x-auto no-scrollbar">
+    <nav
+        class="flex items-center space-x-1 text-sm font-medium p-1 overflow-x-auto no-scrollbar"
+    >
         <Link
             href="/"
-            class="flex items-center justify-center p-2 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-white dark:hover:bg-zinc-800 hover:text-sky-600 dark:hover:text-sky-400 transition-all duration-200 shadow-sm border border-transparent hover:border-gray-200 dark:hover:border-zinc-700"
+            class="flex items-center justify-center p-2 rounded-lg text-gray-500
+            dark:text-gray-400 hover:bg-white dark:hover:bg-zinc-800 hover:text-sky-600
+             dark:hover:text-sky-400 transition-all duration-200 shadow-sm border
+             border-transparent hover:border-gray-200 dark:hover:border-zinc-700"
         >
             <HomeIcon class="h-4 w-4 shrink-0" />
         </Link>
 
-        <div v-for="(parent, index) in parents" :key="parent.id" class="flex items-center">
+        <div
+            v-for="(parent, index) in parents"
+            :key="parent.id"
+            class="flex items-center"
+        >
             <ChevronRightIcon class="h-5 w-5 text-gray-400 shrink-0 mx-0.5" />
 
             <Link
@@ -36,11 +43,20 @@ defineProps<{
                 class="px-3 py-1.5 rounded-lg whitespace-nowrap transition-all duration-200"
                 :class="[
                     index === parents.length - 1
-                        ? 'text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-900/30 font-bold'
-                        : 'text-gray-600 dark:text-zinc-300 hover:bg-white dark:hover:bg-zinc-800 hover:text-sky-600 shadow-sm border border-transparent hover:border-gray-200 dark:hover:border-zinc-700'
+                        ? 'text-sky-600 dark:text-sky-400 bg-sky-50 ' +
+                          'dark:bg-sky-900/30 font-bold'
+                        : 'text-gray-600 dark:text-zinc-300 hover:bg-white border' +
+                          'dark:hover:bg-zinc-800 hover:text-sky-600 border-transparent' +
+                          'shadow-sm  hover:border-gray-200 dark:hover:border-zinc-700',
                 ]"
             >
                 {{ decodeEntities(parent.name) }}
+                <span
+                    v-if="parent.is_archived"
+                    class="font-light italic"
+                >
+                    (Depuis les archives)
+                </span>
             </Link>
         </div>
     </nav>
