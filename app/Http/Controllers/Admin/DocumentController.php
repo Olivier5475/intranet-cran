@@ -59,6 +59,10 @@ class DocumentController extends Controller {
         try {
             if($id) {
                 $document = $this->documentsService->update($id, $data);
+                if(empty($document->folder_id)) {
+                    return redirect()->route("navigate.document", ["document_id" => $document->id])
+                        ->with("success", "Le document a été modifier avec succès");
+                }
                 return redirect()->route("navigate.folder", ["folder_id" => $document->folder_id])
                     ->with("success", "Le document a été mis à jour avec succès.");
             } else {
