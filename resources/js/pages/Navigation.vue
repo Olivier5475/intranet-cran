@@ -83,7 +83,7 @@ const compareParentAndUser = parentDpts.filter((value) =>
 const canCreate = ref(
     user.role === "admin" || // Si l'utilisateur est un admin, il peut créer.
         // Si c'est un editeur et qu'il a des roles en commun avec la page, il peut créer.
-        (user.role === "editor" &&
+        (user.role === "editeur" &&
             (parentDpts.length === 0 || compareParentAndUser.length > 0)),
 );
 

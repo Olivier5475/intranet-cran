@@ -134,7 +134,10 @@ class FolderRepository implements Interfaces\FolderRepositoryInterface
     {
         return Folder::whereNull('parent_id')
             ->where('is_archived', false)
-            ->with(['allChildren' => fn($q) => $q->where('is_archived', false)])
+            ->with([
+                'departements:id',
+                'allChildren' => fn($q) => $q->where('is_archived', false)->with('departements:id'),
+            ])
             ->get();
     }
 

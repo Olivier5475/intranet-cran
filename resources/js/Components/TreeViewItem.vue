@@ -66,6 +66,26 @@ const toggleMenu = ref(false);
 
 // savoir si le Modal de validation de suppression est ouvert
 const isActiveValidation = ref(false);
+
+// On récupère les départements de la page
+const parentDpts = props.child.departements as number[];
+
+// On récupère l'utilisateur
+const user = page.props.auth.user;
+
+// On récupère les départements de l'utilisateur
+const userDpts = user.departements_ids as number[];
+
+// On récupère les départements en commun
+const compareParentAndUser = parentDpts.filter((value) =>
+    userDpts.includes(value),
+);
+const canEdit = ref(
+    user.role === "admin" || // Si l'utilisateur est un admin, il peut créer dans le dossier ou le modifier.
+        // Si c'est un editeur et qu'il a des roles en commun avec la page, il peut créer dans le dossier ou le modifier.
+        (user.role === "editeur" &&
+            (parentDpts.length === 0 || compareParentAndUser.length > 0)),
+);
 </script>
 
 <template>
@@ -78,6 +98,7 @@ const isActiveValidation = ref(false);
         >
             <div @click="isExpanded = !isExpanded" class="p-1 cursor-pointer">
                 <component
+                    v-if="child.children.length > 0 || canEdit"
                     :is="isExpanded ? ChevronDownIcon : ChevronRightIcon"
                     class="w-4 h-4 text-gray-500"
                 />
@@ -101,6 +122,7 @@ const isActiveValidation = ref(false);
                     @mouseleave="isMenuExpend = false"
                 >
                     <button
+                        v-if="canEdit"
                         @click="toggleMenu = !toggleMenu"
                         class="p-1 hover:bg-gray-200 dark:hover:bg-zinc-700 rounded-full"
                     >
@@ -108,7 +130,7 @@ const isActiveValidation = ref(false);
                     </button>
 
                     <div
-                        v-if="isMenuExpend || toggleMenu"
+                        v-if="(isMenuExpend || toggleMenu) && canEdit"
                         class="right-0 top-5 w-32 rounded-lg shadow-xl bg-white dark:bg-zinc-900 border-gray-200 dark:border-zinc-700 py-1 absolute z-20 border opacity-25 group-hover:opacity-100"
                     >
                         <Link
@@ -148,6 +170,7 @@ const isActiveValidation = ref(false);
 
                 <li>
                     <Link
+                        v-if="canEdit"
                         class="text-xs text-gray-400 hover:text-yellow-600 py-1 flex items-center transition-colors"
                         :href="folder_route.create.url(child.id)"
                     >
@@ -160,6 +183,7 @@ const isActiveValidation = ref(false);
     </li>
 
     <DeleteModal
+        v-if="canEdit"
         :show="isActiveValidation"
         :delete-href="folder_route.delete.url(child.id)"
         @close="isActiveValidation = false"
