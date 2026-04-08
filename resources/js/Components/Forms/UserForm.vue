@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useForm } from '@inertiajs/vue3';
-import { CheckIcon } from '@heroicons/vue/20/solid';
+import { CheckIcon } from '@heroicons/vue/24/solid';
 
 const props = defineProps<{ user?: any; departements: any[] }>();
 const emit = defineEmits(['success']);

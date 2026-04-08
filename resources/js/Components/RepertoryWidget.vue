@@ -3,7 +3,7 @@
 import { Link } from "@inertiajs/vue3";
 
 // 2. Librairies Tierces (Icon)
-import { HomeIcon, ChevronRightIcon } from "@heroicons/vue/20/solid";
+import { HomeIcon, ChevronRightIcon } from "@heroicons/vue/24/solid";
 
 // 3. Routes
 import navigate from "@/routes/navigate";

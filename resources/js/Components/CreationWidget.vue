@@ -9,7 +9,7 @@ import {
     FolderPlusIcon,
     DocumentPlusIcon,
     ArrowUpTrayIcon
-} from '@heroicons/vue/20/solid';
+} from '@heroicons/vue/24/solid';
 
 // 3. Routes
 import editor from '@/routes/editor';

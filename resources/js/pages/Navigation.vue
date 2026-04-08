@@ -8,8 +8,8 @@ import {
     ListBulletIcon,
     ViewColumnsIcon,
     ArchiveBoxIcon,
-    ArrowUturnLeftIcon
-} from "@heroicons/vue/20/solid";
+    ArrowUturnLeftIcon,
+} from "@heroicons/vue/24/solid";
 
 // 3. Composables & Fonctions Utilitaires
 import { useDragAndDrop } from "@/Composables/useDragAndDrop";
@@ -38,7 +38,7 @@ const props = defineProps<{
     children: Array<Child>;
     parents: Folder[];
     currentSearch: string;
-    isArchived: boolean
+    isArchived: boolean;
 }>();
 
 const folder_id = computed(() => {
@@ -120,8 +120,7 @@ const { isDragging } = useDragAndDrop({
         class="left-0 top-0 bg-sky-400/40 absolute z-50 flex h-full w-full"
     >
         <div
-            class="bg-sky-900/30 rounded-2xl border-sky-900 z-10 mx-auto my-auto
-            flex h-[92%] w-[92%] border-4 border-dashed"
+            class="bg-sky-900/30 rounded-2xl border-sky-900 z-10 mx-auto my-auto flex h-[92%] w-[92%] border-4 border-dashed"
         >
             <p class="text-sky-900 text-4xl font-black mx-auto my-auto">
                 Déposez votre fichier
@@ -130,8 +129,7 @@ const { isDragging } = useDragAndDrop({
     </div>
 
     <div
-        class="bg-white dark:bg-slate-900 p-2 rounded-xl shadow-sm border-gray-100
-        dark:border-zinc-800 flex items-center justify-between border"
+        class="bg-white dark:bg-slate-900 p-2 rounded-xl shadow-sm border-gray-100 dark:border-zinc-800 flex items-center justify-between border"
     >
         <RepertoryWidget :parents="parents" />
 
@@ -179,7 +177,7 @@ const { isDragging } = useDragAndDrop({
         <Link
             v-if="isArchived"
             :href="navigate_route.folder(folder_id)"
-            class="mx-auto mt-4"
+            class="mx-auto mt-4 text-sky-600"
             title="Retourner au dossier"
         >
             <ArrowUturnLeftIcon class="w-10"></ArrowUturnLeftIcon>
@@ -219,8 +217,7 @@ const { isDragging } = useDragAndDrop({
         class="mt-6 rounded-xl border-gray-200 dark:border-zinc-800 border"
     >
         <div
-            class="bg-gray-50 dark:bg-sky-900/20 py-3 px-4 text-xs font-semibold
-            tracking-wider text-gray-500 dark:text-zinc-400 grid grid-cols-12 uppercase"
+            class="bg-gray-50 dark:bg-sky-900/20 py-3 px-4 text-xs font-semibold tracking-wider text-gray-500 dark:text-zinc-400 grid grid-cols-12 uppercase"
         >
             <p class="col-span-5">Nom</p>
             <p class="col-span-2 text-center">Type</p>

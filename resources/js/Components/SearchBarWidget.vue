@@ -4,7 +4,7 @@ import { ref } from 'vue';
 import { router } from '@inertiajs/vue3';
 
 // 2. Librairies tierces (Icônes)
-import { MagnifyingGlassIcon, XMarkIcon } from '@heroicons/vue/20/solid';
+import { MagnifyingGlassIcon, XMarkIcon } from '@heroicons/vue/24/solid';
 
 const props = defineProps<{
     currentSearch: string | null;

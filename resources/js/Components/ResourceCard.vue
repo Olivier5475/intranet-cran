@@ -4,7 +4,7 @@ import { ref } from "vue";
 import { Link } from "@inertiajs/vue3";
 
 // 2. Librairies tierces (Icônes)
-import { EllipsisHorizontalIcon } from "@heroicons/vue/20/solid";
+import { EllipsisHorizontalIcon } from "@heroicons/vue/24/solid";
 
 // 3. Composables & Utilitaires
 import { decodeEntities } from "@/Composables/useDecodeModule";

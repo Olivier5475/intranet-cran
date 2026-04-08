@@ -1,23 +1,26 @@
 <script setup lang="ts">
 // 1. Vue & Core
-import { ref, computed, watch } from 'vue';
-import { Link, usePage } from '@inertiajs/vue3';
+import { ref, computed, watch } from "vue";
+import { Link, usePage } from "@inertiajs/vue3";
 
 // 2. Librairies tierces (Icônes)
-import { ChevronRightIcon, ChevronDownIcon } from '@heroicons/vue/20/solid';
-import { EllipsisHorizontalIcon } from '@heroicons/vue/24/solid';
+import {
+    EllipsisHorizontalIcon,
+    ChevronRightIcon,
+    ChevronDownIcon,
+} from "@heroicons/vue/24/solid";
 
 // 3. Composables, Routes & Utilitaires
-import { decodeEntities } from '@/Composables/useDecodeModule';
-import folder_route from '@/routes/editor/folder';
-import navigate from '@/routes/navigate';
+import { decodeEntities } from "@/Composables/useDecodeModule";
+import folder_route from "@/routes/editor/folder";
+import navigate from "@/routes/navigate";
 
 // 4. Composants
-import DeleteModal from '@/Components/DeleteModal.vue';
-import TreeViewItem from './TreeViewItem.vue';
+import DeleteModal from "@/Components/DeleteModal.vue";
+import TreeViewItem from "./TreeViewItem.vue";
 
 // 5. Types
-import { Folder } from '@/types/folder';
+import { Folder } from "@/types/folder";
 
 const props = defineProps<{
     child: Folder;
@@ -69,17 +72,26 @@ const isActiveValidation = ref(false);
     <li :id="child.id.toString()" class="select-none">
         <div
             class="group p-1 rounded-md hover:bg-slate-100 dark:hover:bg-sky-900/50 flex items-center transition-colors duration-150"
-            :class="{ 'bg-sky-50 dark:bg-sky-900/20': child.id === currentFolderId }"
+            :class="{
+                'bg-sky-50 dark:bg-sky-900/20': child.id === currentFolderId,
+            }"
         >
             <div @click="isExpanded = !isExpanded" class="p-1 cursor-pointer">
-                <component :is="isExpanded ? ChevronDownIcon : ChevronRightIcon" class="w-4 h-4 text-gray-500" />
+                <component
+                    :is="isExpanded ? ChevronDownIcon : ChevronRightIcon"
+                    class="w-4 h-4 text-gray-500"
+                />
             </div>
 
             <div class="ml-1 flex flex-1 items-center justify-between">
                 <Link
                     :href="navigate.folder.url(child.id)"
                     class="text-sm truncate"
-                    :class="child.id === currentFolderId ? 'text-sky-600 dark:text-sky-400 font-bold' : 'text-gray-700 dark:text-gray-300'"
+                    :class="
+                        child.id === currentFolderId
+                            ? 'text-sky-600 dark:text-sky-400 font-bold'
+                            : 'text-gray-700 dark:text-gray-300'
+                    "
                 >
                     {{ decodeEntities(child.name) }}
                 </Link>
@@ -88,7 +100,10 @@ const isActiveValidation = ref(false);
                     @mouseover="isMenuExpend = true"
                     @mouseleave="isMenuExpend = false"
                 >
-                    <button @click="toggleMenu = !toggleMenu" class="p-1 hover:bg-gray-200 dark:hover:bg-zinc-700 rounded-full">
+                    <button
+                        @click="toggleMenu = !toggleMenu"
+                        class="p-1 hover:bg-gray-200 dark:hover:bg-zinc-700 rounded-full"
+                    >
                         <EllipsisHorizontalIcon class="h-5 w-5 text-gray-500" />
                     </button>
 
@@ -121,8 +136,15 @@ const isActiveValidation = ref(false);
             leave-from-class="max-h-[1000px] opacity-100"
             leave-to-class="max-h-0 opacity-0 overflow-hidden"
         >
-            <ul v-if="isExpanded" class="pl-4 ml-3 border-gray-200 dark:border-zinc-700 mt-1 space-y-1 border-l">
-                <TreeViewItem v-for="subChild in child.children" :key="subChild.id" :child="subChild" />
+            <ul
+                v-if="isExpanded"
+                class="pl-4 ml-3 border-gray-200 dark:border-zinc-700 mt-1 space-y-1 border-l"
+            >
+                <TreeViewItem
+                    v-for="subChild in child.children"
+                    :key="subChild.id"
+                    :child="subChild"
+                />
 
                 <li>
                     <Link
@@ -137,5 +159,9 @@ const isActiveValidation = ref(false);
         </Transition>
     </li>
 
-    <DeleteModal :show="isActiveValidation" :delete-href="folder_route.delete.url(child.id)" @close="isActiveValidation = false" />
+    <DeleteModal
+        :show="isActiveValidation"
+        :delete-href="folder_route.delete.url(child.id)"
+        @close="isActiveValidation = false"
+    />
 </template>

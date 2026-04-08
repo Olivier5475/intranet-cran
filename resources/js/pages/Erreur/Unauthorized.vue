@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { logout } from '@/routes';
-import { ArrowLeftEndOnRectangleIcon } from '@heroicons/vue/20/solid';
+import { ArrowLeftEndOnRectangleIcon } from '@heroicons/vue/24/solid';
 </script>
 <template>
 

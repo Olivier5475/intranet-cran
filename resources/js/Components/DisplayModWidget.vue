@@ -2,7 +2,7 @@
 import {
     ListBulletIcon,
     ViewColumnsIcon
-} from '@heroicons/vue/20/solid';
+} from '@heroicons/vue/24/solid';
 </script>
 
 <template>

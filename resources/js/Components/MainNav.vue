@@ -3,7 +3,7 @@
 import { Link, usePage } from '@inertiajs/vue3';
 
 // 2. Librairie Tierce (Icon)
-import { UserIcon,UserGroupIcon, BuildingOfficeIcon, ArrowLeftEndOnRectangleIcon } from '@heroicons/vue/20/solid';
+import { UserIcon,UserGroupIcon, BuildingOfficeIcon, ArrowLeftEndOnRectangleIcon } from '@heroicons/vue/24/solid';
 
 // 3. Routes
 import admin_routes from '@/routes/admin'

@@ -13,7 +13,7 @@ import {
 } from "@/Composables/useDocumentsTypeRegex";
 
 // 3. Librairies tierces (Icônes)
-import * as SolidIcons from "@heroicons/vue/20/solid";
+import * as SolidIcons from "@heroicons/vue/24/solid";
 
 const props = defineProps<{
     child: { id: number; type: string; mimetype?: string; name?: string };
