@@ -34,15 +34,16 @@ readonly class DepartementsService implements DepartementsServiceInterface
         }
     }
 
-    public function readAll(): array
+    public function readAll(): Collection
     {
         $departements = $this->repository->readAll();
 
-        return array_map(fn($dept) => new DepartementDTO(
-            id: $dept["id"],
-            name: $dept["name"],
-            initials: $dept["initials"],
-        ), $departements->toArray());
+        return $departements->map(fn($dept) => new DepartementDTO(
+            id: $dept->id,
+            name: $dept->name,
+            initials: $dept->initials,
+            color: $dept->color,
+        ));
     }
 
     public function departementsIDs(iterable $departements): array
@@ -79,6 +80,7 @@ readonly class DepartementsService implements DepartementsServiceInterface
                 id: $departement->id,
                 name: $departement->name,
                 initials: $departement->initials,
+                color: $departement->color,
             );
         } catch (DepartementNotFoundException $e) {
             Log::warning("Consultation d'un département inexistant", ["id" => $id]);

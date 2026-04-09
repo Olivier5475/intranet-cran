@@ -13,7 +13,7 @@ interface DepartementsServiceInterface {
     /**
      * @return DepartementDTO[]
      */
-    public function readAll(): array;
+    public function readAll(): Collection;
 
     /**
      * Extrait les IDs d'une collection d'objets départements.

@@ -61,6 +61,7 @@ class DepartementController extends Controller {
         $validatedData = $request->validate([
             'initials' => ['required', 'string', 'max:255'],
             'name' => ['required', 'string', 'max:255'],
+            'color' => ['required', 'string', 'max:255'],
         ]);
 
         if (empty($validatedData["initials"]) || empty($validatedData["name"])) {

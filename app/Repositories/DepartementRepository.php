@@ -15,10 +15,14 @@ class DepartementRepository implements Interfaces\DepartementRepositoryInterface
     public function create(array $data): Departement {
         try {
             // Utilisation de create() pour plus de concision (vérifie le $fillable dans le modèle)
-            return Departement::create([
-                'initials' => $data['initials'],
-                'name' => $data['name'],
-            ]);
+            $departement = new Departement();
+            $departement->name = $data['name'];
+            $departement->initials = $data['initials'];
+            if(isset($data['color'])) {
+                $departement->color = $data['color'];
+            }
+            $departement->save();
+            return $departement;
         } catch (Throwable $t) {
             Log::error("Erreur SQL lors de la création d'un département", [
                 'data' => $data,
@@ -32,10 +36,16 @@ class DepartementRepository implements Interfaces\DepartementRepositoryInterface
         $departement = $this->getById($id);
 
         try {
-            $departement->update([
-                'initials' => $data['initials'] ?? $departement->initials,
-                'name' => $data['name'] ?? $departement->name,
-            ]);
+            if(isset($data['name'])) {
+                $departement->name = $data['name'];
+            }
+            if(isset($data['initials'])) {
+                $departement->initials = $data['initials'];
+            }
+            if(isset($data['color'])) {
+                $departement->color = $data['color'];
+            }
+            $departement->save();
         } catch (Throwable $t) {
             Log::error("Erreur SQL lors de la mise à jour du département $id", [
                 'data' => $data,
