@@ -80,33 +80,11 @@ const submit = () => {
             />
         </div>
 
-        <div class="space-y-3">
-            <label class="font-black text-zinc-400 ml-1 text-[10px] uppercase">Accès aux départements</label>
-            <div class="gap-2 grid grid-cols-2">
-                <label
-                    v-for="dept in departements"
-                    :key="dept.id"
-                    :class="[
-                        'p-3 rounded-xl flex cursor-pointer items-center border-2 transition-all',
-                        form.departements.includes(dept.id) ? 'border-sky-500 bg-sky-50 dark:bg-sky-900/20' : 'border-zinc-100 dark:border-zinc-800',
-                    ]"
-                >
-                    <input type="checkbox" :value="dept.id" v-model="form.departements" class="sr-only" />
-                    <div
-                        :class="[
-                            'w-4 h-4 rounded mr-3 flex items-center justify-center border transition-colors',
-                            form.departements.includes(dept.id) ? 'bg-sky-500 border-sky-500' : 'border-zinc-300',
-                        ]"
-                    >
-                        <CheckIcon v-if="form.departements.includes(dept.id)" class="w-3 h-3 text-white" />
-                    </div>
-                    <span
-                        class="text-xs font-bold truncate"
-                        :class="form.departements.includes(dept.id) ? 'text-sky-700 dark:text-sky-400' : 'text-zinc-500'"
-                        >{{ dept.name }}</span
-                    >
-                </label>
-            </div>
+        <div class="pt-6 dark:border-zinc-800 border-t">
+            <DepartementSelector
+                v-model="form.departements"
+                :all-departements="departements"
+            />
         </div>
 
         <button

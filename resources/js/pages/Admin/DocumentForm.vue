@@ -19,8 +19,9 @@ import route from "@/routes/editor/document";
 import { decodeEntities } from "@/Composables/useDecodeModule";
 
 // 4. Composants
-import CKEditor5Widget from '@/Components/CKEditor5Widget.vue';
-import WarningPermission from '@/Components/WarningPermission.vue';
+import CKEditor5Widget from "@/Components/CKEditor5Widget.vue";
+import WarningPermission from "@/Components/WarningPermission.vue";
+import DepartementSelector from "@/Components/Forms/DepartementSelector.vue";
 
 const props = defineProps<{
     parent_id: number;
@@ -79,11 +80,6 @@ const submit = () => {
     else form.post(route.post.create.url());
 };
 
-const isCheckboxDisabled = (departementId: number) => {
-    if (!userDepartementIds.includes(departementId)) return false;
-    const mySelectedDeps = form.departements.filter((id) => userDepartementIds.includes(id));
-    return form.departements.includes(departementId) && mySelectedDeps.length <= 1;
-};
 </script>
 
 <template>
@@ -131,8 +127,14 @@ const isCheckboxDisabled = (departementId: number) => {
                     </div>
                 </div>
 
-                <div v-if="page.props.auth.user.role == 'admin'" class="md:w-1/4 space-y-2">
-                    <label class="font-black text-gray-400 ml-1 text-[10px] tracking-[0.2em] uppercase">Couleur d'accent</label>
+                <div
+                    v-if="page.props.auth.user.role == 'admin'"
+                    class="md:w-1/4 space-y-2"
+                >
+                    <label
+                        class="font-black text-gray-400 ml-1 text-[10px] tracking-[0.2em] uppercase"
+                        >Couleur d'accent</label
+                    >
                     <input
                         type="color"
                         v-model="form.color"
@@ -242,45 +244,11 @@ const isCheckboxDisabled = (departementId: number) => {
                 </div>
             </div>
 
-            <div class="space-y-4 pt-6 dark:border-zinc-800 border-t">
-                <label class="font-black text-gray-400 ml-1 block text-center text-[10px] tracking-[0.2em] uppercase">Départements ayant accès</label>
-                <div class="sm:grid-cols-2 lg:grid-cols-3 gap-3 grid grid-cols-1">
-                    <label
-                        v-for="departement in departements"
-                        :key="departement.id"
-                        :class="[
-                            'p-4 rounded-2xl group relative flex cursor-pointer items-center border-2 transition-all',
-                            form.departements.includes(departement.id)
-                                ? 'border-sky-500 bg-sky-500/5'
-                                : 'border-gray-100 dark:border-zinc-800 hover:border-gray-200 dark:hover:border-zinc-700',
-                            isCheckboxDisabled(departement.id) ? 'cursor-not-allowed opacity-40' : '',
-                        ]"
-                    >
-                        <input
-                            type="checkbox"
-                            :value="departement.id"
-                            v-model="form.departements"
-                            :disabled="isCheckboxDisabled(departement.id)"
-                            class="sr-only"
-                        />
-                        <span
-                            :class="[
-                                'w-5 h-5 rounded-lg mr-3 flex items-center justify-center border transition-colors',
-                                form.departements.includes(departement.id) ? 'bg-sky-500 border-sky-500' : 'border-gray-300 dark:border-zinc-600',
-                            ]"
-                        >
-                            <CheckIcon v-if="form.departements.includes(departement.id)" class="w-3.5 h-3.5 text-white stroke-[3]" />
-                        </span>
-                        <span
-                            class="text-sm font-bold tracking-tight"
-                            :class="
-                                form.departements.includes(departement.id) ? 'text-sky-700 dark:text-sky-400' : 'text-gray-500 dark:text-zinc-400'
-                            "
-                        >
-                            {{ departement.name }}
-                        </span>
-                    </label>
-                </div>
+            <div class="pt-6 dark:border-zinc-800 border-t">
+                <DepartementSelector
+                    v-model="form.departements"
+                    :all-departements="departements"
+                />
             </div>
 
             <WarningPermission

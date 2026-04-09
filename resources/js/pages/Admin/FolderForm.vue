@@ -58,12 +58,6 @@ const showExternalWarning = computed(() => {
         (selectedId) => !userDepartementsIds.includes(selectedId),
     );
 });
-
-const isCheckboxDisabled = (departementId: number) => {
-    if (!userDepartementsIds.includes(departementId)) return false;
-    const mySelectedDeps = form.departements.filter((id) => userDepartementsIds.includes(id));
-    return form.departements.includes(departementId) && mySelectedDeps.length <= 1;
-};
 </script>
 
 <template>
@@ -130,48 +124,11 @@ const isCheckboxDisabled = (departementId: number) => {
                 </div>
             </div>
 
-            <div class="space-y-4">
-                <label class="font-black text-gray-400 ml-1 text-[10px] tracking-[0.2em] uppercase">Visibilité par département</label>
-                <div class="sm:grid-cols-2 lg:grid-cols-3 gap-3 grid grid-cols-1">
-                    <label
-                        v-for="departement in departements"
-                        :key="departement.id"
-                        :class="[
-                            'p-4 rounded-2xl group relative flex cursor-pointer items-center border-2 transition-all',
-                            form.departements.includes(departement.id)
-                                ? 'border-sky-500 bg-sky-500/5'
-                                : 'border-gray-100 dark:border-zinc-800 hover:border-gray-200 dark:hover:border-zinc-700',
-                            isCheckboxDisabled(departement.id) ? 'cursor-not-allowed opacity-40' : '',
-                        ]"
-                    >
-                        <input
-                            type="checkbox"
-                            :value="departement.id"
-                            v-model="form.departements"
-                            :disabled="isCheckboxDisabled(departement.id)"
-                            class="sr-only"
-                        />
-                        <span
-                            :class="[
-                                'w-5 h-5 rounded-lg mr-3 flex items-center justify-center border transition-colors',
-                                form.departements.includes(departement.id)
-                                    ? 'bg-sky-500 border-sky-500 shadow-sm shadow-sky-500/40'
-                                    : 'border-gray-300 dark:border-zinc-600',
-                            ]"
-                        >
-                            <CheckIcon v-if="form.departements.includes(departement.id)" class="w-3.5 h-3.5 text-white stroke-[3]" />
-                        </span>
-                        <span
-                            class="text-sm font-bold tracking-tight"
-                            :class="
-                                form.departements.includes(departement.id) ? 'text-sky-700 dark:text-sky-400' : 'text-gray-500 dark:text-zinc-400'
-                            "
-                        >
-                            {{ departement.name }}
-                        </span>
-                    </label>
-                </div>
-                <div v-if="form.errors.departements" class="text-xs text-red-500 font-bold ml-1">{{ form.errors.departements }}</div>
+            <div class="pt-6 dark:border-zinc-800 border-t">
+                <DepartementSelector
+                    v-model="form.departements"
+                    :all-departements="departements"
+                />
             </div>
 
             <WarningPermission
