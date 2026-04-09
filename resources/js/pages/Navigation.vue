@@ -219,10 +219,11 @@ const { isDragging } = useDragAndDrop({
         <div
             class="bg-gray-50 dark:bg-sky-900/20 py-3 px-4 text-xs font-semibold tracking-wider text-gray-500 dark:text-zinc-400 grid grid-cols-12 uppercase"
         >
-            <p class="col-span-5">Nom</p>
-            <p class="col-span-2 text-center">Type</p>
-            <p class="col-span-3 text-center">Date de création</p>
-            <p class="col-span-2 text-right">Actions</p>
+            <p class="col-span-6">Nom</p>
+            <p class="col-span-1 text-center">Type</p>
+            <p class="col-span-2 text-center">Date de création</p>
+            <p class="col-span-2 text-center">Départements</p>
+            <p class="col-span-1 text-right">Actions</p>
         </div>
 
         <ResourceRow

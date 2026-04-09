@@ -259,7 +259,7 @@ readonly class FoldersService implements Interfaces\FoldersServiceInterface {
         return new FolderDTO(
             id: $folder->id,
             name: $folder->name,
-            departements: $folder->relationLoaded('departements') ? $folder->departements->pluck('id')->toArray() : [],
+            departements: $folder->departements->pluck('id')->toArray(),
             color: $folder->color,
             created_at: $folder->created_at,
             is_archived: $folder->is_archived,

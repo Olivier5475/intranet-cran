@@ -1,7 +1,7 @@
 <script setup lang="ts">
 // 1. Vue & Core
 import { ref } from "vue";
-import { Link } from "@inertiajs/vue3";
+import { Link, usePage } from '@inertiajs/vue3';
 
 // 2. Librairies tierces (Icônes)
 import { EllipsisHorizontalIcon } from "@heroicons/vue/24/solid";
@@ -16,6 +16,7 @@ import ResourceIcon from "@/Components/ResourceIcon.vue";
 
 // 5. Types
 import { Child } from "@/types/child";
+import { Departement } from '@/types/departement';
 
 const props = defineProps<{
     child: Child;
@@ -34,6 +35,15 @@ const toggleMenu = ref(false);
 
 // savoir si le Modal de validation de suppression est ouvert
 const isActiveValidation = ref(false);
+
+//
+const page = usePage();
+// Récupère les informations d'un département grâce à son id
+const getDep = (id: number) => {
+    return page.props.departements.find((d: Departement) => d.id === id);
+};
+
+const hoveredDepId = ref<number | null>(null);
 </script>
 
 <template>
@@ -48,6 +58,7 @@ const isActiveValidation = ref(false);
             :href="links.href"
             class="flex flex-col items-center"
         >
+
             <div
                 class="w-16 h-16 mb-3 transition-transform
                 duration-200 group-hover:scale-110"
@@ -65,6 +76,51 @@ const isActiveValidation = ref(false);
                 {{ decodeEntities(child.name) }}
             </span>
         </component>
+
+        <div class="absolute top-1 left-1 flex flex-wrap gap-1 max-w-[90%] z-[50] pointer-events-none">
+            <div
+                v-for="depId in child.departements"
+                :key="depId"
+                class="pointer-events-auto relative h-3 transition-all duration-300"
+                :style="{ // Si moins de 2 departements, largueur de base en auto, sinon fixé à 0.75rem
+                    width: (child.departements as number[]).length <= 2 ? 'auto' : '0.75rem'
+                }"
+                @mouseenter="hoveredDepId = depId"
+                @mouseleave="hoveredDepId = null"
+            >
+                <div
+                    :style="{
+                        backgroundColor: getDep(depId)?.color,
+                        zIndex: hoveredDepId === depId ? 10 : 1
+                    }"
+                :class="[
+                    // Si le nombre de departement est supérieur à 2,
+                    (child.departements as number[]).length > 2
+                        // on fixe les pastilles à un endroit
+                        ? 'absolute top-0 left-0'
+                        // Sinon, on les laisse se placer en ligne.
+                        : 'relative',
+
+                    // S\'il y a 2 departements, ou moins par-dessus le departement
+                    ((child.departements as number[]).length <= 2 || hoveredDepId === depId)
+                        // On fix la largeur à 'fit' et le padding à 1
+                        ? 'w-fit px-1'
+                        // Sinon, on fix largeur à 3
+                        : 'w-3'
+                ]"
+                    class="h-3 rounded-full flex items-center justify-center
+                    transition-all duration-300 shadow-sm whitespace-nowrap"
+                >
+                    <span
+                        v-if="(child.departements as number[]).length <= 3 || hoveredDepId === depId"
+                        class="text-[0.5rem] font-black uppercase text-white p-1"
+                        :class="getDep(depId)?.color === '#ffffff' ? '!text-black' : ''"
+                    >
+                        {{ getDep(depId)?.initials }}
+                    </span>
+                </div>
+            </div>
+        </div>
 
         <div
             class="top-0 right-0 absolute"
