@@ -7,4 +7,5 @@ export interface Document {
     color: string;
     attachments: Attachment[];
     departements: number[];
+    folder_id: number
 }

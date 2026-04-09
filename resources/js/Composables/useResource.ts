@@ -41,7 +41,7 @@ export function useResource(props: any) {
 
     // Gestion des permissions
     const canEdit = computed(() => {
-        const userDeps = page.props.auth.user.departements_ids as number[];
+        const userDeps = page.props.auth.user.departements as number[];
         // On vérifie si l'utilisateur a un département en commun OU si l'objet n'a pas de département (public/global)
         return (
             props.child.departements.length === 0 ||

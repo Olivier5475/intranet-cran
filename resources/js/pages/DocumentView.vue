@@ -52,7 +52,7 @@ const parentDpts = props.document.departements as number[];
 const user = page.props.auth.user;
 
 // On récupère les départements de l'utilisateur
-const userDpts = user.departements_ids as number[];
+const userDpts = user.departements as number[];
 
 // On récupère les départements en commun
 const compareParentAndUser = parentDpts.filter((value) => userDpts.includes(value));

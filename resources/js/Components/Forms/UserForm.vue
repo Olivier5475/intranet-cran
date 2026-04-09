@@ -1,23 +1,28 @@
 <script setup lang="ts">
-import { useForm } from '@inertiajs/vue3';
-import { CheckIcon } from '@heroicons/vue/24/solid';
+import { useForm } from "@inertiajs/vue3";
+import DepartementSelector from "@/Components/Forms/DepartementSelector.vue";
+import { Departement } from "@/types/departement";
+import { User } from "@/types";
 
-const props = defineProps<{ user?: any; departements: any[] }>();
-const emit = defineEmits(['success']);
+const props = defineProps<{
+    user?: User;
+    departements: Departement[]
+}>();
+const emit = defineEmits(["success"]);
 
 const form = useForm({
-    nom: props.user?.nom ?? '',
-    prenom: props.user?.prenom ?? '',
-    email: props.user?.email ?? '',
-    role: props.user?.role ?? 'user',
+    nom: props.user?.nom ?? "",
+    prenom: props.user?.prenom ?? "",
+    email: props.user?.email ?? "",
+    role: props.user?.role ?? "user",
     departements: props.user?.departements ?? [],
 });
 const submit = () => {
-    const action = props.user ? 'patch' : 'post';
-    const url = props.user ? `/admin/users/${props.user.id}` : '/admin/users';
+    const action = props.user ? "patch" : "post";
+    const url = props.user ? `/admin/users/${props.user.id}` : "/admin/users";
 
     form[action](url, {
-        onSuccess: () => emit('success'),
+        onSuccess: () => emit("success"),
     });
 };
 </script>
@@ -26,7 +31,11 @@ const submit = () => {
     <form @submit.prevent="submit" class="space-y-6">
         <div class="gap-4 grid grid-cols-2">
             <div class="space-y-1">
-                <label class="font-black text-zinc-400 ml-1 text-[10px] uppercase"> Prénom </label>
+                <label
+                    class="font-black text-zinc-400 ml-1 text-[10px] uppercase"
+                >
+                    Prénom
+                </label>
                 <input
                     v-model="form.prenom"
                     type="text"
@@ -34,7 +43,11 @@ const submit = () => {
                 />
             </div>
             <div class="space-y-1">
-                <label class="font-black text-zinc-400 ml-1 text-[10px] uppercase"> Nom </label>
+                <label
+                    class="font-black text-zinc-400 ml-1 text-[10px] uppercase"
+                >
+                    Nom
+                </label>
                 <input
                     v-model="form.nom"
                     type="text"
@@ -57,7 +70,9 @@ const submit = () => {
         </div>
 
         <div class="space-y-1">
-            <label class="font-black text-zinc-400 ml-1 text-[10px] uppercase">Email professionnel</label>
+            <label class="font-black text-zinc-400 ml-1 text-[10px] uppercase"
+                >Email professionnel</label
+            >
             <input
                 v-model="form.email"
                 type="email"
@@ -99,7 +114,7 @@ const submit = () => {
             :disabled="form.processing"
             class="py-4 bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 font-bold rounded-xl shadow-xl w-full transition-all hover:opacity-90 disabled:opacity-50"
         >
-            {{ user ? 'Mettre à jour le profil' : "Créer l'utilisateur" }}
+            {{ user ? "Mettre à jour le profil" : "Créer l'utilisateur" }}
         </button>
     </form>
 </template>

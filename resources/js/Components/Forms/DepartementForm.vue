@@ -19,7 +19,7 @@ const updateInitials = () => {
     if (!userInteractedWith.value) {
         form.initials = form.name
             .split(' ')
-            .map((word) => word[0])
+            .map((word: any) => word[0])
             .join('')
             .toUpperCase()
             .substring(0, 3); // Limite à 3 caractères pour le design

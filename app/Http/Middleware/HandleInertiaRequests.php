@@ -57,10 +57,11 @@ class HandleInertiaRequests extends Middleware {
                     'prenom' => $request->user()->prenom,
                     'email' => $request->user()->email,
                     'role' => $request->user()->role,
-                    'departements_ids' => $request->user()
+                    'departements' => $request->user()
                         ->load('departements:id')
                         ->departements
-                        ->pluck('id'),
+                        ->pluck('id')
+                        ->toArray(),
                 ] : null,
             ],
             'flash' => [
