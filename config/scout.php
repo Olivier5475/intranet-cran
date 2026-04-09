@@ -146,6 +146,7 @@ return [
             ],
             \App\Models\Document::class => [
                 'filterableAttributes' => ['folder_id', 'id', 'departements', 'is_archived'],
+                'searchableAttributes' => ['title', 'content'],
                 'sortableAttributes' => ['created_at', 'title'],
             ],
             \App\Models\User::class => [

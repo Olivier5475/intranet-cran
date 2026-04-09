@@ -28,7 +28,7 @@ interface FoldersServiceInterface {
      * Récupère le contenu d'un dossier (navigation ou recherche par pertinence via Scout).
      * @return Collection<FolderDTO|FileDTO|DocumentDTO>
      */
-    public function getFolderContents(int $folderId, ?string $searchQuery, bool $archived): Collection;
+    public function getFolderContents(int $folderId, ?string $searchQuery, bool $archived, ?bool $searchInContent): Collection;
 
     /**
      * @throws FolderNotFoundException|BadRequestException

@@ -22,11 +22,12 @@ class NavigationController extends Controller
         }
 
         $searchQuery = $request->input('q');
+        $searchInContent = $request->boolean('in_content');
         $isArchived = $request->routeIs('navigate.archived');
 
         try {
             // Récupération du contenu
-            $items = $this->foldersService->getFolderContents($folder_id, $searchQuery, $isArchived);
+            $items = $this->foldersService->getFolderContents($folder_id, $searchQuery, $isArchived, $searchInContent);
             // Récupération du fil d'Ariane
             $breadcrumbs = $this->foldersService->getBreadcrumbs($folder_id);
 

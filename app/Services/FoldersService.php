@@ -96,15 +96,15 @@ readonly class FoldersService implements Interfaces\FoldersServiceInterface {
             created_at: $folder->created_at,
         );
     }
-    public function getFolderContents(int $folderId, ?string $searchQuery, bool $archived) : Collection
+    public function getFolderContents(int $folderId, ?string $searchQuery, bool $archived, ?bool $searchInContent) : Collection
     {
         if ($searchQuery && trim($searchQuery) !== '') {
-            return $this->performSearch($folderId, $searchQuery, $archived);
+            return $this->performSearch($folderId, $searchQuery, $archived, $searchInContent);
         }
         return collect($this->getChildren($folderId, $archived))->sortBy('name')->values();
     }
 
-    private function performSearch(int $rootFolderId, string $query, bool $archived) : Collection
+    private function performSearch(int $rootFolderId, string $query, bool $archived, ?bool $searchInContent) : Collection
     {
         $folderIds = $this->folderRepository->getDescendantFolderIds($rootFolderId);
 
@@ -115,11 +115,18 @@ readonly class FoldersService implements Interfaces\FoldersServiceInterface {
             ->where('is_archived', (int) $archived)
             ->get();
 
-        $documents = Document::search($query) // ON RECHERCHE LES DOCUMENTS
+        $documentsSearch = Document::search($query) // ON RECHERCHE LES DOCUMENTS
             ->whereIn('folder_id', $folderIds)
             // On cast le booléen en int pour le rendre compréhensible par Meilisearch (0 ou 1)
-            ->where('is_archived', (int) $archived)
-            ->get();
+            ->where('is_archived', (int) $archived);
+
+        if (!$searchInContent) {
+            $documentsSearch->options([
+                'attributesToSearchOn' => ['title'],
+            ]);;
+        }
+
+        $documents = $documentsSearch->get();
 
         // ON TRANSFORME EN Collection DE DTO POUR ÉVITER DE COMMUNIQUER LE MODEL AU CONTROLLER
         $fileDTOs = $files->map(fn($f) => new FileDTO(

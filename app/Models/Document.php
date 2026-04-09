@@ -114,4 +114,20 @@ class Document extends Model {
             }
         }
     }
+
+    // Dans App\Models\Document.php
+
+    public function toSearchableArray(): array
+    {
+        return [
+            'id' => (int) $this->id,
+            'title' => $this->title,
+            // On indexe le texte brut, pas le HTML rendu
+            'content' => strip_tags($this->content),
+            'folder_id' => (int) $this->folder_id,
+            'is_archived' => (int) $this->is_archived,
+            // On peut même indexer le nom des départements pour chercher par service !
+            'departements' => $this->departements->pluck('name')->toArray(),
+        ];
+    }
 }
