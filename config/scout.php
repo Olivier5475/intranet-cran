@@ -141,11 +141,11 @@ return [
         'key' => env('MEILISEARCH_KEY'),
         'index-settings' => [
             \App\Models\File::class => [
-                'filterableAttributes' => ['folder_id', 'id', 'departements'], // Ajoute 'folder_id' ici
+                'filterableAttributes' => ['folder_id', 'id', 'departements', 'is_archived'], // Ajoute 'folder_id' ici
                 'sortableAttributes' => ['created_at', 'name'],
             ],
             \App\Models\Document::class => [
-                'filterableAttributes' => ['folder_id', 'id', 'departements'],
+                'filterableAttributes' => ['folder_id', 'id', 'departements', 'is_archived'],
                 'sortableAttributes' => ['created_at', 'title'],
             ],
             \App\Models\User::class => [

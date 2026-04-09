@@ -109,8 +109,17 @@ readonly class FoldersService implements Interfaces\FoldersServiceInterface {
         $folderIds = $this->folderRepository->getDescendantFolderIds($rootFolderId);
 
         // Recherche via Scout (Meilisearch)
-        $files = File::search($query)->whereIn('folder_id', $folderIds)->where("is_archived", $archived)->get(); // ON RECHERCHE LES FICHIERS
-        $documents = Document::search($query)->whereIn('folder_id', $folderIds)->where("is_archived", $archived)->get(); // ON RECHERCHE LES DOCUMENTS
+        $files = File::search($query) // ON RECHERCHE LES FICHIERS
+            ->whereIn('folder_id', $folderIds)
+            // On cast le booléen en int pour le rendre compréhensible par Meilisearch (0 ou 1)
+            ->where('is_archived', (int) $archived)
+            ->get();
+
+        $documents = Document::search($query) // ON RECHERCHE LES DOCUMENTS
+            ->whereIn('folder_id', $folderIds)
+            // On cast le booléen en int pour le rendre compréhensible par Meilisearch (0 ou 1)
+            ->where('is_archived', (int) $archived)
+            ->get();
 
         // ON TRANSFORME EN Collection DE DTO POUR ÉVITER DE COMMUNIQUER LE MODEL AU CONTROLLER
         $fileDTOs = $files->map(fn($f) => new FileDTO(
@@ -123,7 +132,6 @@ readonly class FoldersService implements Interfaces\FoldersServiceInterface {
             mimetype: $f->mimetype,
             is_archived: $f->is_archived,
         ));
-
         // ON TRANSFORME EN Collection DE DTO POUR ÉVITER DE COMMUNIQUER LE MODEL AU CONTROLLER
         $documentDTOs = $documents->map(fn($d) => new DocumentDTO(
             id: $d->id,
