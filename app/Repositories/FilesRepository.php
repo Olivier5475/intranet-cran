@@ -115,7 +115,7 @@ class FilesRepository implements Interfaces\FilesRepositoryInterface {
             ->when($id, fn($q) => $q->where('id', '!=', $id));
 
         $docQuery = Document::where('folder_id', $folder_id)
-            ->where('title', $name);
+            ->where('name', $name);
 
         return $fileQuery->exists() || $docQuery->exists();
     }

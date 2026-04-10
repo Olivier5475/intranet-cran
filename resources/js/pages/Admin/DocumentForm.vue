@@ -36,8 +36,8 @@ const user = page.props.auth.user;
 const userDepartementIds = user.departements;
 
 const form = useForm({
-    title: props.document
-        ? decodeEntities(props.document.title)
+    name: props.document
+        ? decodeEntities(props.document.name)
         : props.parent_id == 0
           ? "Accueil"
           : "",
@@ -73,11 +73,11 @@ const removeExistingAttachment = (index: number) =>
     form.existing_attachments.splice(index, 1);
 
 const submit = () => {
-    if (props.document)
-        form.post(route.post.update.url(props.document.id), {
-            method: "patch",
-        });
-    else form.post(route.post.create.url());
+        form.post(
+            props.document // Si on a un document
+                ? route.post.update.url(props.document.id) // on l'update
+                : route.post.create.url() // sinon, on en crée un
+        );
 };
 
 </script>
@@ -86,7 +86,7 @@ const submit = () => {
     <Head
         :title="
             document
-                ? `Modifier ${decodeEntities(document.title)}`
+                ? `Modifier ${decodeEntities(document.name)}`
                 : 'Nouveau document'
         "
     />
@@ -114,16 +114,16 @@ const submit = () => {
                     >
                     <input
                         type="text"
-                        v-model="form.title"
+                        v-model="form.name"
                         placeholder="Ex: Procédure de sécurité"
                         :disabled="parent_id == 0"
                         class="px-5 py-4 rounded-2xl border-gray-200 dark:border-zinc-800 dark:bg-zinc-900/50 focus:ring-sky-500/10 focus:border-sky-500 text-xl font-bold dark:text-white w-full transition-all focus:ring-4 disabled:opacity-50"
                     />
                     <div
-                        v-if="form.errors.title"
+                        v-if="form.errors.name"
                         class="text-xs text-red-500 font-bold ml-1"
                     >
-                        {{ form.errors.title }}
+                        {{ form.errors.name }}
                     </div>
                 </div>
 

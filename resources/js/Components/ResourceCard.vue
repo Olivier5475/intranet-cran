@@ -17,6 +17,7 @@ import ResourceIcon from "@/Components/ResourceIcon.vue";
 // 5. Types
 import { Child } from "@/types/child";
 import { Departement } from '@/types/departement';
+import { isImageFile } from '@/Composables/useDocumentsTypeRegex';
 
 const props = defineProps<{
     child: Child;
@@ -44,14 +45,44 @@ const getDep = (id: number) => {
 };
 
 const hoveredDepId = ref<number | null>(null);
+
+const showImage = ref(false);
+const wasShown = ref(false); // Garde en mémoire si on a déjà survolé
+
+const handleMouseEnter = () => {
+    showImage.value = true;
+    wasShown.value = true; // On active le rendu définitif
+};
 </script>
 
 <template>
+    <div v-if="wasShown && child.storage_path" v-show="showImage" class="absolute">
+        <div class="fixed pointer-events-none z-[100] shadow-2xl border-4 bg-white text-black rounded-lg overflow-hidden top-20 right-20">
+            <p class="text-center font-extrabold">Prévisualisation</p>
+
+            <img
+                v-if="child.mimetype && isImageFile(child.mimetype)"
+                :src="'/storage/' + child.storage_path"
+                class="min-w-[12rem] max-w-[18rem] h-auto object-cover"
+                alt=""
+            />
+
+            <iframe
+                v-else-if="child.mimetype && child.mimetype.includes('pdf')"
+                :src="'/storage/' + child.storage_path"
+                frameborder="0"
+                width="350px" height="600px"
+            ></iframe>
+        </div>
+    </div>
     <div
         class="group bg-white dark:bg-slate-800/30 hover:border-sky-200
         dark:hover:border-sky-900 hover:shadow-md p-4 rounded-2xl relative
          overflow-hidden border border-transparent transition-all duration-200
          hover:overflow-visible"
+
+        @mouseenter="handleMouseEnter"
+        @mouseleave="showImage = false"
     >
         <component
             :is="child.type !== 'file' ? Link : 'a'"

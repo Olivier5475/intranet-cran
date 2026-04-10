@@ -41,11 +41,29 @@ export function useResource(props: any) {
 
     // Gestion des permissions
     const canEdit = computed(() => {
-        const userDeps = page.props.auth.user.departements as number[];
-        // On vérifie si l'utilisateur a un département en commun OU si l'objet n'a pas de département (public/global)
+        // On récupère les départements de la page
+        const parentDpts = props.child.departements as number[];
+
+        // On récupère l'utilisateur
+        const user = page.props.auth.user;
+
+        // On récupère les départements de l'utilisateur
+        const userDpts = user.departements as number[];
+
+        // On récupère les départements en commun
+        const compareParentAndUser = parentDpts.filter((value) =>
+            userDpts.includes(value),
+        );
         return (
-            props.child.departements.length === 0 ||
-            props.child.departements.some((depId: number) => userDeps.includes(depId))
+            user.role === "admin" || // Si l'utilisateur est un admin, il peut créer.
+            // Si c'est un editeur et qu'il a des roles en commun avec la page, il peut créer.
+            (
+                user.role === "editeur" &&
+                (
+                    parentDpts.length === 0 ||
+                    compareParentAndUser.length > 0
+                )
+            )
         );
     });
 

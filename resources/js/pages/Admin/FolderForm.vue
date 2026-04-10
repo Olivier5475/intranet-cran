@@ -37,11 +37,10 @@ const page = usePage();
 const userDepartementsIds = page.props.auth.user.departements;
 
 const submit = () => {
-    if (props.folder) {
-        form.patch(route.post.update.url(props.folder.id));
-    } else {
-        form.post(route.post.create.url());
-    }
+    form.post(
+        props.folder
+            ? route.post.update.url(props.folder.id)
+            : route.post.create.url());
 };
 
 onMounted(() => {

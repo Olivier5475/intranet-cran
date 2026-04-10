@@ -25,11 +25,11 @@ import { Folder } from '@/types/folder';
 const page = usePage();
 
 defineProps<{
-    title: string;
+    name: string;
     children?: Array<Folder>;
     racineDocument: {
         id: number;
-        title: string;
+        name: string;
     } | null;
 }>();
 
@@ -47,7 +47,7 @@ const isActive = ref(true);
                     :is="isActive ? ChevronDownIcon : ChevronRightIcon"
                     class="w-5 h-5 text-sky-500 transition-transform duration-300"
                 />
-                <span class="text-sm uppercase tracking-wider">{{ title }}</span>
+                <span class="text-sm uppercase tracking-wider">{{ name }}</span>
             </span>
         </h2>
 

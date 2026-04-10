@@ -10,7 +10,7 @@ interface Attachment {
 }
 interface DocumentPayload {
     id: number;
-    title: string;
+    name: string;
     content: string;
     color: string;
     _relations: {
@@ -65,7 +65,7 @@ const restore = (versionId: number) => {
                 <tbody>
                 <tr v-for="version in versions" :key="version.id" class="border-b transition">
                     <td class="p-4 font-medium">
-                        {{ version.payload.title }}
+                        {{ version.payload.name }}
                     </td>
                     <td class="p-4 text-sm uppercase">
                         DOC

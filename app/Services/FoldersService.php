@@ -49,7 +49,7 @@ readonly class FoldersService implements Interfaces\FoldersServiceInterface {
         foreach ($current->documents as $document) {
             $res[] = new DocumentDTO(
                 id: $document->id,
-                name: $document->title,
+                name: $document->name,
                 departements: $document->departements->pluck('id')->toArray(),
                 created_at: $document->created_at,
                 color: $document->color,
@@ -122,7 +122,7 @@ readonly class FoldersService implements Interfaces\FoldersServiceInterface {
 
         if (!$searchInContent) {
             $documentsSearch->options([
-                'attributesToSearchOn' => ['title'],
+                'attributesToSearchOn' => ['name'],
             ]);;
         }
 
@@ -142,7 +142,7 @@ readonly class FoldersService implements Interfaces\FoldersServiceInterface {
         // ON TRANSFORME EN Collection DE DTO POUR ÉVITER DE COMMUNIQUER LE MODEL AU CONTROLLER
         $documentDTOs = $documents->map(fn($d) => new DocumentDTO(
             id: $d->id,
-            name: $d->title,
+            name: $d->name,
             departements: $d->departements->pluck('id')->toArray(),
             created_at: $d->created_at,
             color: $d->color,

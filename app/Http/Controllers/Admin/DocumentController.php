@@ -28,8 +28,8 @@ class DocumentController extends Controller {
 
     public function store(Request $request, $id = null) {
         $validatedData = $request->validate([
-            'title' => ['required', 'string', 'max:255'],
-            'content' => ['required', 'string'],
+            'name' => ['required', 'string', 'max:255'],
+            'content' => ['sometimes', 'string'],
             'color' => ['nullable', 'string', 'max:16'],
             'existing_attachments' => ['sometimes', 'array'],
             'existing_attachments.*' => ['array'],
@@ -43,14 +43,23 @@ class DocumentController extends Controller {
 
         // Préparation des données
         $data = [
-            "title" => $validatedData["title"],
-            "content" => $validatedData["content"],
-            "color" => $validatedData["color"] ?? ($id ? null : '#ffffff'),
-            "existing_attachments" => $validatedData["existing_attachments"] ?? [],
-            "new_attachments" => $request->file('new_attachments') ?? [],
+            "name" => $validatedData["name"],
             "departements" => $validatedData["departements"] ?? [],
             "folder_id" => $validatedData["parent_id"] ?? null,
         ];
+
+        if (isset($validatedData["content"])) {
+            $data["content"] = $validatedData["content"];
+        }
+        if (isset($validatedData["color"])) {
+            $data["color"] = $validatedData["color"];
+        }
+        if(isset($validatedData["existing_attachments"])) {
+            $data['existing_attachments'] = $validatedData["existing_attachments"];
+        }
+        if(isset($validatedData["new_attachments"])) {
+             $data["new_attachments"] = $request->file('new_attachments') ?? [];
+        }
 
         if(empty($data["folder_id"])) {
             unset($data["folder_id"]);
@@ -97,7 +106,7 @@ class DocumentController extends Controller {
         } catch (Throwable $t) {
             Log::critical('Erreur fatale imprévue (Document Store)', [
                 'id' => $id,
-                'title' => $validatedData['title'],
+                'name' => $validatedData['name'],
                 'error' => $t->getMessage()
             ]);
             return redirect()->back()->with('error', 'Une erreur imprévue est survenue. Veuillez réessayer plus tard.');

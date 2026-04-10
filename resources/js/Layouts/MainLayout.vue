@@ -31,7 +31,7 @@ defineProps<{
     departements: Departement[];
     racineDocument: {
         id: number;
-        title: string;
+        name: string;
     } | null;
 }>();
 </script>
@@ -46,7 +46,7 @@ defineProps<{
         <div class="bg-gray-100 dark:bg-slate-600">
             <div class="lg:grid-cols-5 gap-6 p-4 mx-auto grid w-11/12 grid-cols-1">
                 <aside class="lg:col-span-1 space-y-6">
-                    <SidebarWidget title="Navigation" :children="racineChildren" :racine-document="racineDocument" />
+                    <SidebarWidget name="Navigation" :children="racineChildren" :racine-document="racineDocument" />
                 </aside>
 
                 <main

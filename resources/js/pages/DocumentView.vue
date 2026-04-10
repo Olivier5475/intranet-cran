@@ -22,27 +22,13 @@ import download from '@/routes/download';
 import editor_route from '@/routes/editor';
 import route from '@/routes/editor/document';
 
+// 5. Types
+import { Document } from '@/types/document';
 // Initialisation
 const page = usePage();
 
 const props = defineProps<{
-    document: {
-        // Document courant
-        id: number;
-        folder_id: number;
-        title: string;
-        content: string;
-        attachments?: Array<{
-            // Liste des pièces jointes
-            id: number;
-            name: string;
-            storage_path: string; // chemin d'accès de la piece jointe
-            mimetype: string; // Type de fichier de la pièce jointe (ex pdf, image, video etc ...)
-            size: number; // taille du fichier en octet
-        }>;
-        departements: number[];
-        color: string;
-    };
+    document: Document;
 }>();
 
 // On récupère les départements de la page
@@ -68,7 +54,7 @@ const { isDragging } = useDragAndDrop({
     onDrop: (file) => {
         // Formulaire à envoyer au contrôleur Laravel
         const form = useForm({
-            title: decodeEntities(props.document.title), // On récupère renvoie le meme titre
+            name: decodeEntities(props.document.name), // On récupère renvoie le meme titre
             content: props.document.content ?? '', // On récupère renvoie le meme contenu
             existing_attachments: props.document?.attachments ?? [], // On renvoie les piece jointe deja existante
             new_attachments: [] as File[], // On prépare l'envoie de la nouvelle pièce jointe
@@ -96,7 +82,7 @@ const { isDragging } = useDragAndDrop({
     <div class="max-w-5xl mb-10 mx-auto overflow-hidden">
         <header class="group bg-slate-50 dark:bg-slate-800/50 p-6 rounded-t-2xl border-slate-200 dark:border-slate-700 relative border-b">
             <h1 class="text-4xl font-black text-slate-800 dark:text-white tracking-tight text-center first-letter:uppercase">
-                {{ decodeEntities(document.title) }}
+                {{ decodeEntities(document.name) }}
             </h1>
 
             <Link

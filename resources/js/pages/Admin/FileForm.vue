@@ -43,13 +43,11 @@ const handleNewFileUpload = (event: Event) => {
 };
 
 const submit = () => {
-    if (props.file) {
-        form.post(route.post.update.url(props.file.id), {
-            method: "patch",
-        });
-    } else {
-        form.post(route.post.create.url());
-    }
+    form.post(
+        props.file
+            ? route.post.update.url(props.file.id)
+            : route.post.create.url()
+    );
 };
 
 onMounted(() => {

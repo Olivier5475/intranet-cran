@@ -16,13 +16,13 @@ class DocumentRepository implements Interfaces\DocumentRepositoryInterface {
 
     public function create(array $data): Document {
         // Vérification de l'unicité du nom dans le dossier
-        if($this->checkName($data['folder_id'] ?? null, $data['title'])) {
+        if($this->checkName($data['folder_id'] ?? null, $data['name'])) {
             throw new AlreadyExistsException("Un document ou un fichier porte déjà ce nom dans ce dossier.");
         }
 
         try {
             $document = new Document();
-            $document->title = e($data['title']); // Protection basique XSS sur le titre
+            $document->name = e($data['name']); // Protection basique XSS sur le titre
             $document->content = $data['content']; // Le nettoyage est fait dans le Service via Purifier
             $document->color = $data['color'] ?? '#ffffff';
             $document->folder_id = $data['folder_id'] ?? null;
@@ -55,14 +55,20 @@ class DocumentRepository implements Interfaces\DocumentRepositoryInterface {
     public function update(int $id, array $data): Document {
         $document = $this->read($id);
 
-        if($this->checkName($document->folder_id, $data['title'], $id)) {
+        if($this->checkName($document->folder_id, $data['name'], $id)) {
             throw new AlreadyExistsException("Le nouveau titre est déjà utilisé par un autre élément.");
         }
 
         try {
-            $document->title = e($data['title']);
-            $document->content = $data['content'];
-            $document->color = $data['color'];
+            if (isset($data['name'])) {
+                $document->name = e($data['name']);
+            }
+            if (isset($data["content"])) {
+                $document->content = $data['content'];
+            }
+            if (isset($data["color"])) {
+                $document->color = $data['color'];
+            }
             $document->save();
 
             if (isset($data['departements'])) {
@@ -126,7 +132,7 @@ class DocumentRepository implements Interfaces\DocumentRepositoryInterface {
         $fileQuery = File::where('folder_id', $folderId)->where('name', $name);
 
         $docQuery = Document::where('folder_id', $folderId)
-            ->where('title', $name)
+            ->where('name', $name)
             ->when($excludeId, fn($q) => $q->where('id', '!=', $excludeId));
 
         return $fileQuery->exists() || $docQuery->exists();

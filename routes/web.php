@@ -28,9 +28,9 @@ Route::prefix("editor")
 
             // POST (submit)
             Route::post("/store", [Controllers\Admin\FolderController::class, "store"])->name("editor.folder.post.create");
+            Route::post("/store/{folder_id}", [Controllers\Admin\FolderController::class, "store"])->name("editor.folder.post.update");
 
             // PATCH (submit)
-            Route::patch("/store/{folder_id}", [Controllers\Admin\FolderController::class, "store"])->name("editor.folder.post.update");
             Route::patch("/restore/{folder_id}", [Controllers\Admin\FolderController::class, "restore"])->name("editor.folder.post.restore");
 
             // DELETE

@@ -18,7 +18,7 @@ class Document extends Model {
     use HasFactory, Searchable, HasHistory;
 
     protected $fillable = [
-        'title',
+        'name',
         'content',
         'user_id',
         'folder_id',
@@ -121,7 +121,7 @@ class Document extends Model {
     {
         return [
             'id' => (int) $this->id,
-            'title' => $this->title,
+            'name' => $this->name,
             // On indexe le texte brut, pas le HTML rendu
             'content' => strip_tags($this->content),
             'folder_id' => (int) $this->folder_id,

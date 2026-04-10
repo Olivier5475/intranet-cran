@@ -43,32 +43,33 @@ readonly class DocumentService implements Interfaces\DocumentsServiceInterface {
             DB::beginTransaction();
 
             $newAttachments = $data["new_attachments"] ?? [];
-            $existingAttachments = $data["existing_attachments"] ?? [];
+            $existingAttachments = $data["existing_attachments"] ?? null;
             unset($data["new_attachments"], $data["existing_attachments"]);
 
             $document = $this->documentRepository->update($id, $data);
 
             // --- Synchronisation des Attachements ---
-            $currentIds = $document->attachments()->pluck('id')->all();
-            $keepIds = collect($existingAttachments)->pluck('id')->all();
+            if ($existingAttachments != null) {
+                $currentIds = $document->attachments()->pluck('id')->all();
+                $keepIds = collect($existingAttachments)->pluck('id')->all();
 
-            // 1. Suppression de ce qui n'est plus listé
-            foreach (array_diff($currentIds, $keepIds) as $deleteId) {
-                $this->attachmentService->delete($deleteId);
-            }
+                // 1. Suppression de ce qui n'est plus listé
+                foreach (array_diff($currentIds, $keepIds) as $deleteId) {
+                    $this->attachmentService->delete($deleteId);
+                }
 
-            // 2. Mise à jour des existants
-            foreach ($existingAttachments as $attachmentData) {
-                $attachId = $attachmentData["id"];
-                unset($attachmentData["id"]);
+                // 2. Mise à jour des existants
+                foreach ($existingAttachments as $attachmentData) {
+                    $attachId = $attachmentData["id"];
+                    unset($attachmentData["id"]);
 
-                if($this->attachmentService->getDocumentId($attachId) === $document->id) {
-                    $this->attachmentService->update($attachId, $attachmentData);
-                } else {
-                    throw new BadRequestException("Attachement non relié à ce document.");
+                    if ($this->attachmentService->getDocumentId($attachId) === $document->id) {
+                        $this->attachmentService->update($attachId, $attachmentData);
+                    } else {
+                        throw new BadRequestException("Attachement non relié à ce document.");
+                    }
                 }
             }
-
             // 3. Ajout des nouveaux fichiers
             foreach ($newAttachments as $uploadedFile) {
                 $this->attachmentService->create([
@@ -131,7 +132,7 @@ readonly class DocumentService implements Interfaces\DocumentsServiceInterface {
         }    }
 
     public function create(array $data): DocumentViewDTO {
-        if(empty($data['title']) || empty($data['content'])) {
+        if(empty($data['name']) || empty($data['content'])) {
             throw new BadRequestException("Titre et contenu obligatoires.");
         }
 
@@ -176,7 +177,7 @@ readonly class DocumentService implements Interfaces\DocumentsServiceInterface {
 
         return new DocumentViewDTO(
             id: $document->id,
-            title: $document->title,
+            name: $document->name,
             content: $cleanHtml,
             attachments: $attachments,
             created_at: $document->created_at,

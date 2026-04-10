@@ -2,7 +2,7 @@ import { Attachment } from '@/types/attachment';
 
 export interface Document {
     id: number;
-    title: string;
+    name: string;
     content: string;
     color: string;
     attachments: Attachment[];

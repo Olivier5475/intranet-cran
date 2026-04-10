@@ -60,7 +60,7 @@ class FolderController extends Controller
     {
         $validatedData = $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'color' => ['required', 'string', 'max:16'],
+            'color' => ['sometimes','string', 'max:16'],
             'parent_id' => ['integer', 'nullable'],
             'departements' => ['sometimes', 'array'],
         ]);
