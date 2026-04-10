@@ -1,5 +1,6 @@
 import { Folder } from "@/types/folder";
 import { Document } from "@/types/document"
+import { Departement } from "@/types/departement";
 export interface Auth {
     user: User;
 }
@@ -10,6 +11,7 @@ export type AppPageProps<T extends Record<string, unknown> = Record<string, unkn
     auth: Auth;
     document? : Document
     parents?: Folder[];
+    departements: Departement[];
 };
 
 export interface User {
