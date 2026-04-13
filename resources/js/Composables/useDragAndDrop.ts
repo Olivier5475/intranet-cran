@@ -13,6 +13,11 @@ export function useDragAndDrop({ canDrop, onDrop }: DragDropOptions) {
 
     const handleEnter = (e: DragEvent) => {
         preventDefaults(e);
+
+        // Vérifie si l'objet traîné est un fichier (Files)
+        const isFile = e.dataTransfer?.types?.includes('Files');
+        if (!isFile) return;
+
         dragCounter++;
         if (dragCounter === 1) isDragging.value = true;
     };

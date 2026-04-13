@@ -79,6 +79,18 @@ const submit = () => {
     form.post(route.url(props.child.id));
 }
 
+
+const handleDragStart = (e: DragEvent) => {
+    if (e.dataTransfer) {
+        // On passe l'ID et le type pour savoir quoi déplacer côté serveur ou app
+        e.dataTransfer.setData('resource_id', props.child.id.toString());
+        e.dataTransfer.setData('resource_type', props.child.type);
+
+        // Optionnel : change l'effet visuel du curseur
+        e.dataTransfer.effectAllowed = 'move';
+    }
+};
+
 </script>
 
 <template>
@@ -101,6 +113,7 @@ const submit = () => {
             ></iframe>
         </div>
     </div>
+
     <div
         class="group py-3 px-4 border-gray-100 dark:border-zinc-800
         hover:bg-sky-50/50 dark:hover:bg-slate-900/10 grid grid-cols-12
@@ -108,6 +121,9 @@ const submit = () => {
 
         @mouseenter="handleMouseEnter"
         @mouseleave="showImage = false"
+
+        draggable="true"
+        @dragstart="handleDragStart"
     >
         <component
             v-if="activeRename == false"

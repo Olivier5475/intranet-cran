@@ -28,7 +28,7 @@ class DocumentController extends Controller {
 
     public function store(Request $request, $id = null) {
         $validatedData = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
+            'name' => ['sometimes', 'string', 'max:255'],
             'content' => ['sometimes', 'string'],
             'color' => ['nullable', 'string', 'max:16'],
             'existing_attachments' => ['sometimes', 'array'],
@@ -41,13 +41,14 @@ class DocumentController extends Controller {
             'parent_id' => ['integer', 'nullable'],
         ]);
 
+        $data = [];
         // Préparation des données
-        $data = [
-            "name" => $validatedData["name"],
-            "departements" => $validatedData["departements"] ?? [],
-            "folder_id" => $validatedData["parent_id"] ?? null,
-        ];
-
+        if(isset($validatedData["name"])) {
+            $data["name"] = $validatedData["name"];
+        }
+        if(isset($validatedData["departements"])) {
+            $data["departements"] = $validatedData["departements"];
+        }
         if (isset($validatedData["content"])) {
             $data["content"] = $validatedData["content"];
         }
@@ -60,9 +61,8 @@ class DocumentController extends Controller {
         if(isset($validatedData["new_attachments"])) {
              $data["new_attachments"] = $request->file('new_attachments') ?? [];
         }
-
-        if(empty($data["folder_id"])) {
-            unset($data["folder_id"]);
+        if(isset($validatedData["parent_id"])) {
+             $data["folder_id"] = $validatedData["parent_id"];
         }
 
         try {
@@ -106,7 +106,6 @@ class DocumentController extends Controller {
         } catch (Throwable $t) {
             Log::critical('Erreur fatale imprévue (Document Store)', [
                 'id' => $id,
-                'name' => $validatedData['name'],
                 'error' => $t->getMessage()
             ]);
             return redirect()->back()->with('error', 'Une erreur imprévue est survenue. Veuillez réessayer plus tard.');

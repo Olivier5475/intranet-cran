@@ -1,7 +1,7 @@
 <script setup lang="ts">
 // 1. Vue & Core
 import { ref, computed, watch } from "vue";
-import { Link, usePage } from "@inertiajs/vue3";
+import { Link, useForm, usePage } from '@inertiajs/vue3';
 
 // 2. Librairies tierces (Icônes)
 import {
@@ -13,6 +13,8 @@ import {
 // 3. Composables, Routes & Utilitaires
 import { decodeEntities } from "@/Composables/useDecodeModule";
 import folder_route from "@/routes/editor/folder";
+import document_route from "@/routes/editor/document";
+import file_route from "@/routes/editor/file";
 import navigate from "@/routes/navigate";
 
 // 4. Composants
@@ -86,6 +88,47 @@ const canEdit = ref(
         (user.role === "editeur" &&
             (parentDpts.length === 0 || compareParentAndUser.length > 0)),
 );
+
+const handleDrop = (e: DragEvent) => {
+    e.preventDefault();
+
+    // On récupère les infos stockées lors du dragstart (étape 2)
+    const resourceId = e.dataTransfer?.getData('resource_id');
+    const resourceType = e.dataTransfer?.getData('resource_type');
+
+    if (!resourceId || !resourceType) return;
+
+    // On évite de déplacer un dossier dans lui-même
+    if (resourceType === 'folder' && resourceId === props.child.id.toString()) {
+        return;
+    }
+
+    // Envoi de la requête Inertia
+    const form = useForm({
+        parent_id: props.child.id, // Le nouvel ID parent est celui du dossier sur lequel on drop
+    });
+
+    form.post(
+        (resourceType == "folder")
+            ? folder_route.post.update.url(resourceId)
+            : (resourceType == "document")
+                ? document_route.post.update.url(resourceId)
+                : file_route.post.update.url(resourceId)
+        , {
+        preserveScroll: true,
+        onSuccess: () => {
+            // Optionnel : ouvrir le dossier pour montrer que l'élément est dedans
+            isExpanded.value = true;
+        }
+    });
+};
+
+const handleDragOver = (e: DragEvent) => {
+    e.preventDefault(); // Indispensable pour autoriser le drop
+    if (e.dataTransfer) {
+        e.dataTransfer.dropEffect = 'move';
+    }
+};
 </script>
 
 <template>
@@ -95,6 +138,9 @@ const canEdit = ref(
             :class="{
                 'bg-sky-50 dark:bg-sky-900/20': child.id === currentFolderId,
             }"
+
+            @dragover="handleDragOver"
+            @drop="handleDrop"
         >
             <div @click="isExpanded = !isExpanded" class="p-1 cursor-pointer">
                 <component

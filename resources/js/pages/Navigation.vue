@@ -122,7 +122,7 @@ const { isDragging } = useDragAndDrop({
 <template>
     <div
         v-if="isDragging"
-        class="left-0 top-0 bg-sky-400/40 absolute z-50 flex h-full w-full"
+        class="left-0 top-0 bg-sky-400/40 fixed z-50 flex h-full w-full"
     >
         <div
             class="bg-sky-900/30 rounded-2xl border-sky-900 z-10 mx-auto my-auto flex h-[92%] w-[92%] border-4 border-dashed"

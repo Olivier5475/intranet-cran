@@ -55,7 +55,7 @@ class DocumentRepository implements Interfaces\DocumentRepositoryInterface {
     public function update(int $id, array $data): Document {
         $document = $this->read($id);
 
-        if($this->checkName($document->folder_id, $data['name'], $id)) {
+        if(isset($data["name"]) && $this->checkName($document->folder_id, $data['name'], $id)) {
             throw new AlreadyExistsException("Le nouveau titre est déjà utilisé par un autre élément.");
         }
 
@@ -68,6 +68,9 @@ class DocumentRepository implements Interfaces\DocumentRepositoryInterface {
             }
             if (isset($data["color"])) {
                 $document->color = $data['color'];
+            }
+            if (isset($data["folder_id"])) {
+                $document->folder_id = $data['folder_id'];
             }
             $document->save();
 

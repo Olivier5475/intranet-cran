@@ -146,8 +146,8 @@ return [
             ],
             \App\Models\Document::class => [
                 'filterableAttributes' => ['folder_id', 'id', 'departements', 'is_archived'],
-                'searchableAttributes' => ['title', 'content'],
-                'sortableAttributes' => ['created_at', 'title'],
+                'searchableAttributes' => ['name', 'content'],
+                'sortableAttributes' => ['created_at', 'name'],
             ],
             \App\Models\User::class => [
                 'filterableAttributes' => ['id', 'departements'],
