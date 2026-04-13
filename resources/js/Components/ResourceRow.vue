@@ -120,9 +120,6 @@ const handleDragStart = (e: DragEvent) => {
         hover:bg-sky-50/50 dark:hover:bg-slate-900/10 grid grid-cols-12
         items-center border-t transition-colors duration-150"
 
-        @mouseenter="handleMouseEnter"
-        @mouseleave="showImage = false"
-
         draggable="true"
         @dragstart="handleDragStart"
     >
@@ -131,6 +128,9 @@ const handleDragStart = (e: DragEvent) => {
             :is="child.type !== 'file' ? Link : 'a'"
             :href="links.href"
             class="space-x-3 col-span-6 flex items-center overflow-hidden"
+
+            @mouseenter="handleMouseEnter"
+            @mouseleave="showImage = false"
         >
             <div class="w-9 h-9 flex-shrink-0">
                 <ResourceIcon
