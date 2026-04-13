@@ -66,4 +66,6 @@ interface DocumentsServiceInterface {
      * @throws DocumentNotFoundException|PersistenceException
      */
     public function restore(int $document_id): bool;
+
+    public function getParentId(int $folder_id): int;
 }

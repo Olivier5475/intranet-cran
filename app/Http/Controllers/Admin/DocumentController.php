@@ -27,6 +27,14 @@ class DocumentController extends Controller {
     ){}
 
     public function store(Request $request, $id = null) {
+        // On fait les vérifications de droits le plus tôt possible pour optimiser les requêtes
+        // S'il y a un ID (donc mode update, car document existant)
+        // Mais que l'utilisateur n'a pas les permissions d'édition sur le document.
+        if(!empty($id) && !$this->documentsService->hasEditAccess($id)) {
+            // On le renvoie en arrière avec une erreur "Unauthorize".
+            return redirect()->back()->with(["error", "Vous n'avez pas le droit de modifier ce document."]);
+        }
+
         $validatedData = $request->validate([
             'name' => ['sometimes', 'string', 'max:255'],
             'content' => ['sometimes', 'string'],
@@ -43,6 +51,27 @@ class DocumentController extends Controller {
 
         $data = [];
         // Préparation des données
+
+        // Dès qu'on récupère les données envoyées dans la requête,
+        // on regarde s'il y a un parent_id
+        if(isset($validatedData["parent_id"])) {
+            // Si on n'a pas les droits d'édition sur le dossier parent
+            if (!$this->foldersService->hasEditAccess($validatedData["parent_id"])) {
+                // On redirige l'utilisateur en arrière,
+                return redirect()->back()
+                    // avec une erreur "Unauthorized"
+                    ->with("error", "Action non autorisée dans ce dossier.");
+            }
+            // Sinon, on prépare l'array de données pour le service
+            $data["folder_id"] = $validatedData["parent_id"];
+        }
+
+        // Pour chaque attribut possible dans la requête
+        // On regarde s'il est présent, et si oui, on le mets dans l'array de données à envoyé.
+        /**
+         * TODO : cette partie existe à cause des attachments, qui sont un peu spéciaux à traiter
+         * TODO : Il faudrait les traiter dans le service pour alléger le controller
+         */
         if(isset($validatedData["name"])) {
             $data["name"] = $validatedData["name"];
         }
@@ -60,9 +89,6 @@ class DocumentController extends Controller {
         }
         if(isset($validatedData["new_attachments"])) {
              $data["new_attachments"] = $request->file('new_attachments') ?? [];
-        }
-        if(isset($validatedData["parent_id"])) {
-             $data["folder_id"] = $validatedData["parent_id"];
         }
 
         try {

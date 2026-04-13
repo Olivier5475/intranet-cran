@@ -64,7 +64,7 @@ class FilesRepository implements Interfaces\FilesRepositoryInterface {
             if (isset($data["storage_path"])) $file->storage_path = $data["storage_path"];
             if (isset($data["mimetype"])) $file->mimetype = $data["mimetype"];
             if (isset($data["size"])) $file->size = $data["size"];
-
+            if (isset($data["folder_id"])) $file->folder_id = $data["folder_id"];
             $file->save();
 
             if (isset($data["departements"])) {

@@ -265,4 +265,10 @@ readonly class FoldersService implements Interfaces\FoldersServiceInterface {
             is_archived: $folder->is_archived,
         );
     }
+
+    public function getParentId(int $folder_id): int
+    {
+        $folder = $this->folderRepository->read($folder_id);
+        return $folder->parent_id;
+    }
 }

@@ -209,4 +209,10 @@ readonly class FilesService implements Interfaces\FilesServiceInterface {
         $fileDeptIds = $this->departementsService->departementsIDs($file->departements);
         return (bool) array_intersect($user->departements, $fileDeptIds);
     }
+
+    public function getParentId(int $folder_id): int
+    {
+        $file = $this->filesRepository->read($folder_id);
+        return $file->folder_id;
+    }
 }

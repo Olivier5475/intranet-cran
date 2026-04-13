@@ -58,4 +58,6 @@ interface FilesServiceInterface
      * @return bool
      */
     public function restore(int $file_id): bool;
+
+    public function getParentId(int $folder_id): int;
 }

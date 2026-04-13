@@ -62,4 +62,6 @@ interface FoldersServiceInterface {
      * @return void
      */
     public function restore(int $folder_id): void;
+
+    public function getParentId(int $folder_id) : int;
 }

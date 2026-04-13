@@ -209,4 +209,10 @@ readonly class DocumentService implements Interfaces\DocumentsServiceInterface {
         $docDeptIds = $this->departementsService->departementsIDs($document->departements);
         return (bool) array_intersect($user->departements, $docDeptIds);
     }
+
+    public function getParentId(int $folder_id): int
+    {
+        $document = $this->documentRepository->read($folder_id);
+        return $document->folder_id;
+    }
 }

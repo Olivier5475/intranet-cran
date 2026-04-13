@@ -59,7 +59,7 @@ class FolderController extends Controller
     public function store(Request $request, $id = null)
     {
         $validatedData = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
+            'name' => ['sometimes', 'string', 'max:255'],
             'color' => ['sometimes','string', 'max:16'],
             'parent_id' => ['integer', 'nullable'],
             'departements' => ['sometimes', 'array'],
@@ -71,8 +71,14 @@ class FolderController extends Controller
                 ->with("error", "Action non autorisée dans ce dossier.");
         }
 
-        if (empty($validatedData["parent_id"])) {
-            unset($validatedData["parent_id"]);
+        if(!empty($id) && !empty($validatedData["parent_id"])) {
+            $current_parent_id = $this->foldersService->getParentId($id);
+            if($current_parent_id != $validatedData["parent_id"]) {
+                if (!$this->foldersService->hasEditAccess($validatedData["parent_id"])) {
+                    return redirect()->route("navigate.folder", ["folder_id" => $targetId])
+                        ->with("error", "Action non autorisée dans ce dossier.");
+                }
+            }
         }
 
         try {

@@ -25,7 +25,13 @@ class FileController extends Controller {
     public function store(Request $request, $file_id = null) {
         $validatedData = $request->validate([
             'name' => [
-                $request->hasFile('files') ? 'nullable' : 'required',
+                $file_id
+                    ? 'sometimes'
+                    : (
+                        $request->hasFile('files')
+                            ? 'nullable'
+                            : 'required'
+                    ),
                 'string',
                 'max:255'
             ],
@@ -34,13 +40,29 @@ class FileController extends Controller {
             'departements' => ['sometimes', 'array'],
             'parent_id' => ['integer', 'nullable'],
         ]);
+        $data = [];
 
-        $data = [
-            "name" => $validatedData["name"],
-            "file" => $request->file('files')[0] ?? null,
-            "departements" => $validatedData["departements"] ?? [],
-            "folder_id" => $validatedData["parent_id"] ?? null,
-        ];
+        if(isset($validatedData["name"])) {
+            $data['name'] = $validatedData["name"];
+        }
+        if(isset($validatedData["departements"])) {
+            $data['departements'] = $validatedData["departements"];
+        }
+        if(isset($validatedData["files"])) {
+            $data['file'] = $request->file('files')[0] ?? null;
+        }
+        if(isset($validatedData["parent_id"])) {
+            if(!empty($id)) {
+                $current_parent_id = $this->foldersService->getParentId($id);
+                if($current_parent_id != $validatedData["parent_id"]) {
+                    if (!$this->foldersService->hasEditAccess($validatedData["parent_id"])) {
+                        return redirect()->route("navigate.folder", ["folder_id" => $targetId])
+                            ->with("error", "Action non autorisée dans ce dossier.");
+                    }
+                }
+            }
+            $data['folder_id'] = $validatedData["parent_id"];
+        }
 
         try {
             if($file_id) {
