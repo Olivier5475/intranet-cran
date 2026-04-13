@@ -54,13 +54,13 @@ const isActive = ref(true);
         <Transition
             enter-active-class="transition-all duration-300 ease-in-out"
             enter-from-class="max-h-0 opacity-0"
-            enter-to-class="max-h-[1200px] opacity-100"
+            enter-to-class="opacity-100"
             leave-active-class="transition-all duration-200 ease-in-out"
-            leave-from-class="max-h-[1200px] opacity-100"
+            leave-from-class="opacity-100"
             leave-to-class="max-h-0 opacity-0"
         >
             <div v-if="isActive" class="dark:bg-sky-900/5 p-3">
-                <ul class="lg:min-h-[65svh] max-h-[75vh] overflow-y-auto no-scrollbar space-y-1">
+                <ul class="lg:min-h-[65svh] max-h-[calc(100vh-2rem)] overflow-y-auto no-scrollbar space-y-1">
 
                     <Link
                         v-if="racineDocument"
