@@ -24,6 +24,7 @@ import { ArrowTurnDownRightIcon } from '@heroicons/vue/24/outline';
 import folder_route from '@/routes/editor/folder';
 import document_route from '@/routes/editor/document';
 import file_route from '@/routes/editor/file';
+import download_route from '@/routes/download/file'
 
 const props = defineProps<{
     child: Child;
@@ -100,14 +101,14 @@ const handleDragStart = (e: DragEvent) => {
 
             <img
                 v-if="child.mimetype && isImageFile(child.mimetype)"
-                :src="'/storage/' + child.storage_path"
+                :src="download_route.preview.url(child.id)"
                 class="min-w-[12rem] max-w-[18rem] h-auto object-cover"
                 alt=""
             />
 
             <iframe
                 v-else-if="child.mimetype && child.mimetype.includes('pdf')"
-                :src="'/storage/' + child.storage_path"
+                :src="download_route.preview.url(child.id)"
                 frameborder="0"
                 width="350px" height="600px"
             ></iframe>

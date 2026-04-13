@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exception\FileNotFoundException;
 use App\Services\Interfaces\AttachmentServiceInterface;
 use App\Services\Interfaces\FilesServiceInterface;
 use Illuminate\Support\Facades\Log;
@@ -46,6 +47,19 @@ class DownloadController extends Controller {
                 'error' => $t->getMessage()
             ]);
             return redirect()->back()->with("error", "Impossible de récupérer cette version du fichier.");
+        }
+    }
+
+    public function preview(int $id)
+    {
+        if(!$id) {
+            abort(400);
+        }
+        try {
+            $file = $this->filesService->read($id);
+            return response()->file(storage_path('app/public/'.$file->storage_path));
+        } catch (FileNotFoundException) {
+            abort(404);
         }
     }
 }

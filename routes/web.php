@@ -10,6 +10,8 @@ Route::get("/download/attachment/{id}", [Controllers\DownloadController::class, 
 Route::get("/download/file/{id}", [Controllers\DownloadController::class, "file"])->name('download.file');
 Route::get("/download/file/version/{id}", [Controllers\DownloadController::class, "version"])->name('download.file.version');
 
+Route::get("/preview/file/{id}", [Controllers\DownloadController::class, "preview"])->name('download.file.preview');
+
 Route::prefix('/navigation')->group(function () {
     Route::get('/f/{folder_id}', Controllers\NavigationController::class)->name('navigate.folder');
     Route::get('/f/{folder_id}/archived', Controllers\NavigationController::class)->name('navigate.archived');
@@ -23,7 +25,7 @@ Route::prefix("editor")
     ->group(function () {
         Route::prefix("folders")->group(function () {
             // GET (form)
-            Route::get("create/p/{parent_id}", [Controllers\Admin\FolderController::class, "create"])->name("editor.folder.create");
+            Route::get("/create/p/{parent_id}", [Controllers\Admin\FolderController::class, "create"])->name("editor.folder.create");
             Route::get("/update/{folder_id}", [Controllers\Admin\FolderController::class, "update"])->name("editor.folder.update");
 
             // POST (submit)
@@ -69,8 +71,8 @@ Route::prefix("editor")
             Route::delete("/delete/{file_id}", [Controllers\Admin\FileController::class, "delete"])->name('editor.file.delete');
         });
 
-        Route::get("{model}/history/{model_id}", [Controllers\Admin\VersionController::class, "history"])->name('editor.model.history');
-        Route::post("{model}/restore/{version_id}", [Controllers\Admin\VersionController::class, "restore"])->name('editor.model.post.restore');
+        Route::get("/{model}/history/{model_id}", [Controllers\Admin\VersionController::class, "history"])->name('editor.model.history');
+        Route::post("/{model}/restore/{version_id}", [Controllers\Admin\VersionController::class, "restore"])->name('editor.model.post.restore');
     });
 
 Route::prefix("admin")
