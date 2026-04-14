@@ -141,6 +141,18 @@ class DocumentRepository implements Interfaces\DocumentRepositoryInterface {
         return $fileQuery->exists() || $docQuery->exists();
     }
 
+    public function performSearch(string $query, array $folderIds, bool $fromArchived = false, bool $searchInContent = false): Collection
+    {
+        $documents = Document::search($query)
+            ->whereIn('folder_id', $folderIds)
+            ->where('is_archived', (int) $fromArchived);
+
+        if (!$searchInContent) {
+            $documents->options(['attributesToSearchOn' => ['name']]);
+        }
+        return $documents->get();
+    }
+
     public function findVersionWithParent(int $versionId): Version {
         return Version::with('versionable')->findOrFail($versionId);
     }

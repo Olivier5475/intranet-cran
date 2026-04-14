@@ -11,6 +11,7 @@ use App\Models\Attachment;
 use App\Repositories\Interfaces\DocumentRepositoryInterface;
 use App\Services\Interfaces\FoldersServiceInterface;
 use App\Repositories\Interfaces\AttachmentRepositoryInterface;
+use App\Services\Interfaces\MapDTOServiceInterface;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -27,6 +28,7 @@ readonly class AttachmentService implements Interfaces\AttachmentServiceInterfac
         private AttachmentRepositoryInterface $attachmentRepository,
         private FoldersServiceInterface $foldersService,
         private DocumentRepositoryInterface $documentsRepository,
+        private MapDTOServiceInterface $mapDTOService,
     ){}
 
     public function create(array $data): AttachmentDTO {
@@ -77,7 +79,7 @@ readonly class AttachmentService implements Interfaces\AttachmentServiceInterfac
             $attachment = $this->attachmentRepository->create($payload);
             DB::commit();
 
-            return $this->makeAttachmentDTO($attachment);
+            return $this->mapDTOService->mapToAttachmentDTO($attachment);
 
         } catch (Throwable $e) {
             DB::rollBack();
@@ -93,8 +95,15 @@ readonly class AttachmentService implements Interfaces\AttachmentServiceInterfac
     }
 
     public function read(int $id): AttachmentDTO {
-        $attachment = $this->attachmentRepository->read($id);
-        return $this->makeAttachmentDTO($attachment);
+        try {
+            $attachment = $this->attachmentRepository->read($id);
+        } catch (AttachmentNotFoundException $e) {
+            Log::alert("Attachment introuvable", [
+                "error" => $e->getMessage(),
+                "id" => $id
+            ]);
+        }
+        return $this->mapDTOService->mapToAttachmentDTO($attachment);
     }
 
     public function update(int $id, array $data): AttachmentDTO {
@@ -102,7 +111,7 @@ readonly class AttachmentService implements Interfaces\AttachmentServiceInterfac
             // On vérifie l'existence avant
             $this->attachmentRepository->read($id);
             $attachment = $this->attachmentRepository->update($id, $data);
-            return $this->makeAttachmentDTO($attachment);
+            return $this->mapDTOService->mapToAttachmentDTO($attachment);
 
         } catch (AttachmentNotFoundException $e) {
             Log::warning("Tentative de mise à jour d'un attachement inexistant.", ["id" => $id]);
@@ -139,20 +148,6 @@ readonly class AttachmentService implements Interfaces\AttachmentServiceInterfac
         }
 
         return Storage::disk('public')->response($attachment->storage_path, $attachment->name);
-    }
-
-    private function makeAttachmentDTO(Attachment $attachment): AttachmentDTO {
-        if (!Storage::disk('public')->exists($attachment->storage_path)) {
-            throw new FileNotFoundException("Fichier introuvable sur le disque : {$attachment->storage_path}");
-        }
-
-        return new AttachmentDTO(
-            id: $attachment->id,
-            name: $attachment->name,
-            storage_path: $attachment->storage_path, // On passe le chemin, pas le contenu binaire (plus léger pour le DTO)
-            mimetype: $attachment->mimetype,
-            size: $attachment->size,
-        );
     }
 
     public function getDocumentId(int $attachment_id): int {

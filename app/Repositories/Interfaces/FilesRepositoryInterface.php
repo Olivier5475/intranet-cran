@@ -59,4 +59,12 @@ interface FilesRepositoryInterface {
      * @throws FileNotFoundException
      */
     public function restore(int $file_id): bool;
+
+    /**
+     * @param string $query
+     * @param array $folderIds
+     * @param bool $fromArchived
+     * @return Collection
+     */
+    public function performSearch(string $query, array $folderIds, bool $fromArchived = false): Collection;
 }

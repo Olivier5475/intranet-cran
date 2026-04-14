@@ -4,14 +4,21 @@ namespace App\DTO;
 
 readonly class FileDTO {
     public function __construct(
+        // Identifiant
         public int $id,
+
+        // Informations
         public string $name,
-        public array $departements,
         public string $created_at,
-        public int $folder_id,
         public ?string $storage_path,
         public ?string $mimetype,
         public ?bool $is_archived = null,
+
+        // Relations
+        public array $departements,
+        public int $folder_id,
+
+        // type "file" pour que la vue sache qu'il s'agit d'un fichier
         public string $type = "file",
     ) {}
 }

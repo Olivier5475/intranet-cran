@@ -9,6 +9,7 @@ use App\Models\File;
 use App\Repositories\Interfaces\FilesRepositoryInterface;
 use App\Services\Interfaces\DepartementsServiceInterface;
 use App\Services\Interfaces\FoldersServiceInterface;
+use App\Services\Interfaces\MapDTOServiceInterface;
 use App\Services\Interfaces\UserServiceInterface;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
@@ -26,7 +27,8 @@ readonly class FilesService implements Interfaces\FilesServiceInterface {
         private FilesRepositoryInterface $filesRepository,
         private FoldersServiceInterface $foldersService,
         private UserServiceInterface $userService,
-        private DepartementsServiceInterface $departementsService
+        private DepartementsServiceInterface $departementsService,
+        private MapDTOServiceInterface $mapDTOService,
     ){}
 
     public function create(array $data): FileDTO {
@@ -74,7 +76,7 @@ readonly class FilesService implements Interfaces\FilesServiceInterface {
             $file = $this->filesRepository->create($data);
 
             DB::commit();
-            return $this->makeFileDTO($file);
+            return $this->mapDTOService->mapToFileDTO($file);
 
         } catch (Throwable $e) {
             DB::rollBack();
@@ -117,7 +119,7 @@ readonly class FilesService implements Interfaces\FilesServiceInterface {
             }
 
             DB::commit();
-            return $this->makeFileDTO($updatedFile);
+            return $this->mapDTOService->mapToFileDTO($updatedFile);
 
         } catch (Throwable $e) {
             DB::rollBack();
@@ -129,13 +131,9 @@ readonly class FilesService implements Interfaces\FilesServiceInterface {
 
 
     public function delete(int $id): bool {
-//        $file = $this->filesRepository->read($id);
-//        $path = $file->storage_path;
-
         try {
             DB::beginTransaction();
             $res = $this->filesRepository->delete($id);
-//            Storage::disk('public')->delete($path);
             DB::commit();
             return $res;
         } catch (Throwable $e) {
@@ -154,7 +152,7 @@ readonly class FilesService implements Interfaces\FilesServiceInterface {
             return $res;
         } catch (Throwable $e) {
             DB::rollBack();
-            Log::critical("Échec suppression fichier", ["id" => $id, "error" => $e->getMessage()]);
+            Log::critical("Échec suppression fichier", ["id" => $file_id, "error" => $e->getMessage()]);
             throw new PersistenceException("Erreur lors de la suppression.");
         }
     }
@@ -182,20 +180,8 @@ readonly class FilesService implements Interfaces\FilesServiceInterface {
         return Storage::disk('public')->download($path, $payload["name"] ?? "version_".$id);
     }
 
-    private function makeFileDTO(File $file): FileDTO {
-        return new FileDTO(
-            id: $file->id,
-            name: $file->name,
-            departements: $this->departementsService->departementsIDs($file->departements),
-            created_at: $file->created_at,
-            folder_id: $file->folder_id,
-            storage_path: $file->storage_path,
-            mimetype: $file->mimetype
-        );
-    }
-
     public function read(int $id): FileDTO {
-        return $this->makeFileDTO($this->filesRepository->read($id));
+        return $this->mapDTOService->mapToFileDTO($this->filesRepository->read($id));
     }
 
     public function hasEditAccess(int $file_id): bool {

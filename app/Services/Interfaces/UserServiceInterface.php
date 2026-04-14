@@ -6,6 +6,7 @@ use App\DTO\AuthDTO;
 use App\Exception\PersistenceException;
 use App\Exception\UserNotFoundException;
 use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Support\Collection;
 use Throwable;
 
 interface UserServiceInterface {
@@ -54,10 +55,10 @@ interface UserServiceInterface {
 
     /**
      * @param ?string $searchQuery
-     * @return AuthDTO[]
+     * @return Collection
      * @throws Throwable
      */
-    public function getUsers(?string $searchQuery): array;
+    public function getUsers(?string $searchQuery): Collection;
 
     /**
      * @return string

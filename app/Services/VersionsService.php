@@ -10,6 +10,7 @@ use App\Models\Version;
 use App\Repositories\Interfaces\AttachmentRepositoryInterface;
 use App\Repositories\Interfaces\DocumentRepositoryInterface;
 use App\Repositories\Interfaces\FilesRepositoryInterface;
+use App\Services\Interfaces\MapDTOServiceInterface;
 use App\Services\Interfaces\VersionsServiceInterface;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -21,9 +22,10 @@ readonly class VersionsService implements VersionsServiceInterface
 {
 
     public function __construct(
-        private FilesRepositoryInterface    $filesRepository,
-        private DocumentRepositoryInterface $documentsRepository,
+        private FilesRepositoryInterface      $filesRepository,
+        private DocumentRepositoryInterface   $documentsRepository,
         private AttachmentRepositoryInterface $attachmentsRepository,
+        private MapDTOServiceInterface        $mapDTOService,
     ) { }
 
     public function restoreFromVersionId(int $versionId, string $modelString): void {
@@ -103,15 +105,8 @@ readonly class VersionsService implements VersionsServiceInterface
             throw new BadRequestException();
         }
         $versions = $repository->findVersionsFromParent($parent_id);
-        return $versions->map(function ($version) {return $this->makeVersionDTO($version);})->toArray();
-    }
-
-    private function makeVersionDTO(Version $version): VersionDTO {
-        return new VersionDTO(
-            id: $version->id,
-            versionable_id: (int)$version->versionable_id,
-            versionable_type: $version->versionable_type,
-            payload: $version->payload
-        );
+        return $versions->map(function ($version) {
+            return $this->mapDTOService->mapToVersionDTO($version);
+        })->toArray();
     }
 }

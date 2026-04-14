@@ -7,8 +7,10 @@ use App\Exception\PersistenceException;
 use App\Exception\UserNotFoundException;
 use App\Repositories\Interfaces\UserRepositoryInterface;
 use App\Services\Interfaces\DepartementsServiceInterface;
+use App\Services\Interfaces\MapDTOServiceInterface;
 use Dotenv\Dotenv;
 use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\UnauthorizedException;
@@ -19,7 +21,7 @@ readonly class AuthService implements Interfaces\UserServiceInterface {
 
     public function __construct(
         private UserRepositoryInterface $userRepository,
-        private DepartementsServiceInterface $departementsService
+        private MapDTOServiceInterface $mapDTOService,
     ) {}
 
     public function handleUserInDatabase(array $data): void {
@@ -52,25 +54,15 @@ readonly class AuthService implements Interfaces\UserServiceInterface {
         return Auth::id() ?? 0;
     }
 
-    public function getUsers(?string $searchQuery): array {
+    public function getUsers(?string $searchQuery) : Collection {
         if ($searchQuery && trim($searchQuery) !== '') {
             $users = $this->userRepository->performSearch($searchQuery);
         } else {
             $users = $this->userRepository->readAll();
         }
-        $authDtos = [];
-        foreach ($users as $user) {
-            $authDtos[] = new AuthDTO(
-                email: $user["email"],
-                nom: $user["nom"],
-                prenom: $user["prenom"],
-                departements: $this->departementsService->departementsIDs($user["departements"]),
-                role: $user["role"],
-                id: $user["id"]
-            );
-        }
+
         try {
-            return $authDtos;
+            return $this->mapDTOService->mapToAuthDTOsCollection($users);
         } catch (Throwable $e) {
             Log::error("Erreur lors de la conversion des users en AuthDTO",["message" => $e->getMessage(), "line" => $e->getLine(), "file" => $e->getFile()]);
             throw $e;
@@ -93,14 +85,7 @@ readonly class AuthService implements Interfaces\UserServiceInterface {
     public function readById(int $id): AuthDTO {
         $user = $this->userRepository->getUserById($id);
 
-        return new AuthDTO(
-            email: $user->email,
-            nom: $user->nom,
-            prenom: $user->prenom,
-            departements: $this->departementsService->departementsIDs($user->departements),
-            role: $user->role,
-            id: $user->id
-        );
+        return $this->mapDTOService->mapToAuthDTO($user);
     }
 
     public function update(int $id, array $data): void {
@@ -143,6 +128,7 @@ readonly class AuthService implements Interfaces\UserServiceInterface {
 
     public function emailExistIn12Plus(string $email): bool
     {
+        // récupération de l'url de 12plus dans les variables d'environnements
         $url = config('services.12plus.url');
 
         $tab_post = [
@@ -164,12 +150,10 @@ readonly class AuthService implements Interfaces\UserServiceInterface {
 
         $resultat = curl_exec($session);
 
+        curl_close($session);
         if ($resultat === false) {
-            curl_close($session);
             return false;
         }
-
-        curl_close($session);
 
         $tab_listeindividu = json_decode($resultat, true);
 

@@ -120,6 +120,19 @@ class FilesRepository implements Interfaces\FilesRepositoryInterface {
         return $fileQuery->exists() || $docQuery->exists();
     }
 
+    public function performSearch(string $query, array $folderIds, bool $fromArchived = false): Collection
+    {
+        return File::search($query)
+            // on regarde dans tous les sous dossiers (enfants) du dossier actuel
+            // ainsi que leurs propres enfants, etc...
+            ->whereIn('folder_id', $folderIds)
+
+            // on cast en int pour que Meilisearch comprenne
+            // (il doit recevoir 0 ou 1 et nan false ou true)
+            ->where('is_archived', (int) $fromArchived)
+            ->get();
+    }
+
     public function findVersionWithParent(int $versionId): Version {
         return Version::with('versionable')->findOrFail($versionId);
     }

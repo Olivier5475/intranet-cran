@@ -2,7 +2,7 @@
 
 namespace App\Services\Interfaces;
 
-use App\DTO\DocumentViewDTO;
+use App\DTO\DocumentDTO;
 use App\Exception\AttachmentNotFoundException;
 use App\Exception\DiskWriteException;
 use App\Exception\DocumentNotFoundException;
@@ -15,28 +15,28 @@ interface DocumentsServiceInterface {
 
     /**
      * @param int $id
-     * @return DocumentViewDTO
+     * @return DocumentDTO
      * @throws DocumentNotFoundException
      * @throws FileNotFoundException
      */
-    public function read(int $id) : DocumentViewDTO;
+    public function read(int $id) : DocumentDTO;
 
     /**
      * Crée un document et ses attachements associés (Transactionnel).
      * @param array $data
-     * @return DocumentViewDTO
+     * @return DocumentDTO
      * @throws BadRequestException|PersistenceException|DiskWriteException
      */
-    public function create(array $data) : DocumentViewDTO;
+    public function create(array $data) : DocumentDTO;
 
     /**
      * Met à jour un document et synchronise ses attachements (Transactionnel).
      * @param int $id
      * @param array $data
-     * @return DocumentViewDTO
+     * @return DocumentDTO
      * @throws DocumentNotFoundException|PersistenceException|DiskWriteException|AttachmentNotFoundException
      */
-    public function update(int $id, array $data) : DocumentViewDTO;
+    public function update(int $id, array $data) : DocumentDTO;
 
     /**
      * Supprime le document et tous ses attachements liés.
@@ -48,10 +48,10 @@ interface DocumentsServiceInterface {
 
     /**
      * Récupère le document racine de l'application.
-     * @return DocumentViewDTO|null
+     * @return DocumentDTO|null
      * @throws ServerException
      */
-    public function readRacineDoc() : ?DocumentViewDTO;
+    public function readRacineDoc() : ?DocumentDTO;
 
     /**
      * Vérifie les droits de modification de l'utilisateur sur un document.

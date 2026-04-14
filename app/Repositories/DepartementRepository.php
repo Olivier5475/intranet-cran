@@ -32,7 +32,7 @@ class DepartementRepository implements Interfaces\DepartementRepositoryInterface
         }
     }
 
-    public function update(int $id, array $data): void {
+    public function update(int $id, array $data): Departement {
         $departement = $this->getById($id);
 
         try {
@@ -46,6 +46,7 @@ class DepartementRepository implements Interfaces\DepartementRepositoryInterface
                 $departement->color = $data['color'];
             }
             $departement->save();
+            return $departement;
         } catch (Throwable $t) {
             Log::error("Erreur SQL lors de la mise à jour du département $id", [
                 'data' => $data,

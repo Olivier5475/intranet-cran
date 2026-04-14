@@ -20,10 +20,11 @@ interface DepartementRepositoryInterface {
     /**
      * @param int $id
      * @param array $data
+     * @return Departement
      * @throws DepartementNotFoundException
      * @throws PersistenceException
      */
-    public function update(int $id, array $data) : void;
+    public function update(int $id, array $data) : Departement;
 
     /**
      * @return Collection<int, Departement>

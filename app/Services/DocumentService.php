@@ -2,24 +2,16 @@
 
 namespace App\Services;
 
-use App\DTO\AttachmentDTO;
-use App\DTO\DocumentViewDTO;
-use App\Exception\DiskWriteException;
-use App\Exception\DocumentNotFoundException;
-use App\Exception\FolderNotFoundException;
-use App\Exception\PersistenceException;
+use App\DTO\DocumentDTO;
 use App\Exception\ServerException;
-use App\Models\Document;
 use App\Services\Interfaces\AttachmentServiceInterface;
 use App\Repositories\Interfaces\DocumentRepositoryInterface;
 use App\Services\Interfaces\DepartementsServiceInterface;
+use App\Services\Interfaces\MapDTOServiceInterface;
 use App\Services\Interfaces\UserServiceInterface;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Mews\Purifier\Facades\Purifier;
-use Parsedown;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
-use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Throwable;
 
 readonly class DocumentService implements Interfaces\DocumentsServiceInterface {
@@ -29,14 +21,15 @@ readonly class DocumentService implements Interfaces\DocumentsServiceInterface {
         private AttachmentServiceInterface $attachmentService,
         private UserServiceInterface $userService,
         private DepartementsServiceInterface $departementsService,
+        private MapDTOServiceInterface $mapDTOService,
     ){}
 
-    public function read(int $id) : DocumentViewDTO {
+    public function read(int $id) : DocumentDTO {
         $document = $this->documentRepository->read($id);
-        return $this->makeDocumentViewDto($document);
+        return $this->mapDTOService->mapToDocumentDTO($document);
     }
 
-    public function update(int $id, array $data): DocumentViewDTO {
+    public function update(int $id, array $data): DocumentDTO {
         if(empty($id)) throw new BadRequestException("ID manquant");
 
         try {
@@ -79,7 +72,7 @@ readonly class DocumentService implements Interfaces\DocumentsServiceInterface {
             }
 
             DB::commit();
-            return $this->makeDocumentViewDto($document);
+            return $this->mapDTOService->mapToDocumentDto($document);
 
         } catch (Throwable $e) {
             DB::rollBack();
@@ -94,11 +87,6 @@ readonly class DocumentService implements Interfaces\DocumentsServiceInterface {
     public function delete(int $id): bool {
         try {
             DB::beginTransaction();
-//            $document = $this->documentRepository->read($id);
-
-//            foreach ($document->attachments as $attachment) {
-//                $this->attachmentService->delete($attachment->id);
-//            }
 
             $result = $this->documentRepository->delete($id);
             DB::commit();
@@ -115,11 +103,6 @@ readonly class DocumentService implements Interfaces\DocumentsServiceInterface {
     {
         try {
             DB::beginTransaction();
-//            $document = $this->documentRepository->read($id);
-
-//            foreach ($document->attachments as $attachment) {
-//                $this->attachmentService->delete($attachment->id);
-//            }
 
             $result = $this->documentRepository->restore($document_id);
             DB::commit();
@@ -131,7 +114,7 @@ readonly class DocumentService implements Interfaces\DocumentsServiceInterface {
             throw $e;
         }    }
 
-    public function create(array $data): DocumentViewDTO {
+    public function create(array $data): DocumentDTO {
         if(empty($data['name']) || empty($data['content'])) {
             throw new BadRequestException("Titre et contenu obligatoires.");
         }
@@ -153,7 +136,7 @@ readonly class DocumentService implements Interfaces\DocumentsServiceInterface {
             }
 
             DB::commit();
-            return $this->makeDocumentViewDto($document);
+            return $this->mapDTOService->mapToDocumentDto($document);
 
         } catch (Throwable $e) {
             DB::rollBack();
@@ -162,36 +145,10 @@ readonly class DocumentService implements Interfaces\DocumentsServiceInterface {
         }
     }
 
-    private function makeDocumentViewDto(Document $document) : DocumentViewDTO {
-        $attachments = $document->attachments->map(fn($a) => new AttachmentDTO(
-            id: $a->id,
-            name: $a->name,
-            storage_path: $a->storage_path,
-            mimetype: $a->mimetype,
-            size: $a->size,
-        ))->all();
-
-        // Rendu Markdown sécurisé
-        $renderedHtml = (new Parsedown())->text($document->content);
-        $cleanHtml = Purifier::clean($renderedHtml);
-
-        return new DocumentViewDTO(
-            id: $document->id,
-            name: $document->name,
-            content: $cleanHtml,
-            attachments: $attachments,
-            created_at: $document->created_at,
-            updated_at: $document->updated_at,
-            departements: $this->departementsService->departementsIDs($document->departements),
-            folder_id: $document->folder_id,
-            color: $document->color
-        );
-    }
-
-    public function readRacineDoc(): ?DocumentViewDTO {
+    public function readRacineDoc(): ?DocumentDTO {
         try {
             $document = $this->documentRepository->readRacineDoc();
-            return $document ? $this->makeDocumentViewDto($document) : null;
+            return $document ? $this->mapDTOService->mapToDocumentDto($document) : null;
         } catch (Throwable $e) {
             Log::error("Erreur lecture document racine", ['error' => $e->getMessage()]);
             throw new ServerException("Impossible de charger le document d'accueil.");

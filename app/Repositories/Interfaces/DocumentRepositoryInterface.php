@@ -65,4 +65,13 @@ interface DocumentRepositoryInterface {
      * @throws PersistenceException
      */
     public function restore(int $document_id): bool;
+
+    /**
+     * @param string $query
+     * @param array $folderIds
+     * @param bool $fromArchived
+     * @param bool $searchInContent
+     * @return Collection
+     */
+    public function performSearch(string $query, array $folderIds, bool $fromArchived = false, bool $searchInContent = false) : Collection;
 }

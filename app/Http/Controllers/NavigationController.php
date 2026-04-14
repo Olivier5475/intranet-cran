@@ -27,13 +27,11 @@ class NavigationController extends Controller
 
         try {
             // Récupération du contenu
-            $items = $this->foldersService->getFolderContents($folder_id, $searchQuery, $isArchived, $searchInContent);
-            // Récupération du fil d'Ariane
-            $breadcrumbs = $this->foldersService->getBreadcrumbs($folder_id);
+            $navData = $this->foldersService->getFolderContents($folder_id, $searchQuery, $isArchived, $searchInContent);
 
             return Inertia::render('Navigation', [
-                "parents" => $breadcrumbs,
-                "children" => $items,
+                "parents" =>  $navData['breadcrumbs'],
+                "children" => $navData['items'],
                 "currentSearch" => $searchQuery,
                 "isArchived" => $isArchived,
             ]);

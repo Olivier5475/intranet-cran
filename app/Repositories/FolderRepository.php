@@ -147,12 +147,11 @@ class FolderRepository implements Interfaces\FolderRepositoryInterface
 
         return Folder::with([
             'departements:id',
-            // On ne filtre QUE ce qui est à l'intérieur
+            'parent.parent.parent.parent.parent', // Pour le fil d'Ariane
             'children' => fn($q) => $q->where('is_archived', $archived),
             'files' => fn($q) => $q->where('is_archived', $archived),
             'documents' => fn($q) => $q->where('is_archived', $archived)
-        ])
-            ->findOrFail($id); // Trouve le dossier 2, peu importe son état
+        ])->findOrFail($id);
     }
 
     public function getFolderWithParents(int $id): Folder

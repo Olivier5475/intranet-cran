@@ -53,6 +53,10 @@ class AppServiceProvider extends ServiceProvider
             Services\VersionsService::class
         );
 
+        $this->app->bind(
+            Services\Interfaces\MapDTOServiceInterface::class,
+            Services\MapDTOService::class
+        );
 //        REPOSITORY BINDING
         $this->app->bind(
             Repositories\Interfaces\FolderRepositoryInterface::class,

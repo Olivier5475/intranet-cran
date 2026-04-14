@@ -11,16 +11,10 @@ use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 
 interface DepartementsServiceInterface {
     /**
-     * @return DepartementDTO[]
+     * @return Collection
      */
     public function readAll(): Collection;
 
-    /**
-     * Extrait les IDs d'une collection d'objets départements.
-     * @param iterable $departements
-     * @return int[]
-     */
-    public function departementsIDs(iterable $departements): array;
 
     /**
      * @param int $id
@@ -54,7 +48,7 @@ interface DepartementsServiceInterface {
      * @return array
      * @throws DepartementNotFoundException
      */
-    public function getUsers($id): array;
+    public function getUsers($id): Collection;
 
     /**
      * @param string $id
