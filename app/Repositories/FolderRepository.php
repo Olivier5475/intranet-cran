@@ -102,6 +102,7 @@ class FolderRepository implements FolderRepositoryInterface
         try {
             $folder = new Folder();
             $folder->name = e($data['name']);
+            if(empty($data["parent_id"])) { $data["parent_id"] = null; }
             $folder->parent_id = $data['parent_id'] ?? null;
             $folder->user_id = $data['user_id'];
             $folder->color = $data['color'] ?? '#f5be51';
