@@ -33,7 +33,7 @@ readonly class DepartementsService implements DepartementsServiceInterface
     public function readById(int $id): DepartementDTO
     {
         try {
-            $departement = $this->departementRepository->getById($id);
+            $departement = $this->departementRepository->read($id);
             return $this->mapDTOService->mapToDepartementDTO($departement);
         } catch (DepartementNotFoundException $e) {
             Log::warning("Consultation d'un département inexistant", ["id" => $id]);
