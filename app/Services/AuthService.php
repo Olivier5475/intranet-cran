@@ -3,117 +3,27 @@
 namespace App\Services;
 
 use App\DTO\AuthDTO;
-use App\Exception\PersistenceException;
-use App\Exception\UserNotFoundException;
+use App\Exception\{PersistenceException, UserNotFoundException};
 use App\Repositories\Interfaces\UserRepositoryInterface;
-use App\Services\Interfaces\DepartementsServiceInterface;
-use App\Services\Interfaces\MapDTOServiceInterface;
-use Dotenv\Dotenv;
+use App\Services\Interfaces\{MapDTOServiceInterface, UserServiceInterface};
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\{Auth, Log};
 use Illuminate\Validation\UnauthorizedException;
 use phpCAS;
 use Throwable;
 
-readonly class AuthService implements Interfaces\UserServiceInterface {
-
+readonly class AuthService implements UserServiceInterface
+{
     public function __construct(
         private UserRepositoryInterface $userRepository,
         private MapDTOServiceInterface $mapDTOService,
     ) {}
 
-    public function handleUserInDatabase(array $data): void {
-        $user = $this->userRepository->getUserByEmail($data['email']);
+    // --- AUTHENTIFICATION & SESSION ---
 
-        if(!$this->emailExistIn12Plus($data['email'])) {
-            throw new UnauthorizedException();
-        }
-
-        if (!$user) {
-            $data["verified_member_role"] = true; // Rôle par défaut à la création
-            try {
-                $this->userRepository->createUser($data);
-                Log::info("Nouvel utilisateur créé automatiquement via login", ['email' => $data['email']]);
-            } catch (PersistenceException $e) {
-                Log::error("Échec de la création automatique de l'utilisateur", [
-                    'email' => $data['email'],
-                    'error' => $e->getMessage()
-                ]);
-                throw $e;
-            }
-        }
-    }
-
-    public function getUserByEmail(string $email): ?Authenticatable {
-        return $this->userRepository->getUserByEmail($email);
-    }
-
-    public function getCurrentUserId(): int {
-        return Auth::id() ?? 0;
-    }
-
-    public function getUsers(?string $searchQuery) : Collection {
-        if ($searchQuery && trim($searchQuery) !== '') {
-            $users = $this->userRepository->performSearch($searchQuery);
-        } else {
-            $users = $this->userRepository->readAll();
-        }
-
-        try {
-            return $this->mapDTOService->mapToAuthDTOsCollection($users);
-        } catch (Throwable $e) {
-            Log::error("Erreur lors de la conversion des users en AuthDTO",["message" => $e->getMessage(), "line" => $e->getLine(), "file" => $e->getFile()]);
-            throw $e;
-        }
-    }
-
-    public function delete(int $id): void {
-        try {
-            $this->userRepository->delete($id);
-            Log::info("Utilisateur supprimé de la base", ['id' => $id]);
-        } catch (PersistenceException|UserNotFoundException $e) {
-            Log::error("Impossible de supprimer l'utilisateur", [
-                'id' => $id,
-                'error' => $e->getMessage()
-            ]);
-            throw $e;
-        }
-    }
-
-    public function readById(int $id): AuthDTO {
-        $user = $this->userRepository->getUserById($id);
-
-        return $this->mapDTOService->mapToAuthDTO($user);
-    }
-
-    public function update(int $id, array $data): void {
-        try {
-            $this->userRepository->update($id, $data);
-            Log::info("Profil utilisateur mis à jour", ['id' => $id]);
-        } catch(PersistenceException|UserNotFoundException $e) {
-            Log::error("Erreur lors de la mise à jour de l'utilisateur", [
-                'id' => $id,
-                'error' => $e->getMessage()
-            ]);
-            throw $e;
-        }
-    }
-
-    public function getRole(): string {
-        $userId = $this->getCurrentUserId();
-        if ($userId === 0) return 'guest';
-
-        $user = $this->userRepository->getUserById($userId);
-        return $user->role ?? 'guest';
-    }
-
-    public function isAdmin(): bool {
-        return $this->getRole() === "admin";
-    }
-
-    public function logout(string $returnUrl): void {
+    public function logout(string $returnUrl): void
+    {
         if (str_contains($returnUrl, '/logout')) {
             $returnUrl = url('/');
         }
@@ -126,9 +36,108 @@ readonly class AuthService implements Interfaces\UserServiceInterface {
         ]);
     }
 
+    public function getCurrentUserId(): int
+    {
+        return Auth::id() ?? 0;
+    }
+
+    public function getRole(): string
+    {
+        $userId = $this->getCurrentUserId();
+        if ($userId === 0) return 'guest';
+
+        try {
+            $user = $this->userRepository->getUserById($userId);
+            return $user->role ?? 'guest';
+        } catch (UserNotFoundException) {
+            return 'guest';
+        }
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->getRole() === "admin";
+    }
+
+    // --- LECTURE & RECHERCHE ---
+
+    public function getUsers(?string $searchQuery): Collection
+    {
+        $users = ($searchQuery && trim($searchQuery) !== '')
+            ? $this->userRepository->performSearch($searchQuery)
+            : $this->userRepository->readAll();
+
+        try {
+            return $this->mapDTOService->mapToAuthDTOsCollection($users);
+        } catch (Throwable $e) {
+            Log::error("Erreur mapping AuthDTO Collection", [
+                "message" => $e->getMessage(),
+                "file" => $e->getFile()
+            ]);
+            throw $e;
+        }
+    }
+
+    public function readById(int $id): AuthDTO
+    {
+        $user = $this->userRepository->getUserById($id);
+        return $this->mapDTOService->mapToAuthDTO($user);
+    }
+
+    public function getUserByEmail(string $email): ?Authenticatable
+    {
+        return $this->userRepository->getUserByEmail($email);
+    }
+
+    // --- ECRITURES (CRUD) ---
+
+    public function handleUserInDatabase(array $data): void
+    {
+        if (!$this->emailExistIn12Plus($data['email'])) {
+            Log::warning("Tentative connexion email non-autorisé 12Plus", ['email' => $data['email']]);
+            throw new UnauthorizedException();
+        }
+
+        $user = $this->userRepository->getUserByEmail($data['email']);
+
+        if (!$user) {
+            $data["verified_member_role"] = true;
+            try {
+                $this->userRepository->createUser($data);
+                Log::info("Création automatique utilisateur via login CAS", ['email' => $data['email']]);
+            } catch (PersistenceException $e) {
+                Log::error("Échec création auto utilisateur", ['error' => $e->getMessage()]);
+                throw $e;
+            }
+        }
+    }
+
+    public function update(int $id, array $data): void
+    {
+        try {
+            $this->userRepository->update($id, $data);
+            Log::info("Profil utilisateur mis à jour", ['id' => $id]);
+        } catch (PersistenceException|UserNotFoundException $e) {
+            Log::error("Erreur mise à jour utilisateur", ['id' => $id, 'error' => $e->getMessage()]);
+            throw $e;
+        }
+    }
+
+    public function delete(int $id): void
+    {
+        try {
+            $this->userRepository->delete($id);
+            Log::info("Utilisateur supprimé", ['id' => $id]);
+        } catch (PersistenceException|UserNotFoundException $e) {
+            Log::error("Erreur suppression utilisateur", ['id' => $id, 'error' => $e->getMessage()]);
+            throw $e;
+        }
+    }
+
+    // --- VÉRIFICATIONS EXTERNES ---
+
     public function emailExistIn12Plus(string $email): bool
     {
-        // récupération de l'url de 12plus dans les variables d'environnements
         $url = config('services.12plus.url');
 
         $tab_post = [
@@ -149,19 +158,13 @@ readonly class AuthService implements Interfaces\UserServiceInterface {
         ]);
 
         $resultat = curl_exec($session);
-
         curl_close($session);
-        if ($resultat === false) {
-            return false;
-        }
+
+        if ($resultat === false) return false;
 
         $tab_listeindividu = json_decode($resultat, true);
+        if (!is_array($tab_listeindividu)) return false;
 
-        if (!is_array($tab_listeindividu)) {
-            return false;
-        }
-
-        // 🔎 Extraction rapide de tous les emails
         $emails = array_map('strtolower', array_column($tab_listeindividu, 'email'));
         return in_array(strtolower($email), $emails, true);
     }

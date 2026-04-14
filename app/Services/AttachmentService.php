@@ -3,27 +3,19 @@
 namespace App\Services;
 
 use App\DTO\AttachmentDTO;
-use App\Exception\AttachmentNotFoundException;
-use App\Exception\DiskWriteException;
-use App\Exception\DocumentNotFoundException;
-use App\Exception\PersistenceException;
-use App\Models\Attachment;
-use App\Repositories\Interfaces\DocumentRepositoryInterface;
-use App\Services\Interfaces\FoldersServiceInterface;
-use App\Repositories\Interfaces\AttachmentRepositoryInterface;
-use App\Services\Interfaces\MapDTOServiceInterface;
+use App\Exception\{AttachmentNotFoundException, DiskWriteException, DocumentNotFoundException, PersistenceException};
+use App\Repositories\Interfaces\{AttachmentRepositoryInterface, DocumentRepositoryInterface};
+use App\Services\Interfaces\{AttachmentServiceInterface, FoldersServiceInterface, MapDTOServiceInterface};
+use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\{DB, Log, Storage};
 use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
-use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Throwable;
 
-readonly class AttachmentService implements Interfaces\AttachmentServiceInterface {
-
+readonly class AttachmentService implements AttachmentServiceInterface
+{
     public function __construct(
         private AttachmentRepositoryInterface $attachmentRepository,
         private FoldersServiceInterface $foldersService,
@@ -31,7 +23,28 @@ readonly class AttachmentService implements Interfaces\AttachmentServiceInterfac
         private MapDTOServiceInterface $mapDTOService,
     ){}
 
-    public function create(array $data): AttachmentDTO {
+    // --- LECTURE ---
+
+    public function read(int $id): AttachmentDTO
+    {
+        try {
+            $attachment = $this->attachmentRepository->read($id);
+            return $this->mapDTOService->mapToAttachmentDTO($attachment);
+        } catch (AttachmentNotFoundException $e) {
+            Log::alert("Attachment introuvable lors de la lecture", ["id" => $id]);
+            throw $e;
+        }
+    }
+
+    public function getDocumentId(int $attachment_id): int
+    {
+        return $this->attachmentRepository->read($attachment_id)->document_id;
+    }
+
+    // --- ECRITURE ---
+
+    public function create(array $data): AttachmentDTO
+    {
         if (empty($data["document_id"]) || !($data['uploaded_file'] ?? null) instanceof UploadedFile) {
             throw new BadRequestException("ID document ou fichier manquant.");
         }
@@ -39,7 +52,7 @@ readonly class AttachmentService implements Interfaces\AttachmentServiceInterfac
         /** @var UploadedFile $uploadedFile */
         $uploadedFile = $data["uploaded_file"];
 
-        // 1. Construction du chemin (Arborescence folders/document_ID/)
+        // 1. Construction du chemin sécurisé (Dossiers/Document_ID)
         $folderPath = "";
         try {
             $document = $this->documentsRepository->read($data["document_id"]);
@@ -55,7 +68,7 @@ readonly class AttachmentService implements Interfaces\AttachmentServiceInterfac
             throw $e;
         }
 
-        // 2. Stockage physique
+        // 2. Stockage physique (Nom UUID pour éviter les conflits et l'injection de nom)
         $secureName = Str::uuid() . "." . $uploadedFile->getClientOriginalExtension();
         $storagePath = $uploadedFile->storeAs($folderPath, $secureName, "public");
 
@@ -68,22 +81,21 @@ readonly class AttachmentService implements Interfaces\AttachmentServiceInterfac
         try {
             DB::beginTransaction();
 
-            $payload = [
+            $attachment = $this->attachmentRepository->create([
                 'document_id'  => $data['document_id'],
                 'name'         => $uploadedFile->getClientOriginalName(),
                 'storage_path' => $storagePath,
                 'mimetype'     => $uploadedFile->getMimeType(),
                 'size'         => $uploadedFile->getSize(),
-            ];
+            ]);
 
-            $attachment = $this->attachmentRepository->create($payload);
             DB::commit();
 
             return $this->mapDTOService->mapToAttachmentDTO($attachment);
 
         } catch (Throwable $e) {
             DB::rollBack();
-            Storage::disk('public')->delete($storagePath); // Nettoyage du fichier orphelin
+            Storage::disk('public')->delete($storagePath); // Rollback physique si la DB échoue
 
             Log::error("Erreur de persistance attachement. Fichier supprimé.", [
                 "error" => $e->getMessage(),
@@ -94,22 +106,12 @@ readonly class AttachmentService implements Interfaces\AttachmentServiceInterfac
         }
     }
 
-    public function read(int $id): AttachmentDTO {
+    public function update(int $id, array $data): AttachmentDTO
+    {
         try {
-            $attachment = $this->attachmentRepository->read($id);
-        } catch (AttachmentNotFoundException $e) {
-            Log::alert("Attachment introuvable", [
-                "error" => $e->getMessage(),
-                "id" => $id
-            ]);
-        }
-        return $this->mapDTOService->mapToAttachmentDTO($attachment);
-    }
-
-    public function update(int $id, array $data): AttachmentDTO {
-        try {
-            // On vérifie l'existence avant
+            // Vérification existence
             $this->attachmentRepository->read($id);
+
             $attachment = $this->attachmentRepository->update($id, $data);
             return $this->mapDTOService->mapToAttachmentDTO($attachment);
 
@@ -122,24 +124,10 @@ readonly class AttachmentService implements Interfaces\AttachmentServiceInterfac
         }
     }
 
-    public function delete(int $id): bool {
-        $attachment = $this->attachmentRepository->read($id);
-        $path = $attachment->storage_path;
+    // --- ACTIONS ---
 
-        try {
-            DB::beginTransaction();
-            $this->attachmentRepository->delete($id);
-            Storage::disk('public')->delete($path);
-            DB::commit();
-            return true;
-        } catch (Throwable $e) {
-            DB::rollBack();
-            Log::critical("Impossible de supprimer l'attachement (DB/Disque).", ["id" => $id, "error" => $e->getMessage()]);
-            throw new PersistenceException("Erreur lors de la suppression.");
-        }
-    }
-
-    public function download(int $id): StreamedResponse {
+    public function download(int $id): StreamedResponse
+    {
         $attachment = $this->attachmentRepository->read($id);
 
         if (!Storage::disk('public')->exists($attachment->storage_path)) {
@@ -150,7 +138,23 @@ readonly class AttachmentService implements Interfaces\AttachmentServiceInterfac
         return Storage::disk('public')->response($attachment->storage_path, $attachment->name);
     }
 
-    public function getDocumentId(int $attachment_id): int {
-        return $this->attachmentRepository->read($attachment_id)->document_id;
+    public function delete(int $id): bool
+    {
+        $attachment = $this->attachmentRepository->read($id);
+        $path = $attachment->storage_path;
+
+        try {
+            DB::beginTransaction();
+
+            $this->attachmentRepository->delete($id);
+            Storage::disk('public')->delete($path);
+
+            DB::commit();
+            return true;
+        } catch (Throwable $e) {
+            DB::rollBack();
+            Log::critical("Impossible de supprimer l'attachement (DB/Disque).", ["id" => $id, "error" => $e->getMessage()]);
+            throw new PersistenceException("Erreur lors de la suppression.");
+        }
     }
 }

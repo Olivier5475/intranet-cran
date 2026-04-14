@@ -11,61 +11,67 @@ use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
-interface AttachmentServiceInterface {
-
+interface AttachmentServiceInterface
+{
     /**
-     * Enregistre le fichier physiquement et crée l'entrée en base de données.
-     * * @param array $data {document_id: int, uploaded_file: UploadedFile}
+     * Récupère un attachement par son identifiant unique.
+     *
+     * @param int $id Identifiant de l'attachement.
      * @return AttachmentDTO
-     * @throws BadRequestException Si des données obligatoires manquent ou sont invalides.
-     * @throws DocumentNotFoundException Si le document parent n'existe pas.
-     * @throws DiskWriteException Si l'écriture sur le disque échoue.
-     * @throws PersistenceException En cas d'erreur lors de l'enregistrement SQL.
+     * @throws AttachmentNotFoundException Si l'attachement n'existe pas en base.
      */
-    public function create(array $data) : AttachmentDTO;
+    public function read(int $id): AttachmentDTO;
 
     /**
-     * Récupère un attachement sous forme de DTO.
-     * * @param int $id
+     * Récupère l'identifiant du document parent d'un attachement.
+     *
+     * @param int $attachment_id Identifiant de l'attachement.
+     * @return int ID du document parent.
+     * @throws AttachmentNotFoundException Si l'attachement n'existe pas.
+     */
+    public function getDocumentId(int $attachment_id): int;
+
+    /**
+     * Crée un nouvel attachement : stocke le fichier physiquement et enregistre les meta-data en base.
+     * Le chemin est construit dynamiquement : public/storage/{breadcrumbs_folders}/document_{ID}/uuid.ext
+     *
+     * @param array{document_id: int, uploaded_file: \Illuminate\Http\UploadedFile} $data
      * @return AttachmentDTO
-     * @throws AttachmentNotFoundException Si l'ID n'existe pas.
-     * @throws FileNotFoundException Si le fichier est référencé en BD mais absent du disque.
+     * @throws BadRequestException Si les paramètres requis sont manquants ou invalides.
+     * @throws DocumentNotFoundException Si le document parent spécifié n'existe pas.
+     * @throws DiskWriteException Si l'écriture du fichier sur le stockage échoue.
+     * @throws PersistenceException Si l'enregistrement en base de données échoue (avec nettoyage du fichier).
      */
-    public function read(int $id) : AttachmentDTO;
+    public function create(array $data): AttachmentDTO;
 
     /**
-     * Met à jour les métadonnées d'un attachement.
-     * * @param int $id
-     * @param array $data
+     * Met à jour les informations d'un attachement (principalement le nom ou le dossier parent).
+     *
+     * @param int $id Identifiant de l'attachement.
+     * @param array $data Données à mettre à jour.
      * @return AttachmentDTO
-     * @throws AttachmentNotFoundException
-     * @throws PersistenceException
+     * @throws AttachmentNotFoundException Si l'attachement n'existe pas.
+     * @throws PersistenceException En cas d'erreur lors de la sauvegarde.
      */
-    public function update(int $id, array $data) : AttachmentDTO;
+    public function update(int $id, array $data): AttachmentDTO;
 
     /**
-     * Supprime le fichier physique et l'entrée en base de données.
-     * * @param int $id
-     * @return bool
-     * @throws AttachmentNotFoundException
-     * @throws PersistenceException
-     */
-    public function delete(int $id) : bool;
-
-    /**
-     * Récupère l'ID du document lié à l'attachement.
-     * * @param int $attachment_id
-     * @return int
-     * @throws AttachmentNotFoundException
-     */
-    public function getDocumentId(int $attachment_id) : int;
-
-    /**
-     * Prépare la réponse de téléchargement pour le navigateur.
-     * * @param int $id
+     * Prépare une réponse de streaming pour le téléchargement du fichier.
+     *
+     * @param int $id Identifiant de l'attachement.
      * @return StreamedResponse
-     * @throws AttachmentNotFoundException
-     * @throws FileNotFoundException
+     * @throws AttachmentNotFoundException Si l'entrée en base n'existe pas.
+     * @throws FileNotFoundException Si le fichier est référencé en base mais absent du disque.
      */
     public function download(int $id): StreamedResponse;
+
+    /**
+     * Supprime définitivement l'attachement de la base de données et du disque.
+     *
+     * @param int $id Identifiant de l'attachement.
+     * @return bool True si la suppression totale a réussi.
+     * @throws AttachmentNotFoundException Si l'attachement n'existe pas.
+     * @throws PersistenceException Si la transaction échoue ou si le fichier ne peut être supprimé.
+     */
+    public function delete(int $id): bool;
 }

@@ -2,26 +2,22 @@
 
 namespace App\Services;
 
-use App\DTO\{
-    FolderDTO,
-    FileDTO,
-    DocumentDTO,
-    VersionDTO,
-    DepartementDTO,
-    AuthDTO,
-    AttachmentDTO
-};
+use App\DTO\{FolderDTO, FileDTO, DocumentDTO, VersionDTO, DepartementDTO, AuthDTO, AttachmentDTO};
 use App\Models\{Folder, File, Document, Version, Departement, User, Attachment};
+use App\Services\Interfaces\MapDTOServiceInterface;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
-use Illuminate\Support\Facades\Storage;
-use App\Services\Interfaces\{MapDTOServiceInterface, DepartementsServiceInterface};
 use Illuminate\Support\Collection;
-use Parsedown;
+use Illuminate\Support\Facades\Storage;
 use Mews\Purifier\Facades\Purifier;
+use Parsedown;
 
 readonly class MapDTOService implements MapDTOServiceInterface
 {
+    // --- SECTION : DOSSIERS & NAVIGATION ---
 
+    /**
+     * @inheritDoc
+     */
     public function mapToFolderDTO(Folder $folder, bool $withChildren = false): FolderDTO
     {
         $children = [];
@@ -42,7 +38,9 @@ readonly class MapDTOService implements MapDTOServiceInterface
         );
     }
 
-    // ----------------- FOLDERS -----------------
+    /**
+     * @inheritDoc
+     */
     public function mapFolderContents(Folder $folder): Collection
     {
         $items = collect();
@@ -54,64 +52,54 @@ readonly class MapDTOService implements MapDTOServiceInterface
         return $items->sortBy('name')->values();
     }
 
-
     /**
-     * Fusionne et mappe des fichiers et des documents pour les résultats de recherche
+     * @inheritDoc
      */
     public function mapFilesAndDocuments(Collection $files, Collection $documents): Collection
     {
         $fileDTOs = $files->map(fn($f) => $this->mapToFileDTO($f));
         $docDTOs = $documents->map(fn($d) => $this->mapToDocumentDTO($d));
 
-        return $fileDTOs
-            ->merge($docDTOs)
-            ->sortBy('name')
-            ->values();
+        return $fileDTOs->merge($docDTOs)->sortBy('name')->values();
     }
 
-    // --------------- FILES ---------------
+    // --- SECTION : CONTENU (FILES & DOCUMENTS) ---
+
+    /**
+     * @inheritDoc
+     */
     public function mapToFileDTO(File $file): FileDTO
     {
         return new FileDTO(
-            // Identifiant
             id: $file->id,
-
-            // Information
             name: $file->name,
             created_at: $file->created_at,
             storage_path: $file->storage_path,
             mimetype: $file->mimetype,
             is_archived: $file->is_archived ?? false,
-
-            // Relations
             departements: $this->getDeptIds($file->departements),
             folder_id: $file->folder_id,
         );
     }
 
-    // --------------- DOCUMENTS ---------------
+    /**
+     * @inheritDoc
+     */
     public function mapToDocumentDTO(Document $document): DocumentDTO
     {
         $attachments = $document->attachments->map(fn($a) => $this->mapToAttachmentDTO($a))->all();
 
-        // Rendu HTML Sécurisé (pas d'injection de script)
+        // Rendu Markdown + Nettoyage XSS
         $html = (new Parsedown())->text($document->content ?? '');
         $cleanHtml = Purifier::clean($html);
 
         return new DocumentDTO(
-            // IDENTIFIANT
             id: $document->id,
-
-            // CONTENU
             name: $document->name,
             content: $cleanHtml,
-
-            // RELATION
             departements: $this->getDeptIds($document->departements),
             attachments: $attachments,
             folder_id: $document->folder_id,
-
-            // INFORMATION
             created_at: $document->created_at,
             updated_at: $document->updated_at,
             color: $document->color,
@@ -119,7 +107,11 @@ readonly class MapDTOService implements MapDTOServiceInterface
         );
     }
 
-    // --------------- VERSIONS ---------------
+    // --- SECTION : MÉTA-DONNÉES ---
+
+    /**
+     * @inheritDoc
+     */
     public function mapToVersionDTO(Version $version): VersionDTO
     {
         return new VersionDTO(
@@ -130,7 +122,29 @@ readonly class MapDTOService implements MapDTOServiceInterface
         );
     }
 
-    // ----------------- DEPARTEMENTS -----------------
+    /**
+     * @inheritDoc
+     */
+    public function mapToAttachmentDTO(Attachment $attachment): AttachmentDTO
+    {
+        if (!Storage::disk('public')->exists($attachment->storage_path)) {
+            throw new FileNotFoundException("Fichier introuvable sur le disque : {$attachment->storage_path}");
+        }
+
+        return new AttachmentDTO(
+            id: $attachment->id,
+            name: $attachment->name,
+            storage_path: $attachment->storage_path,
+            mimetype: $attachment->mimetype,
+            size: $attachment->size
+        );
+    }
+
+    // --- SECTION : ACTEURS (USERS & DEPT) ---
+
+    /**
+     * @inheritDoc
+     */
     public function mapToDepartementDTO(Departement $departement): DepartementDTO
     {
         return new DepartementDTO(
@@ -141,20 +155,17 @@ readonly class MapDTOService implements MapDTOServiceInterface
         );
     }
 
+    /**
+     * @inheritDoc
+     */
     public function mapToDepartementDTOsCollection(Collection $departements): Collection
     {
         return $departements->map(fn($dept) => $this->mapToDepartementDTO($dept));
     }
 
     /**
-     * Helper interne pour éviter la répétition du pluck/toArray
+     * @inheritDoc
      */
-    private function getDeptIds(Collection $departements): array
-    {
-        return $departements->pluck('id')->toArray();
-    }
-
-    // ----------------- Users -----------------
     public function mapToAuthDTO(User|array $user): AuthDTO
     {
         if (is_array($user)) {
@@ -178,23 +189,27 @@ readonly class MapDTOService implements MapDTOServiceInterface
         );
     }
 
-    public function mapToAuthDTOsCollection($users) : Collection
+    /**
+     * @inheritDoc
+     */
+    public function mapToAuthDTOsCollection($users): Collection
     {
         return collect($users)->map(fn($user) => $this->mapToAuthDTO($user));
     }
 
-    public function mapToAttachmentDTO(Attachment $attachment): AttachmentDTO
+    // --- HELPERS PRIVÉS ---
+
+    /**
+     * Extrait les IDs d'une collection de départements.
+     * Accepte une Collection ou un tableau de données.
+     */
+    private function getDeptIds(mixed $departements): array
     {
-        if (!Storage::disk('public')->exists($attachment->storage_path)) {
-            throw new FileNotFoundException("Fichier introuvable sur le disque : {$attachment->storage_path}");
+        if ($departements instanceof Collection) {
+            return $departements->pluck('id')->toArray();
         }
 
-        return new AttachmentDTO(
-            id: $attachment->id,
-            name: $attachment->name,
-            storage_path: $attachment->storage_path,
-            mimetype: $attachment->mimetype,
-            size: $attachment->size
-        );
+        // Cas des données brutes (AuthService)
+        return array_map(fn($d) => is_array($d) ? $d['id'] : $d, (array)$departements);
     }
 }

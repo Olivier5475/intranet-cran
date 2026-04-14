@@ -7,72 +7,102 @@ use App\Exception\PersistenceException;
 use App\Exception\UserNotFoundException;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Collection;
-use Throwable;
+use Illuminate\Validation\UnauthorizedException;
 
-interface UserServiceInterface {
-
+interface UserServiceInterface
+{
     /**
-     * Vérifie si l'utilisateur existe, sinon le crée.
-     * @param array $data
-     * @throws PersistenceException
+     * Gère la connexion et la déconnexion via phpCAS.
+     *
+     * @param string $returnUrl URL de retour après la déconnexion.
+     * @return void
      */
-    public function handleUserInDatabase(array $data): void;
+    public function logout(string $returnUrl): void;
 
-    public function emailExistIn12Plus(string $email): bool;
     /**
+     * Récupère l'identifiant de l'utilisateur actuellement connecté via Auth.
+     *
+     * @return int ID de l'utilisateur ou 0 si non connecté.
+     */
+    public function getCurrentUserId(): int;
+
+    /**
+     * Vérifie si l'utilisateur possède le rôle administrateur.
+     *
+     * @return bool
+     */
+    public function isAdmin(): bool;
+
+    /**
+     * Récupère le rôle de l'utilisateur actuel.
+     *
+     * @return string Le rôle (ex: 'admin', 'user') ou 'guest' par défaut.
+     */
+    public function getRole(): string;
+
+    /**
+     * Récupère une liste d'utilisateurs, éventuellement filtrée par une recherche.
+     *
+     * @param string|null $searchQuery Terme de recherche (nom, prénom, email).
+     * @return Collection<int, AuthDTO> Collection de DTOs d'utilisateurs.
+     * @throws \Throwable En cas d'erreur de mapping ou de base de données.
+     */
+    public function getUsers(?string $searchQuery): Collection;
+
+    /**
+     * Récupère les données complètes d'un utilisateur par son ID.
+     *
+     * @param int $id
+     * @return AuthDTO
+     * @throws UserNotFoundException Si l'utilisateur n'existe pas.
+     */
+    public function readById(int $id): AuthDTO;
+
+    /**
+     * Récupère le modèle utilisateur par son email (utilisé pour l'Auth Laravel).
+     *
      * @param string $email
      * @return Authenticatable|null
      */
     public function getUserByEmail(string $email): ?Authenticatable;
 
     /**
-     * @return int
+     * Assure la présence de l'utilisateur en base de données lors de la connexion CAS.
+     * Si l'utilisateur n'existe pas mais est autorisé (12Plus), il est créé.
+     *
+     * @param array{email: string, nom: string, prenom: string} $data
+     * @return void
+     * @throws UnauthorizedException Si l'email n'est pas autorisé par l'annuaire 12Plus.
+     * @throws PersistenceException Si la création automatique échoue.
      */
-    public function getCurrentUserId(): int;
+    public function handleUserInDatabase(array $data): void;
 
     /**
+     * Met à jour les informations d'un utilisateur.
+     *
      * @param int $id
-     * @param array $data
+     * @param array $data Données à modifier (nom, rôle, départements, etc.).
+     * @return void
      * @throws UserNotFoundException
      * @throws PersistenceException
      */
     public function update(int $id, array $data): void;
 
     /**
+     * Supprime définitivement un utilisateur.
+     *
      * @param int $id
-     * @return AuthDTO
+     * @return void
      * @throws UserNotFoundException
-     */
-    public function readById(int $id): AuthDTO;
-
-    /**
-     * @param int $id
      * @throws PersistenceException
-     * @throws UserNotFoundException
      */
     public function delete(int $id): void;
 
-
     /**
-     * @param ?string $searchQuery
-     * @return Collection
-     * @throws Throwable
+     * Vérifie via un appel cURL si un email appartient à l'annuaire de l'intranet 12Plus.
+     *
+     * @param string $email
+     * @return bool True si l'email est présent dans la liste.
      */
-    public function getUsers(?string $searchQuery): Collection;
-
-    /**
-     * @return string
-     */
-    public function getRole(): string;
-
-    /**
-     * @return bool
-     */
-    public function isAdmin(): bool;
-
-    /**
-     * Déconnecte l'utilisateur via CAS.
-     * @param string $returnUrl
-     */
-    public function logout(string $returnUrl): void;
+    public function emailExistIn12Plus(string $email): bool;
 }
