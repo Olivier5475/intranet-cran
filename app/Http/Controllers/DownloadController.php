@@ -57,7 +57,9 @@ class DownloadController extends Controller {
         }
         try {
             $file = $this->filesService->read($id);
-            return response()->file(storage_path('app/public/'.$file->storage_path));
+            return response()->file(storage_path('app/public/'.$file->storage_path), [
+                'Content-Disposition' => 'inline; filename="' . $file->name . '"'
+            ]);
         } catch (FileNotFoundException) {
             abort(404);
         }

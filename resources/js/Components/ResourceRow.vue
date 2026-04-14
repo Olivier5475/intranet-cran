@@ -4,7 +4,7 @@ import { ref } from 'vue';
 import { Link, useForm, usePage } from '@inertiajs/vue3';
 
 // 2. Librairies tierces (Icônes)
-import { EllipsisHorizontalIcon } from "@heroicons/vue/24/solid";
+import { EllipsisHorizontalIcon, ArrowDownTrayIcon } from "@heroicons/vue/24/solid";
 
 // 3. Composables & Utilitaires
 import { decodeEntities } from "@/Composables/useDecodeModule";
@@ -127,6 +127,7 @@ const handleDragStart = (e: DragEvent) => {
             v-if="activeRename == false"
             :is="child.type !== 'file' ? Link : 'a'"
             :href="links.href"
+            :target="child.type == 'file' ? 'blank' : ''"
             class="space-x-3 col-span-6 flex items-center overflow-hidden"
 
             @mouseenter="handleMouseEnter"
@@ -217,61 +218,76 @@ const handleDragStart = (e: DragEvent) => {
             </span>
         </div>
 
-        <div
-            class="relative col-start-12 flex justify-end"
-            v-if="canEdit"
-            @mouseenter="isMenuExpend = true"
-            @mouseleave="isMenuExpend = false"
-        >
-            <button
-                @click="toggleMenu = !toggleMenu"
+        <div class="col-start-12 flex justify-center">
+            <!--               DOWNLOAD               -->
+            <a
+                v-if="child.type == 'file'"
+                :href="links.download"
                 class="p-1 hover:bg-gray-100 dark:hover:bg-zinc-700
                 rounded-full transition-all group-hover:opacity-100"
+                title="Télécharger"
             >
-                <EllipsisHorizontalIcon class="w-5 h-5 text-gray-400" />
-            </button>
+                <ArrowDownTrayIcon class="w-5 h-5 text-gray-400"/>
+            </a>
 
+            <!--            ACTION EDITEUR            -->
             <div
-                v-if="toggleMenu || isMenuExpend"
-                class="top-6 -right-7 w-32 bg-white dark:bg-zinc-900 shadow-xl rounded-xl border-gray-100 dark:border-zinc-700 absolute z-50 border"
+                class="relative  flex justify-end"
+                v-if="canEdit"
+                @mouseenter="isMenuExpend = true"
+                @mouseleave="isMenuExpend = false"
             >
-                <Link
-                    v-if="links.history"
-                    :href="links.history"
-                    class="px-4 py-2 text-xs hover:bg-gray-40 dark:hover:bg-sky-900/50 text-sky-500 block"
+                <button
+                    @click="toggleMenu = !toggleMenu"
+                    class="p-1 hover:bg-gray-100 dark:hover:bg-zinc-700
+                rounded-full transition-all group-hover:opacity-100"
                 >
-                    Historique
-                </Link>
-                <Link
-                    :href="links.update"
-                    class="px-4 py-2 text-xs hover:bg-gray-40 dark:hover:bg-yellow-900/50 text-yellow-600 block"
-                >
-                    Modifier
-                </Link>
+                    <EllipsisHorizontalIcon class="w-5 h-5 text-gray-400" />
+                </button>
 
-                <button
-                    v-if="!child.is_archived"
-                    @click="isActiveValidation = true"
-                    class="px-4 py-2 text-xs hover:bg-red-400 text-left dark:hover:bg-red-900/50 text-red-600 block w-full"
+                <div
+                    v-if="toggleMenu || isMenuExpend"
+                    class="top-6 -right-7 w-32 bg-white dark:bg-zinc-900 shadow-xl rounded-xl border-gray-100 dark:border-zinc-700 absolute z-50 border"
                 >
-                    Archiver
-                </button>
-                <Link
-                    v-if="child.is_archived"
-                    :href="links.restore"
-                    method="patch"
-                    class="px-4 py-2 text-xs hover:bg-emerald-400 w-full text-left block dark:hover:bg-emerald-900/50 text-emerald-600 dark:text-emerald-500"
-                >
-                    Restaurer
-                </Link>
-                <button
-                    class="px-4 py-2 text-xs hover:bg-purple-400 text-left dark:hover:bg-purple-900/50 text-purple-600 block w-full"
-                    @click="activeRename = true"
-                >
-                    Renommer
-                </button>
+                    <Link
+                        v-if="links.history"
+                        :href="links.history"
+                        class="px-4 py-2 text-xs hover:bg-gray-40 dark:hover:bg-sky-900/50 text-sky-500 block"
+                    >
+                        Historique
+                    </Link>
+                    <Link
+                        :href="links.update"
+                        class="px-4 py-2 text-xs hover:bg-gray-40 dark:hover:bg-yellow-900/50 text-yellow-600 block"
+                    >
+                        Modifier
+                    </Link>
+
+                    <button
+                        v-if="!child.is_archived"
+                        @click="isActiveValidation = true"
+                        class="px-4 py-2 text-xs hover:bg-red-400 text-left dark:hover:bg-red-900/50 text-red-600 block w-full"
+                    >
+                        Archiver
+                    </button>
+                    <Link
+                        v-if="child.is_archived"
+                        :href="links.restore"
+                        method="patch"
+                        class="px-4 py-2 text-xs hover:bg-emerald-400 w-full text-left block dark:hover:bg-emerald-900/50 text-emerald-600 dark:text-emerald-500"
+                    >
+                        Restaurer
+                    </Link>
+                    <button
+                        class="px-4 py-2 text-xs hover:bg-purple-400 text-left dark:hover:bg-purple-900/50 text-purple-600 block w-full"
+                        @click="activeRename = true"
+                    >
+                        Renommer
+                    </button>
+                </div>
             </div>
         </div>
+
     </div>
     <DeleteModal
         :show="isActiveValidation"

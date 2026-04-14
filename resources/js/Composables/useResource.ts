@@ -3,6 +3,7 @@ import { usePage } from '@inertiajs/vue3';
 import download from '@/routes/download';
 import editor from '@/routes/editor';
 import navigate from '@/routes/navigate';
+import { isGifFile, isImageFile } from '@/Composables/useDocumentsTypeRegex';
 
 export function useResource(props: any) {
     const page = usePage();
@@ -11,12 +12,17 @@ export function useResource(props: any) {
     const links = computed(() => {
         const { type, id } = props.child;
         if (type === 'file') {
+            const mimetype = props.child.mimetype;
+            const conditions = isImageFile(mimetype) || isGifFile(mimetype) || mimetype.includes("pdf")
             return {
-                href: download.file.url(id),
+                href: conditions
+                        ? download.file.preview.url(id)
+                        : download.file.url(id),
                 update: editor.file.update.url(id),
                 delete: editor.file.delete.url(id),
                 history: editor.model.history.url(["files", id]),
-                restore: editor.file.post.restore.url(id)
+                restore: editor.file.post.restore.url(id),
+                download: download.file.url(id)
             };
         } else if (type === 'folder') {
             return {
