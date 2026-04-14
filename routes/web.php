@@ -29,30 +29,30 @@ Route::prefix("editor")
             Route::get("/update/{folder_id}", [Controllers\Admin\FolderController::class, "update"])->name("editor.folder.update");
 
             // POST (submit)
-            Route::post("/store", [Controllers\Admin\FolderController::class, "store"])->name("editor.folder.post.create");
-            Route::post("/store/{folder_id}", [Controllers\Admin\FolderController::class, "store"])->name("editor.folder.post.update");
+            Route::post("/", [Controllers\Admin\FolderController::class, "store"])->name("editor.folder.post.create");
+            Route::post("/{folder_id}", [Controllers\Admin\FolderController::class, "store"])->name("editor.folder.post.update");
 
             // PATCH (submit)
             Route::patch("/restore/{folder_id}", [Controllers\Admin\FolderController::class, "restore"])->name("editor.folder.post.restore");
 
             // DELETE
-            Route ::delete("/delete/{folder_id}", [Controllers\Admin\FolderController::class, "delete"])->name("editor.folder.delete");
+            Route ::delete("/{folder_id}", [Controllers\Admin\FolderController::class, "delete"])->name("editor.folder.delete");
         });
 
         Route::prefix("documents")->group(function () {
             // GET (form)
             Route::get("/create/p/{parent_id}", [Controllers\Admin\DocumentController::class, "create"])->name('editor.document.create');
-            Route::get("/update/{document_id}", [Controllers\Admin\DocumentController::class, "update"])->name('editor.document.update');
+            Route::get("/update/{document_id}", [Controllers\Admin\DocumentController::class, "edit"])->name('editor.document.update');
 
             // POST (submit)
-            Route::post("/store", [Controllers\Admin\DocumentController::class, "store"])->name('editor.document.post.create');
-            Route::post("/store/{document_id}", [Controllers\Admin\DocumentController::class, "store"])->name('editor.document.post.update');
+            Route::post("/", [Controllers\Admin\DocumentController::class, "store"])->name('editor.document.post.create');
+            Route::post("/{document_id}", [Controllers\Admin\DocumentController::class, "update"])->name('editor.document.post.update');
 
             // PATCH (submit)
             Route::patch("/restore/{document_id}", [Controllers\Admin\DocumentController::class, "restore"])->name("editor.document.post.restore");
 
             // DELETE
-            Route::delete("/delete/{document_id}", [Controllers\Admin\DocumentController::class, "delete"])->name('editor.document.delete');
+            Route::delete("/{document_id}", [Controllers\Admin\DocumentController::class, "delete"])->name('editor.document.delete');
         });
 
         Route::prefix("files")->group(function () {
@@ -61,14 +61,14 @@ Route::prefix("editor")
             Route::get("/update/{file_id}", [Controllers\Admin\FileController::class, "update"])->name('editor.file.update');
 
             // POST (submit)
-            Route::post("/store", [Controllers\Admin\FileController::class, "store"])->name('editor.file.post.create');
-            Route::post("/store/{file_id}", [Controllers\Admin\FileController::class, "store"])->name('editor.file.post.update');
+            Route::post("/", [Controllers\Admin\FileController::class, "store"])->name('editor.file.post.create');
+            Route::post("/{file_id}", [Controllers\Admin\FileController::class, "store"])->name('editor.file.post.update');
 
             // PATCH (submit)
             Route::patch("/restore/{file_id}", [Controllers\Admin\FileController::class, "restore"])->name("editor.file.post.restore");
 
             // DELETE
-            Route::delete("/delete/{file_id}", [Controllers\Admin\FileController::class, "delete"])->name('editor.file.delete');
+            Route::delete("/{file_id}", [Controllers\Admin\FileController::class, "delete"])->name('editor.file.delete');
         });
 
         Route::get("/{model}/history/{model_id}", [Controllers\Admin\VersionController::class, "history"])->name('editor.model.history');
@@ -80,7 +80,7 @@ Route::prefix("admin")
     ->group(function () {
     Route::prefix("users")->group(function () {
         // GET
-        Route::get("", [Controllers\Admin\UsersController::class, "readAll"])->name("admin.user");
+        Route::get("/", [Controllers\Admin\UsersController::class, "readAll"])->name("admin.user");
 
         // POST
         Route::post("/", [Controllers\Admin\UsersController::class, "store"])->name("admin.user.post.create");
@@ -94,7 +94,7 @@ Route::prefix("admin")
 
     Route::prefix("departements")->group(function () {
         // GET
-        Route::get("", [Controllers\Admin\DepartementController::class, "readAll"])->name("admin.departements");
+        Route::get("/", [Controllers\Admin\DepartementController::class, "readAll"])->name("admin.departements");
         Route::get("/{id}/users", [Controllers\Admin\DepartementController::class, "users"])->name("admin.departements.users");
 
         // POST
