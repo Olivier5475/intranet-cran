@@ -2,104 +2,82 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Exception\PersistenceException;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\SaveUserRequest;
 use App\Services\Interfaces\UserServiceInterface;
+use App\Exception\PersistenceException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\UnauthorizedException;
-use Symfony\Component\HttpFoundation\Exception\BadRequestException;
-use Throwable;
 use Inertia\Inertia;
+use Throwable;
 
 class UsersController extends Controller {
+
     public function __construct(
         private readonly UserServiceInterface $usersService,
     ){}
 
-    public function readAll(Request $request) {
-        $searchQuery = $request->input('q');
+    // --- VUES ---
 
+    public function index(Request $request) {
         try {
+            $searchQuery = $request->input('q');
             return Inertia::render("Admin/Users", [
                 "users" => $this->usersService->getUsers($searchQuery)
             ]);
         } catch (Throwable $t) {
-            Log::error("Erreur lors de la récupération des utilisateurs", [
-                'error' => $t->getMessage()
-            ]);
-            return redirect()->back()->with("error", "Impossible de charger la liste des utilisateurs.");
+            return $this->handleException($t, "chargement");
         }
     }
 
-    public function store(Request $request, $id = null) {
-        $validatedData = $request->validate([
-            'nom' => ['required', 'string', 'max:255'],
-            'prenom' => ['required', 'string', 'max:255'],
-            'role' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'max:255', 'email'],
-            'departements' => ['sometimes', 'array'],
-        ]);
+    // --- ACTIONS ---
 
+    public function store(SaveUserRequest $request) {
         try {
-            if($id) {
-                $this->usersService->update($id, $validatedData);
-                return redirect()->route("admin.user")
-                    ->with("success", "Utilisateur mis à jour avec succès.");
-            } else {
-                try {
-                    $this->usersService->handleUserInDatabase($validatedData);
-                    return redirect()->route("admin.user")
-                        ->with("success", "Utilisateur créé avec succès.");
-                } catch (UnauthorizedException) {
-                    return redirect()->back()->with("error", "Cette utilisateur ne fais pas partie de 12Plus");
-                }
+            // handleUserInDatabase vérifie déjà l'existence et l'annuaire 12Plus
+            $this->usersService->handleUserInDatabase($request->validated());
 
-            }
-
-        } catch (BadRequestException $e) {
-            Log::warning("Requête invalide lors de la gestion utilisateur", [
-                'id' => $id,
-                'email' => $validatedData['email']
-            ]);
-            return redirect()->back()->with('error', 'Les données fournies sont incorrectes.');
-
-        } catch (PersistenceException $e) {
-            Log::error("Erreur de base de données (User)", [
-                'id' => $id,
-                'email' => $validatedData['email'],
-                'exception' => $e->getMessage()
-            ]);
-            return redirect()->back()->with('error', 'Erreur lors de la sauvegarde. Veuillez réessayer.');
-
+            return redirect()->route("admin.user")->with("success", "Utilisateur créé avec succès.");
+        } catch (UnauthorizedException) {
+            return redirect()->back()->with("error", "Cet utilisateur ne fait pas partie de l'annuaire 12Plus.");
         } catch (Throwable $t) {
-            Log::critical('Erreur fatale utilisateur', [
-                'id' => $id,
-                'data' => $validatedData,
-                'error' => $t->getMessage()
-            ]);
-            return redirect()->back()->with('error', 'Une erreur imprévue est survenue.');
+            return $this->handleException($t, "création");
         }
     }
 
-    public function delete($id) {
+    public function update(SaveUserRequest $request, int $id) {
+        try {
+            $this->usersService->update($id, $request->validated());
+
+            return redirect()->route("admin.user")->with("success", "Utilisateur mis à jour avec succès.");
+        } catch (Throwable $t) {
+            return $this->handleException($t, "mise à jour", $id);
+        }
+    }
+
+    public function delete(int $id) {
         try {
             $this->usersService->delete($id);
             return redirect()->back()->with("success", "Utilisateur supprimé avec succès.");
-
-        } catch (BadRequestException) {
-            return redirect()->back()->with('error', 'Impossible de supprimer cet utilisateur (ID invalide).');
-
-        } catch (PersistenceException $e) {
-            Log::error("Échec de suppression utilisateur", ['id' => $id, 'error' => $e->getMessage()]);
-            return redirect()->back()->with('error', 'Erreur technique lors de la suppression.');
-
         } catch (Throwable $t) {
-            Log::critical('Crash lors de la suppression utilisateur', [
-                'id' => $id,
-                'error' => $t->getMessage()
-            ]);
-            return redirect()->back()->with('error', 'Une erreur imprévue est survenue.');
+            return $this->handleException($t, "suppression", $id);
         }
+    }
+
+    // --- HELPER D'ERREURS ---
+
+    private function handleException(Throwable $t, string $action, int $id = null) {
+        Log::error("Erreur Utilisateur $action", [
+            'id' => $id,
+            'error' => $t->getMessage()
+        ]);
+
+        $message = match(get_class($t)) {
+            PersistenceException::class => "Erreur technique lors de la sauvegarde en base de données.",
+            default => "Une erreur imprévue est survenue lors de la $action de l'utilisateur."
+        };
+
+        return redirect()->back()->with('error', $message);
     }
 }

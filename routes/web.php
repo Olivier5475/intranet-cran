@@ -80,13 +80,13 @@ Route::prefix("admin")
     ->group(function () {
     Route::prefix("users")->group(function () {
         // GET
-        Route::get("/", [Controllers\Admin\UsersController::class, "readAll"])->name("admin.user");
+        Route::get("/", [Controllers\Admin\UsersController::class, "index"])->name("admin.user");
 
         // POST
         Route::post("/", [Controllers\Admin\UsersController::class, "store"])->name("admin.user.post.create");
 
         // PATCH
-        Route::patch("/{id}", [Controllers\Admin\UsersController::class, "store"])->name("admin.user.post.update");
+        Route::patch("/{id}", [Controllers\Admin\UsersController::class, "update"])->name("admin.user.post.update");
 
         // DELETE
         Route::delete("/{id}", [Controllers\Admin\UsersController::class, "delete"])->name("admin.user.delete");
