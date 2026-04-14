@@ -30,7 +30,7 @@ readonly class MapDTOService implements MapDTOServiceInterface
         return new FolderDTO(
             id: $folder->id,
             name: $folder->name,
-            departements: $this->getDeptIds($folder->departements),
+            departements: $this->getDeptIds($folder), // On passe l'objet entier ici
             color: $folder->color,
             children: $children,
             created_at: $folder->created_at,
@@ -77,7 +77,7 @@ readonly class MapDTOService implements MapDTOServiceInterface
             storage_path: $file->storage_path,
             mimetype: $file->mimetype,
             is_archived: $file->is_archived ?? false,
-            departements: $this->getDeptIds($file->departements),
+            departements: $this->getDeptIds($file), // On passe l'objet entier
             folder_id: $file->folder_id,
         );
     }
@@ -87,9 +87,11 @@ readonly class MapDTOService implements MapDTOServiceInterface
      */
     public function mapToDocumentDTO(Document $document): DocumentDTO
     {
-        $attachments = $document->attachments->map(fn($a) => $this->mapToAttachmentDTO($a))->all();
+        // On n'appelle mapToAttachmentDTO que si la relation est chargée pour éviter les requêtes disque inutiles en liste
+        $attachments = $document->relationLoaded('attachments')
+            ? $document->attachments->map(fn($a) => $this->mapToAttachmentDTO($a))->all()
+            : [];
 
-        // Rendu Markdown + Nettoyage XSS
         $html = (new Parsedown())->text($document->content ?? '');
         $cleanHtml = Purifier::clean($html);
 
@@ -97,7 +99,7 @@ readonly class MapDTOService implements MapDTOServiceInterface
             id: $document->id,
             name: $document->name,
             content: $cleanHtml,
-            departements: $this->getDeptIds($document->departements),
+            departements: $this->getDeptIds($document), // On passe l'objet entier
             attachments: $attachments,
             folder_id: $document->folder_id,
             created_at: $document->created_at,
@@ -107,7 +109,35 @@ readonly class MapDTOService implements MapDTOServiceInterface
         );
     }
 
-    // --- SECTION : MÉTA-DONNÉES ---
+    // --- SECTION : ACTEURS (USERS & DEPT) ---
+
+    /**
+     * @inheritDoc
+     */
+    public function mapToAuthDTO(User|array $user): AuthDTO
+    {
+        if (is_array($user)) {
+            return new AuthDTO(
+                email: $user['email'],
+                nom: $user['nom'],
+                prenom: $user['prenom'],
+                departements: is_array($user['departements']) ? $user['departements'] : [],
+                role: $user['role'],
+                id: $user['id']
+            );
+        }
+
+        return new AuthDTO(
+            email: $user->email,
+            nom: $user->nom,
+            prenom: $user->prenom,
+            departements: $this->getDeptIds($user), // On passe l'objet entier
+            role: $user->role,
+            id: $user->id
+        );
+    }
+
+    // ... (mapToVersionDTO, mapToDepartementDTO, mapToAttachmentDTO etc. restent identiques)
 
     /**
      * @inheritDoc
@@ -127,10 +157,6 @@ readonly class MapDTOService implements MapDTOServiceInterface
      */
     public function mapToAttachmentDTO(Attachment $attachment): AttachmentDTO
     {
-        if (!Storage::disk('public')->exists($attachment->storage_path)) {
-            throw new FileNotFoundException("Fichier introuvable sur le disque : {$attachment->storage_path}");
-        }
-
         return new AttachmentDTO(
             id: $attachment->id,
             name: $attachment->name,
@@ -139,8 +165,6 @@ readonly class MapDTOService implements MapDTOServiceInterface
             size: $attachment->size
         );
     }
-
-    // --- SECTION : ACTEURS (USERS & DEPT) ---
 
     /**
      * @inheritDoc
@@ -166,50 +190,28 @@ readonly class MapDTOService implements MapDTOServiceInterface
     /**
      * @inheritDoc
      */
-    public function mapToAuthDTO(User|array $user): AuthDTO
-    {
-        if (is_array($user)) {
-            return new AuthDTO(
-                email: $user['email'],
-                nom: $user['nom'],
-                prenom: $user['prenom'],
-                departements: $this->getDeptIds($user['departements']),
-                role: $user['role'],
-                id: $user['id']
-            );
-        }
-
-        return new AuthDTO(
-            email: $user->email,
-            nom: $user->nom,
-            prenom: $user->prenom,
-            departements: $this->getDeptIds($user->departements),
-            role: $user->role,
-            id: $user->id
-        );
-    }
-
-    /**
-     * @inheritDoc
-     */
     public function mapToAuthDTOsCollection($users): Collection
     {
         return collect($users)->map(fn($user) => $this->mapToAuthDTO($user));
     }
 
-    // --- HELPERS PRIVÉS ---
+    // --- HELPERS PRIVÉS OPTIMISÉS ---
 
     /**
-     * Extrait les IDs d'une collection de départements.
-     * Accepte une Collection ou un tableau de données.
+     * Extrait les IDs de départements sans déclencher de nouvelle requête SQL.
      */
-    private function getDeptIds(mixed $departements): array
+    private function getDeptIds(mixed $model): array
     {
-        if ($departements instanceof Collection) {
-            return $departements->pluck('id')->toArray();
+        // Si c'est un modèle Eloquent (File, Document, Folder, User)
+        if ($model instanceof \Illuminate\Database\Eloquent\Model) {
+            // Crucial : On vérifie si la relation est déjà chargée
+            if ($model->relationLoaded('departements')) {
+                return $model->departements->pluck('id')->toArray();
+            }
+            // Si pas chargée, on ne fait RIEN (retourne vide) pour éviter le N+1
+            return [];
         }
 
-        // Cas des données brutes (AuthService)
-        return array_map(fn($d) => is_array($d) ? $d['id'] : $d, (array)$departements);
+        return [];
     }
 }
