@@ -11,6 +11,10 @@ use Throwable;
 
 class DocumentRepository implements DocumentRepositoryInterface
 {
+    // On crée une variable statique pour stocker le résultat en mémoire
+    // Et éviter de faire 2 fois la requete
+    private static ?Document $racineDocCache = null;
+
     // --- LECTURE ---
 
     /**
@@ -18,7 +22,9 @@ class DocumentRepository implements DocumentRepositoryInterface
      */
     public function read(int $id): Document
     {
-        $document = Document::with("departements")->find($id);
+        $document = Document::with("departements")
+            ->with("attachments")
+            ->find($id);
 
         if (!$document) {
             throw new DocumentNotFoundException("Le document avec l'ID $id est introuvable.");
@@ -31,11 +37,19 @@ class DocumentRepository implements DocumentRepositoryInterface
      */
     public function readRacineDoc(): ?Document
     {
+        // Si on l'a déjà récupéré durant cette requête, on le renvoie direct
+        if (self::$racineDocCache !== null) {
+            return self::$racineDocCache;
+        }
+
         try {
-            return Document::with('departements')
+            self::$racineDocCache = Document::with('departements')
                 ->whereNull("folder_id")
                 ->orderBy("created_at")
+                ->with('attachments')
                 ->first();
+
+            return self::$racineDocCache;
         } catch (Throwable $e) {
             Log::error('Erreur SQL : lecture du document racine', ["message" => $e->getMessage()]);
             return null;
