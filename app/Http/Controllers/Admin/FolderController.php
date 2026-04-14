@@ -2,15 +2,13 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Exception\FolderNotFoundException;
-use App\Exception\PersistenceException;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\SaveFolderRequest;
 use App\Services\Interfaces\FoldersServiceInterface;
-use Illuminate\Http\Request;
+use App\Exception\{FolderNotFoundException, PersistenceException};
 use Illuminate\Support\Facades\Log;
-use Symfony\Component\HttpFoundation\Exception\BadRequestException;
-use Throwable;
 use Inertia\Inertia;
+use Throwable;
 
 class FolderController extends Controller
 {
@@ -18,14 +16,12 @@ class FolderController extends Controller
         private readonly FoldersServiceInterface $foldersService
     ) {}
 
-    public function create($parent_id)
+    // --- VUES (GET) ---
+
+    public function create(int $parent_id)
     {
-        if ($parent_id != 0) {
-            if (!$this->foldersService->hasEditAccess($parent_id)) {
-                Log::notice("Accès refusé pour la création dans un dossier", ['parent_id' => $parent_id, 'user_id' => auth()->id()]);
-                return redirect()->route("navigate.folder", ["folder_id" => $parent_id])
-                    ->with("error", "Vous n'avez pas les permissions nécessaires pour créer un dossier ici.");
-            }
+        // On vérifie juste l'existence du parent s'il n'est pas à la racine (0)
+        if ($parent_id !== 0) {
             try {
                 $this->foldersService->read($parent_id);
             } catch (FolderNotFoundException) {
@@ -33,130 +29,84 @@ class FolderController extends Controller
             }
         }
 
-        return Inertia::render('Admin/FolderForm', [
-            "parent_id" => $parent_id,
-        ]);
+        return Inertia::render('Admin/FolderForm', ["parent_id" => $parent_id]);
     }
 
-    public function update(int $folder_id)
+    public function edit(int $id)
     {
-        if (!$this->foldersService->hasEditAccess($folder_id)) {
-            Log::notice("Accès refusé pour la modification du dossier", ['folder_id' => $folder_id]);
-            return redirect()->route("navigate.folder", ["folder_id" => $folder_id])
-                ->with("error", "Vous n'avez pas le droit de modifier ce dossier.");
-        }
-
         try {
-            $folder = $this->foldersService->read($folder_id);
-            return Inertia::render('Admin/FolderForm', [
-                "folder" => $folder,
-            ]);
+            $folder = $this->foldersService->read($id);
+            return Inertia::render('Admin/FolderForm', ["folder" => $folder]);
         } catch (FolderNotFoundException) {
-            return redirect()->back()->with("error", "Le dossier que vous tentez de modifier n'existe pas.");
+            return redirect()->back()->with("error", "Ce dossier n'existe pas.");
         }
     }
 
-    public function store(Request $request, $id = null)
+    // --- ACTIONS (POST / PUT) ---
+
+    public function store(SaveFolderRequest $request)
     {
-        $validatedData = $request->validate([
-            'name' => ['sometimes', 'string', 'max:255'],
-            'color' => ['sometimes','string', 'max:16'],
-            'parent_id' => ['integer', 'nullable'],
-            'departements' => ['sometimes', 'array'],
-        ]);
-
-        $targetId = $id ?? $validatedData["parent_id"];
-        if (!$this->foldersService->hasEditAccess($targetId)) {
-            return redirect()->route("navigate.folder", ["folder_id" => $targetId])
-                ->with("error", "Action non autorisée dans ce dossier.");
-        }
-
-        if(!empty($id) && !empty($validatedData["parent_id"])) {
-            $current_parent_id = $this->foldersService->getParentId($id);
-            if($current_parent_id != $validatedData["parent_id"]) {
-                if (!$this->foldersService->hasEditAccess($validatedData["parent_id"])) {
-                    return redirect()->route("navigate.folder", ["folder_id" => $targetId])
-                        ->with("error", "Action non autorisée dans ce dossier.");
-                }
-            }
-        }
-
         try {
-            if ($id) {
-                $this->foldersService->update($id, $validatedData);
-                return redirect()->route("navigate.folder", ["folder_id" => $id])
-                    ->with("success", "Le dossier a été mis à jour avec succès.");
-            } else {
-                $this->foldersService->create($validatedData);
-                return redirect()->route("navigate.folder", ["folder_id" => $validatedData["parent_id"] ?? 0])
-                    ->with("success", "Le dossier a été créé avec succès.");
+            $this->foldersService->create($request->validated());
+
+            return redirect()->route("navigate.folder", ["folder_id" => $request->input('parent_id') ?? 0])
+                ->with("success", "Le dossier a été créé avec succès.");
+        } catch (Throwable $t) {
+            return $this->handleException($t, "création");
+        }
+    }
+
+    public function update(SaveFolderRequest $request, int $id)
+    {
+        try {
+            $this->foldersService->update($id, $request->validated());
+
+            return redirect()->route("navigate.folder", ["folder_id" => $id])
+                ->with("success", "Le dossier a été mis à jour avec succès.");
+        } catch (Throwable $t) {
+            return $this->handleException($t, "mise à jour", $id);
+        }
+    }
+
+    // --- SUPPRESSION / RESTAURATION ---
+
+    public function delete(int $id)
+    {
+        try {
+            // La sécurité logicielle (hasEditAccess) peut être mise ici ou en middleware
+            if (!$this->foldersService->hasEditAccess($id)) {
+                return redirect()->back()->with("error", "Permissions insuffisantes.");
             }
 
-        } catch (BadRequestException $e) {
-            Log::warning("Requête invalide (Folder Store)", ['id' => $id, 'error' => $e->getMessage()]);
-            return redirect()->back()->with('error', 'Les données saisies sont incorrectes.');
-
-        } catch (FolderNotFoundException) {
-            return redirect()->back()->with('error', 'Le dossier cible est introuvable.');
-
-        } catch (PersistenceException $e) {
-            Log::error("Erreur de persistance dossier", ['id' => $id, 'error' => $e->getMessage()]);
-            return redirect()->back()->with('error', 'Une erreur technique est survenue lors de la sauvegarde.');
-
+            $this->foldersService->delete($id);
+            return redirect()->back()->with("success", "Le dossier a été supprimé avec succès.");
         } catch (Throwable $t) {
-            Log::critical('Erreur fatale imprévue (Folder Transaction)', [
-                'id' => $id,
-                'error' => $t->getMessage(),
-                'trace' => $t->getTraceAsString()
-            ]);
-            return redirect()->back()->with('error', 'Une erreur imprévue est survenue.');
+            return $this->handleException($t, "suppression", $id);
         }
     }
 
-    public function delete(int $folder_id)
+    public function restore(int $id)
     {
-        if (!$this->foldersService->hasEditAccess($folder_id)) {
-            Log::notice("Tentative de suppression de dossier non autorisée", ['id' => $folder_id]);
-            return redirect()->back()->with("error", "Vous n'avez pas les permissions pour supprimer ce dossier.");
-        }
         try {
-            $this->foldersService->delete($folder_id);
-            return redirect()->back()->with("success", "Le dossier a été supprimé avec succès.");
-
-        } catch (FolderNotFoundException) {
-            return redirect()->back()->with("error", "Ce dossier n'existe plus ou a déjà été supprimé.");
-
-        } catch (PersistenceException $e) {
-            Log::error("Erreur lors de la suppression du dossier", ['id' => $folder_id, 'error' => $e->getMessage()]);
-            return redirect()->back()->with("error", "Le dossier ne peut pas être supprimé (vérifiez s'il est vide).");
-
+            $this->foldersService->restore($id);
+            return redirect()->back()->with("success", "Le dossier a été restauré avec succès.");
         } catch (Throwable $t) {
-            Log::critical('Erreur fatale lors de la suppression du dossier', ['id' => $folder_id, 'error' => $t->getMessage()]);
-            return redirect()->back()->with("error", "Une erreur technique est survenue.");
+            return $this->handleException($t, "restauration", $id);
         }
     }
 
-    public function restore(string $folder_id)
+    // --- HELPER D'ERREURS ---
+
+    private function handleException(Throwable $t, string $action, int $id = null)
     {
-        if (!$this->foldersService->hasEditAccess($folder_id)) {
-            Log::notice("Tentative de suppression de dossier non autorisée", ['id' => $folder_id]);
-            return redirect()->back()->with("error", "Vous n'avez pas les permissions pour supprimer ce dossier.");
-        }
+        Log::error("Erreur Dossier $action", ['id' => $id, 'error' => $t->getMessage()]);
 
-        try {
-            $this->foldersService->restore($folder_id);
-            return redirect()->back()->with("success", "Le dossier a été supprimé avec succès.");
+        $message = match(get_class($t)) {
+            FolderNotFoundException::class => "Le dossier cible est introuvable.",
+            PersistenceException::class => "Erreur technique lors de la sauvegarde (le dossier est peut-être lié à d'autres éléments).",
+            default => "Une erreur imprévue est survenue lors de la $action."
+        };
 
-        } catch (FolderNotFoundException) {
-            return redirect()->back()->with("error", "Ce dossier n'existe plus ou a déjà été supprimé.");
-
-        } catch (PersistenceException $e) {
-            Log::error("Erreur lors de la suppression du dossier", ['id' => $folder_id, 'error' => $e->getMessage()]);
-            return redirect()->back()->with("error", "Le dossier ne peut pas être supprimé (vérifiez s'il est vide).");
-
-        } catch (Throwable $t) {
-            Log::critical('Erreur fatale lors de la suppression du dossier', ['id' => $folder_id, 'error' => $t->getMessage()]);
-            return redirect()->back()->with("error", "Une erreur technique est survenue.");
-        }
+        return redirect()->back()->with('error', $message);
     }
 }
