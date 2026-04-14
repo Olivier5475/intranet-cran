@@ -58,11 +58,11 @@ Route::prefix("editor")
         Route::prefix("files")->group(function () {
             // GET (form)
             Route::get("/create/p/{parent_id}", [Controllers\Admin\FileController::class, "create"])->name('editor.file.create');
-            Route::get("/update/{file_id}", [Controllers\Admin\FileController::class, "update"])->name('editor.file.update');
+            Route::get("/update/{file_id}", [Controllers\Admin\FileController::class, "edit"])->name('editor.file.update');
 
             // POST (submit)
             Route::post("/", [Controllers\Admin\FileController::class, "store"])->name('editor.file.post.create');
-            Route::post("/{file_id}", [Controllers\Admin\FileController::class, "store"])->name('editor.file.post.update');
+            Route::post("/{file_id}", [Controllers\Admin\FileController::class, "update"])->name('editor.file.post.update');
 
             // PATCH (submit)
             Route::patch("/restore/{file_id}", [Controllers\Admin\FileController::class, "restore"])->name("editor.file.post.restore");
