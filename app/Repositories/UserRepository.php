@@ -2,20 +2,60 @@
 
 namespace App\Repositories;
 
-use App\Exception\PersistenceException;
-use App\Exception\UserNotFoundException;
+use App\Exception\{PersistenceException, UserNotFoundException};
 use App\Models\User;
+use App\Repositories\Interfaces\UserRepositoryInterface;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
-class UserRepository implements Interfaces\UserRepositoryInterface {
+class UserRepository implements UserRepositoryInterface
+{
+    // --- LECTURE & AUTHENTIFICATION ---
 
-    public function getUserByEmail(string $email) : ?User {
+    /**
+     * @inheritDoc
+     */
+    public function getUserByEmail(string $email): ?User
+    {
         return User::where('email', $email)->first();
     }
 
-    public function createUser(array $data): User {
+    /**
+     * @inheritDoc
+     */
+    public function getUserById(int $id): User
+    {
+        $user = User::find($id);
+        if (!$user) {
+            throw new UserNotFoundException("Utilisateur ID $id introuvable.");
+        }
+        return $user;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function readAll(): Collection
+    {
+        return User::all();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function performSearch(string $query): Collection
+    {
+        return User::search($query)->get();
+    }
+
+    // --- ÉCRITURE (CRUD) ---
+
+    /**
+     * @inheritDoc
+     */
+    public function createUser(array $data): User
+    {
         try {
             $user = new User();
             $user->email = $data['email'];
@@ -34,11 +74,15 @@ class UserRepository implements Interfaces\UserRepositoryInterface {
                 'email' => $data['email'] ?? 'N/A',
                 'message' => $t->getMessage()
             ]);
-            throw new PersistenceException("Erreur lors de la création de l'utilisateur en base de données.", 0, $t);
+            throw new PersistenceException("Erreur lors de la création de l'utilisateur.", 0, $t);
         }
     }
 
-    public function update(int $id, array $data): void {
+    /**
+     * @inheritDoc
+     */
+    public function update(int $id, array $data): void
+    {
         $user = User::find($id);
 
         if (!$user) {
@@ -46,18 +90,10 @@ class UserRepository implements Interfaces\UserRepositoryInterface {
         }
 
         try {
-            if(!empty($data['nom'])) {
-                $user->nom = $data['nom'];
-            }
-            if(!empty($data['prenom'])) {
-                $user->prenom = $data['prenom'];
-            }
-            if(!empty($data['email'])) {
-                $user->email = $data['email'];
-            }
-            if(!empty($data['role'])) {
-                $user->role = $data['role'];
-            }
+            if (isset($data['nom'])) $user->nom = $data['nom'];
+            if (isset($data['prenom'])) $user->prenom = $data['prenom'];
+            if (isset($data['email'])) $user->email = $data['email'];
+            if (isset($data['role'])) $user->role = $data['role'];
 
             $user->save();
 
@@ -69,23 +105,15 @@ class UserRepository implements Interfaces\UserRepositoryInterface {
                 'message' => $t->getMessage(),
                 'data' => $data
             ]);
-            throw new PersistenceException("Erreur de persistence lors de la modification de l'utilisateur.");
+            throw new PersistenceException("Erreur lors de la modification de l'utilisateur.");
         }
     }
 
-    public function readAll(): Collection {
-        return User::all();
-    }
-
-    public function getUserById(int $id) : User {
-        $user = User::find($id);
-        if (!$user) {
-            throw new UserNotFoundException("Utilisateur ID $id introuvable.");
-        }
-        return $user;
-    }
-
-    public function delete(int $id) : void {
+    /**
+     * @inheritDoc
+     */
+    public function delete(int $id): void
+    {
         $user = User::find($id);
 
         if (!$user) {
@@ -98,12 +126,7 @@ class UserRepository implements Interfaces\UserRepositoryInterface {
             Log::error("Échec de la suppression SQL de l'utilisateur $id", [
                 'message' => $t->getMessage()
             ]);
-            throw new PersistenceException("Erreur technique lors de la suppression de l'utilisateur.");
+            throw new PersistenceException("Erreur technique lors de la suppression.");
         }
-    }
-
-    public function performSearch(string $query)
-    {
-        return User::search($query)->get();
     }
 }

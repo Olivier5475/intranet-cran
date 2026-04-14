@@ -2,19 +2,37 @@
 
 namespace App\Repositories;
 
-use App\Exception\FileNotFoundException;
-use App\Exception\PersistenceException;
-use App\Exception\AlreadyExistsException;
-use App\Models\Document;
-use App\Models\File;
-use App\Models\Version;
+use App\Exception\{AlreadyExistsException, FileNotFoundException, PersistenceException};
+use App\Models\{Document, File, Version};
+use App\Repositories\Interfaces\FilesRepositoryInterface;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
-class FilesRepository implements Interfaces\FilesRepositoryInterface {
+class FilesRepository implements FilesRepositoryInterface
+{
+    // --- LECTURE ---
 
-    public function create(array $data): File {
+    /**
+     * @inheritDoc
+     */
+    public function read(int $id): File
+    {
+        $file = File::with("departements")->find($id);
+
+        if (!$file) {
+            throw new FileNotFoundException("Le fichier avec l'ID $id est introuvable.");
+        }
+        return $file;
+    }
+
+    // --- ÉCRITURE (CRUD) ---
+
+    /**
+     * @inheritDoc
+     */
+    public function create(array $data): File
+    {
         if ($this->checkName($data["folder_id"] ?? null, $data["name"])) {
             throw new AlreadyExistsException("Un fichier ou document porte déjà ce nom dans ce dossier.");
         }
@@ -43,16 +61,11 @@ class FilesRepository implements Interfaces\FilesRepositoryInterface {
         }
     }
 
-    public function read(int $id) : File {
-        $file = File::with("departements")->find($id);
-
-        if (!$file) {
-            throw new FileNotFoundException("Le fichier avec l'ID $id est introuvable.");
-        }
-        return $file;
-    }
-
-    public function update(int $id, array $data): File {
+    /**
+     * @inheritDoc
+     */
+    public function update(int $id, array $data): File
+    {
         $file = $this->read($id);
 
         if (isset($data["name"]) && $this->checkName($file->folder_id, $data["name"], $id)) {
@@ -65,6 +78,7 @@ class FilesRepository implements Interfaces\FilesRepositoryInterface {
             if (isset($data["mimetype"])) $file->mimetype = $data["mimetype"];
             if (isset($data["size"])) $file->size = $data["size"];
             if (isset($data["folder_id"])) $file->folder_id = $data["folder_id"];
+
             $file->save();
 
             if (isset($data["departements"])) {
@@ -82,34 +96,80 @@ class FilesRepository implements Interfaces\FilesRepositoryInterface {
     }
 
     /**
-     * @throws PersistenceException
-     * @throws FileNotFoundException
+     * @inheritDoc
      */
-    private function setIsArchived(int $id, bool $is_archived) : bool {
+    public function delete(int $id): bool
+    {
+        return $this->setIsArchived($id, true);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function restore(int $file_id): bool
+    {
+        return $this->setIsArchived($file_id, false);
+    }
+
+    // --- RECHERCHE ---
+
+    /**
+     * @inheritDoc
+     */
+    public function performSearch(string $query, array $folderIds, bool $fromArchived = false): Collection
+    {
+        return File::search($query)
+            ->whereIn('folder_id', $folderIds)
+            ->where('is_archived', (int) $fromArchived)
+            ->get();
+    }
+
+    // --- VERSIONS ---
+
+    /**
+     * @inheritDoc
+     */
+    public function findVersionsFromParent(int $parent_id): Collection
+    {
+        return Version::where('versionable_id', $parent_id)
+            ->where("versionable_type", File::class)
+            ->orderByDesc('created_at')
+            ->get();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function findVersionWithParent(int $versionId): Version
+    {
+        return Version::with('versionable')->findOrFail($versionId);
+    }
+
+    // --- HELPERS PRIVÉS ---
+
+    /**
+     * Bascule l'état d'archivage d'un fichier.
+     */
+    private function setIsArchived(int $id, bool $is_archived): bool
+    {
         $file = $this->read($id);
 
         try {
             $file->is_archived = $is_archived;
             return $file->save();
         } catch (Throwable $e) {
-            Log::error("Erreur SQL : Suppression du fichier $id échouée", [
+            Log::error("Erreur SQL : Changement état archivage fichier $id", [
                 'message' => $e->getMessage(),
             ]);
-            throw new PersistenceException("Erreur technique lors de la suppression en base de données.", 0, $e);
+            throw new PersistenceException("Erreur technique lors de la modification de l'état.", 0, $e);
         }
     }
 
-    public function delete(int $id) : bool {
-        return $this->setIsArchived($id, true);
-    }
-
-    public function restore(int $file_id): bool
+    /**
+     * Vérifie la disponibilité d'un nom dans un dossier (tous types confondus).
+     */
+    private function checkName(?int $folder_id, string $name, ?int $id = null): bool
     {
-        return $this->setIsArchived($file_id, false);
-    }
-
-    private function checkName(?int $folder_id, string $name, ?int $id = null): bool {
-        // Gestion des nuls pour folder_id (racine)
         $fileQuery = File::where('folder_id', $folder_id)
             ->where('name', $name)
             ->when($id, fn($q) => $q->where('id', '!=', $id));
@@ -118,29 +178,5 @@ class FilesRepository implements Interfaces\FilesRepositoryInterface {
             ->where('name', $name);
 
         return $fileQuery->exists() || $docQuery->exists();
-    }
-
-    public function performSearch(string $query, array $folderIds, bool $fromArchived = false): Collection
-    {
-        return File::search($query)
-            // on regarde dans tous les sous dossiers (enfants) du dossier actuel
-            // ainsi que leurs propres enfants, etc...
-            ->whereIn('folder_id', $folderIds)
-
-            // on cast en int pour que Meilisearch comprenne
-            // (il doit recevoir 0 ou 1 et nan false ou true)
-            ->where('is_archived', (int) $fromArchived)
-            ->get();
-    }
-
-    public function findVersionWithParent(int $versionId): Version {
-        return Version::with('versionable')->findOrFail($versionId);
-    }
-
-    public function findVersionsFromParent(int $parent_id): Collection {
-        return Version::where('versionable_id', $parent_id)
-            ->where("versionable_type", File::class)
-            ->orderByDesc('created_at')
-            ->get();
     }
 }

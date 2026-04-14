@@ -2,22 +2,28 @@
 
 namespace App\Repositories;
 
-use App\Exception\AttachmentNotFoundException;
-use App\Exception\PersistenceException;
+use App\Exception\{AttachmentNotFoundException, PersistenceException};
 use App\Models\Attachment;
+use App\Repositories\Interfaces\AttachmentRepositoryInterface;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
-class AttachmentRepository implements Interfaces\AttachmentRepositoryInterface {
-
-    public function create(array $data): Attachment {
+class AttachmentRepository implements AttachmentRepositoryInterface
+{
+    /**
+     * @inheritDoc
+     */
+    public function create(array $data): Attachment
+    {
         try {
             $attachment = new Attachment();
             $attachment->fill($data);
 
+            // Permet de forcer un ID spécifique (utile lors des restaurations de versions)
             if (isset($data['id'])) {
                 $attachment->id = $data['id'];
             }
+
             $attachment->save();
             return $attachment;
         } catch (Throwable $e) {
@@ -30,7 +36,11 @@ class AttachmentRepository implements Interfaces\AttachmentRepositoryInterface {
         }
     }
 
-    public function read(int $id): Attachment {
+    /**
+     * @inheritDoc
+     */
+    public function read(int $id): Attachment
+    {
         $attachment = Attachment::find($id);
 
         if (!$attachment) {
@@ -40,12 +50,16 @@ class AttachmentRepository implements Interfaces\AttachmentRepositoryInterface {
         return $attachment;
     }
 
-    public function update(int $id, array $data): Attachment {
-        $attachment = $this->read($id); // Réutilise read() pour gérer l'exception 404
+    /**
+     * @inheritDoc
+     */
+    public function update(int $id, array $data): Attachment
+    {
+        $attachment = $this->read($id);
 
         try {
             $attachment->update($data);
-            return $attachment->fresh(); // On retourne une instance fraîchement synchronisée
+            return $attachment->fresh();
         } catch (Throwable $e) {
             Log::error("Erreur SQL : Mise à jour attachement échouée", [
                 'id' => $id,
@@ -57,7 +71,11 @@ class AttachmentRepository implements Interfaces\AttachmentRepositoryInterface {
         }
     }
 
-    public function delete(int $id): bool {
+    /**
+     * @inheritDoc
+     */
+    public function delete(int $id): bool
+    {
         $attachment = $this->read($id);
 
         try {

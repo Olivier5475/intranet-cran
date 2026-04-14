@@ -2,18 +2,78 @@
 
 namespace App\Repositories;
 
-use App\Exception\FolderNotFoundException;
-use App\Exception\PersistenceException;
+use App\Exception\{FolderNotFoundException, PersistenceException};
 use App\Models\Folder;
+use App\Repositories\Interfaces\FolderRepositoryInterface;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\{DB, Log};
 use Throwable;
 
-class FolderRepository implements Interfaces\FolderRepositoryInterface
+class FolderRepository implements FolderRepositoryInterface
 {
+    // --- SECTION : LECTURE & NAVIGATION ---
+
     /**
-     * Utilise une expression de table commune (CTE) pour récupérer l'arborescence.
+     * @inheritDoc
+     */
+    public function read(int $id): Folder
+    {
+        $folder = Folder::with([
+            'departements:id',
+            'children' => fn($q) => $q->where('is_archived', false)->with('departements:id'),
+            'files.departements:id',
+            'documents.departements:id'
+        ])->find($id);
+
+        if (!$folder) {
+            throw new FolderNotFoundException("Dossier ID $id introuvable ou supprimé.");
+        }
+
+        return $folder;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getRacineChildren(): Collection
+    {
+        return Folder::whereNull('parent_id')
+            ->where('is_archived', false)
+            ->with([
+                'departements:id',
+                'allChildren' => fn($q) => $q->where('is_archived', false)->with('departements:id'),
+            ])
+            ->get();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getFolderWithContents(int $id, bool $archived): Folder
+    {
+        return Folder::with([
+            'departements:id',
+            'parent.parent.parent.parent.parent',
+            'children' => fn($q) => $q->where('is_archived', $archived),
+            'files' => fn($q) => $q->where('is_archived', $archived),
+            'documents' => fn($q) => $q->where('is_archived', $archived)
+        ])->findOrFail($id);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getFolderWithParents(int $id): Folder
+    {
+        return Folder::with('departements:id')
+            ->with('parent.parent.parent.parent.parent')
+            ->findOrFail($id);
+    }
+
+    // --- SECTION : RÉCURSIVITÉ SQL ---
+
+    /**
+     * @inheritDoc
      */
     public function getDescendantFolderIds(int $rootFolderId): array
     {
@@ -32,22 +92,11 @@ class FolderRepository implements Interfaces\FolderRepositoryInterface
         return collect($results)->pluck('id')->all();
     }
 
-    public function read(int $id): Folder
-    {
-        $folder = Folder::with([
-                'departements:id',
-                'children' => fn($q) => $q->where('is_archived', false)->with('departements:id'),
-                'files.departements:id',
-                'documents.departements:id'
-            ])->find($id);
+    // --- SECTION : ÉCRITURE (CRUD) ---
 
-        if (!$folder) {
-            throw new FolderNotFoundException("Dossier ID $id introuvable ou supprimé.");
-        }
-
-        return $folder;
-    }
-
+    /**
+     * @inheritDoc
+     */
     public function create(array $data): Folder
     {
         try {
@@ -73,6 +122,9 @@ class FolderRepository implements Interfaces\FolderRepositoryInterface
         }
     }
 
+    /**
+     * @inheritDoc
+     */
     public function update(int $id, array $data): Folder
     {
         $folder = $this->read($id);
@@ -98,10 +150,28 @@ class FolderRepository implements Interfaces\FolderRepositoryInterface
     }
 
     /**
-     * @throws FolderNotFoundException
-     * @throws PersistenceException
+     * @inheritDoc
      */
-    private function setIsArchived($id, $isArchived){
+    public function delete(int $id): bool
+    {
+        return $this->setIsArchived($id, true);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function restore(int $folder_id): bool
+    {
+        return $this->setIsArchived($folder_id, false);
+    }
+
+    // --- HELPERS PRIVÉS ---
+
+    /**
+     * Gère l'état d'archivage logique.
+     */
+    private function setIsArchived(int $id, bool $isArchived): bool
+    {
         $folder = Folder::find($id);
 
         if (!$folder) {
@@ -111,53 +181,13 @@ class FolderRepository implements Interfaces\FolderRepositoryInterface
         try {
             $folder->is_archived = $isArchived;
             $res = $folder->save();
-            Log::info("Dossier marqué comme supprimé", ['id' => $id]);
+            Log::info("Changement état archivage dossier", ['id' => $id, 'archived' => $isArchived]);
             return $res;
         } catch (Throwable $e) {
-            Log::error("Erreur SQL : Suppression logique du dossier $id échouée", [
+            Log::error("Erreur SQL : Modification archivage dossier $id échouée", [
                 'message' => $e->getMessage()
             ]);
-            throw new PersistenceException("Erreur technique lors de la suppression.", 0, $e);
+            throw new PersistenceException("Erreur technique lors du traitement.", 0, $e);
         }
-    }
-    public function delete(int $id): bool
-    {
-        return $this->setIsArchived($id, true);
-    }
-
-    public function restore(int $folder_id): bool
-    {
-        return $this->setIsArchived($folder_id, false);
-    }
-
-    public function getRacineChildren(): Collection
-    {
-        return Folder::whereNull('parent_id')
-            ->where('is_archived', false)
-            ->with([
-                'departements:id',
-                'allChildren' => fn($q) => $q->where('is_archived', false)->with('departements:id'),
-            ])
-            ->get();
-    }
-
-    public function getFolderWithContents(int $id, bool $archived): Folder
-    {
-        // On récupère le dossier "conteneur" sans condition sur son propre is_archived
-
-        return Folder::with([
-            'departements:id',
-            'parent.parent.parent.parent.parent', // Pour le fil d'Ariane
-            'children' => fn($q) => $q->where('is_archived', $archived),
-            'files' => fn($q) => $q->where('is_archived', $archived),
-            'documents' => fn($q) => $q->where('is_archived', $archived)
-        ])->findOrFail($id);
-    }
-
-    public function getFolderWithParents(int $id): Folder
-    {
-        return Folder::with('departements:id')
-            ->with('parent.parent.parent.parent.parent')
-            ->findOrFail($id);
     }
 }
