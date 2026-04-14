@@ -58,7 +58,17 @@ class Authentification {
         // On met à jour l'activité
         session(['last_activity' => time()]);
 
-        phpCAS::forceAuthentication();
+        if (!phpCAS::checkAuthentication()) {
+            // Le CAS a expiré ou n'est plus valide
+            if (Auth::check()) {
+                Auth::logout();
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+            }
+
+            // 2. Maintenant, on force la redirection pour se reconnecter au CAS
+            phpCAS::forceAuthentication();
+        }
 
         $casUser = phpCAS::getUser();
         $attributes = phpCAS::getAttributes();
