@@ -69,9 +69,9 @@ class HandleInertiaRequests extends Middleware {
                 'error' => $request->session()->get('error'),
                 'warn' => $request->session()->get('warn'),
             ],
-            'racineChildren' => $this->foldersService->getRacineChildren(),
-            'racineDocument' => $this->documentsService->readRacineDoc(),
-            'departements' => $this->departementsService->readAll(),
+            'racineChildren' => fn() => $this->foldersService->getRacineChildren(),
+            'racineDocument' => fn() => $this->documentsService->readRacineDoc(),
+            'departements'   => fn() => $this->departementsService->readAll(),
         ];
     }
 }
