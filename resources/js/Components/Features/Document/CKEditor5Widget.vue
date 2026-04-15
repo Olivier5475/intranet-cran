@@ -8,7 +8,7 @@
                 <div ref="editorElement" style="">
                     <ckeditor
                         v-if="editor && config"
-                        :modelValue="modelValue"
+                        :modelValue="cleanHtml(modelValue)"
                         :editor="editor"
                         :config="config as any"
                         @input="onEditorChange" />
@@ -26,6 +26,7 @@
 
 import { computed, ref, onMounted } from 'vue';
 import { Ckeditor } from '@ckeditor/ckeditor5-vue';
+import DOMPurify from 'dompurify';
 
 // Définition des props pour v-model
 defineProps<{
@@ -33,11 +34,24 @@ defineProps<{
     name: string; // Le nom du champ pour le formulaire (optionnel ici, mais bonne pratique)
 }>();
 
+const cleanHtml = (html: string) => {
+    let clean = DOMPurify.sanitize(html, {
+        USE_PROFILES: { html: true, svg: true },
+        // ON NE BANNI PLUS TOUT LE STYLE
+        // On laisse DOMPurify nettoyer le contenu du style par défaut
+        FORBID_TAGS: ['script', 'iframe', 'object', 'embed'],
+        FORBID_ATTR: ['onerror', 'onclick', 'onload', 'onmouseover'],
+        ALLOW_UNKNOWN_PROTOCOLS: false,
+    });
+
+    clean = clean.replace(/position\s*:\s*(fixed|absolute)/gi, 'position:static');
+    clean = clean.replace(/z-index\s*:\s*\d+/gi, 'z-index:1');
+    return clean;
+}
 // Définition des événements pour v-model
 const emit = defineEmits(['update:modelValue']);
 
 const onEditorChange = (newHtmlValue: string) => {
-    console.log(newHtmlValue);
     emit('update:modelValue', newHtmlValue);
 };
 
