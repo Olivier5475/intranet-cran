@@ -17,7 +17,7 @@ import folder_route from '@/routes/editor/folder';
 import { home } from '@/routes';
 
 // 4. Composants
-import TreeViewItem from '@/Components/TreeViewItem.vue';
+import TreeViewItem from '@/Components/Layout/TreeViewItem.vue';
 
 // 5. Types
 import { Folder } from '@/types/folder';

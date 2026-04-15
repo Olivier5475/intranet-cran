@@ -14,11 +14,14 @@ import { UserPlusIcon, TrashIcon } from '@heroicons/vue/24/outline';
 
 // 4. Icons
 import dept_routes from '@/routes/admin/departements';
-import { router } from '@inertiajs/vue3';
+
+// 5. Composants
+import Modal from '@/Components/UI/Modal.vue';
 
 const props = defineProps<{
     departement: Departement;
     users: User[];
+    othersUsers: User[]
 }>();
 
 const removeUser = (user_id: number) => {
@@ -26,12 +29,21 @@ const removeUser = (user_id: number) => {
         router.delete(dept_routes.users.remove.url([props.departement.id, user_id]));
     }
 };
+
+
+const showModal = ref(false);
+
+const openAddUser = () => {
+    showModal.value = true;
+};
 </script>
 
 <template>
     <div>
         <div
-            class="group p-5 rounded-2xl border-zinc-100 dark:border-zinc-800 hover:shadow-xl hover:border-sky-200 dark:hover:border-sky-900/50 flex items-center justify-between border transition-all duration-200"
+            class="group p-5 rounded-2xl border-zinc-100 dark:border-zinc-800 hover:shadow-xl
+            hover:border-sky-200 dark:hover:border-sky-900/50 flex items-center
+            justify-between border transition-all duration-200"
         >
             <div class="gap-5 flex items-center">
                 <div
@@ -48,6 +60,14 @@ const removeUser = (user_id: number) => {
                     <p class="text-xs text-zinc-400 tracking-widest font-semibold mt-0.5 uppercase">Entité active</p>
                 </div>
             </div>
+            <button
+                @click="openAddUser"
+                class="gap-2 bg-sky-600 hover:bg-sky-700 text-white px-5 py-2.5 rounded-xl
+                shadow-lg shadow-sky-500/20 flex items-center transition-all active:scale-95"
+            >
+                <UserPlusIcon class="w-5 h-5 stroke-[3]" />
+                <span class="font-bold">Ajouter un utilisateur</span>
+            </button>
         </div>
 
         <div class="gap-4 mt-4 grid">
@@ -90,5 +110,13 @@ const removeUser = (user_id: number) => {
                 </div>
             </div>
         </div>
+
+        <Modal :show="showModal" :title="'Ajouter un utilisateur au departement ' + departement.initials" @close="showModal = false">
+            <AddUserToDepartement
+                :departement="departement"
+                :users="othersUsers"
+                @success="showModal = false"
+            />
+        </Modal>
     </div>
 </template>

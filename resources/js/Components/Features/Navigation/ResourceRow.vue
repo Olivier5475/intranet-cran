@@ -12,8 +12,8 @@ import { useResource } from "@/Composables/useResource";
 import { isImageFile } from '@/Composables/useDocumentsTypeRegex';
 
 // 4. Composants
-import DeleteModal from "@/Components/DeleteModal.vue";
-import ResourceIcon from "@/Components/ResourceIcon.vue";
+import DeleteModal from "@/Components/UI/DeleteModal.vue";
+import ResourceIcon from "@/Components/Features/Navigation/ResourceIcon.vue";
 
 // 5. Types
 import { Child } from "@/types/child";

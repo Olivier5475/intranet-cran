@@ -22,7 +22,7 @@ defineProps<{
         class="flex items-center space-x-1 text-sm font-medium p-1 overflow-x-auto no-scrollbar"
     >
         <Link
-            href="/"
+            href="/public"
             class="flex items-center justify-center p-2 rounded-lg text-gray-500
             dark:text-gray-400 hover:bg-white dark:hover:bg-zinc-800 hover:text-sky-600
              dark:hover:text-sky-400 transition-all duration-200 shadow-sm border

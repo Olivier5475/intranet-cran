@@ -17,9 +17,9 @@ import { Departement } from '@/types/departement';
 import user from '@/routes/admin/user';
 
 // 4. Composants
-import Modal from '@/Components/Modal.vue';
+import Modal from '@/Components/UI/Modal.vue';
 import UserForm from '@/Components/Forms/UserForm.vue';
-import SearchBarWidget from '@/Components/SearchBarWidget.vue';
+import SearchBarWidget from '@/Components/Features/SearchBarWidget.vue';
 
 defineProps<{
     users: User[];
@@ -45,8 +45,12 @@ const deleteUser = (id: number) => {
 </script>
 
 <template>
-    <div class="p-6 max-w-6xl mx-auto">
-        <div class="mb-8 flex items-center justify-between">
+    <div
+        class="p-6 max-w-6xl mx-auto"
+    >
+        <div
+            class="mb-8 flex items-center justify-between"
+        >
             <div>
                 <h1 class="text-3xl font-black dark:text-white gap-3 flex items-center">
                     <UserGroupIcon class="w-8 h-8 text-sky-500" />
@@ -56,10 +60,11 @@ const deleteUser = (id: number) => {
             </div>
             <button
                 @click="openCreate"
-                class="gap-2 bg-sky-600 hover:bg-sky-700 text-white px-4 py-2 rounded-xl shadow-lg shadow-sky-500/20 flex items-center transition-all"
+                class="gap-2 bg-sky-600 hover:bg-sky-700 text-white px-5 py-2.5 rounded-xl
+                shadow-lg shadow-sky-500/20 flex items-center transition-all active:scale-95"
             >
-                <UserPlusIcon class="w-5 h-5" />
-                Nouveau
+                <UserPlusIcon class="w-5 h-5 stroke-[3]" />
+                <span class="font-bold">Créer un utilisateur</span>
             </button>
         </div>
 

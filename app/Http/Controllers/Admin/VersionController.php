@@ -42,13 +42,16 @@ class VersionController extends Controller
             throw new BadRequestHttpException();
         }
         try {
-            if($model == "files"){
+            $versions = $this->versionsService->readVersionsFromParent($model_id, $model);
+            if($model == "files"){ // Si c'est un fichier
+                // On retourne la vue pour les fichiers
                 return Inertia::render("Admin/Version/File", [
-                    "versions" => $this->versionsService->readVersionsFromParent($model_id, $model),
+                    "versions" => $versions,
                 ]);
-            } elseif($model == "documents"){
+            } else { // Sinon ça veut dire que c'est un document
+                // Et on retourne la vue pour un document
                 return Inertia::render("Admin/Version/Document", [
-                    "versions" => $this->versionsService->readVersionsFromParent($model_id, $model),
+                    "versions" => $versions,
                 ]);
             }
 

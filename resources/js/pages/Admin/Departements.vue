@@ -12,7 +12,7 @@ import dept_routes from '@/routes/admin/departements';
 
 // 4. Composants
 import DepartementForm from '@/Components/Forms/DepartementForm.vue';
-import Modal from '@/Components/Modal.vue';
+import Modal from '@/Components/UI/Modal.vue';
 
 defineProps<{
     departements: Departement[];

@@ -1,5 +1,5 @@
 <template>
-    <a href="/" class="flex mx-auto">
+    <a href="/public" class="flex mx-auto">
         <img src="/images/logo.png" alt="logo CRAN" class="h-16 w-auto" />
         <div class="pl-6">
             <p class="text-blue-600 text-2xl font-bold">Centre de recherche en Automatique de Nancy</p>

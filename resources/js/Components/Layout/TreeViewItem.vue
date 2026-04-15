@@ -18,7 +18,7 @@ import file_route from "@/routes/editor/file";
 import navigate from "@/routes/navigate";
 
 // 4. Composants
-import DeleteModal from "@/Components/DeleteModal.vue";
+import DeleteModal from "@/Components/UI/DeleteModal.vue";
 import TreeViewItem from "./TreeViewItem.vue";
 
 // 5. Types

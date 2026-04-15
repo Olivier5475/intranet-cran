@@ -17,7 +17,7 @@ import route from "@/routes/editor/file";
 import { decodeEntities } from "@/Composables/useDecodeModule";
 
 // 4. Composants
-import WarningPermission from "@/Components/WarningPermission.vue";
+import WarningPermission from "@/Components/UI/WarningPermission.vue";
 import DepartementSelector from "@/Components/Forms/DepartementSelector.vue";
 
 

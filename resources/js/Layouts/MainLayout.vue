@@ -10,11 +10,11 @@ import { Departement } from '@/types/departement';
 import { Folder } from '@/types/folder';
 
 // 4. Composants
-import FilterWidget from '@/Components/FilterWidget.vue';
-import FlashMessage from '@/Components/FlashMessage.vue';
-import LogoWidget from '@/Components/LogoWidget.vue';
-import MainNav from '@/Components/MainNav.vue';
-import SidebarWidget from '@/Components/SidebarWidget.vue';
+import FilterWidget from '@/Components/Layout/FilterWidget.vue';
+import FlashMessage from '@/Components/UI/FlashMessage.vue';
+import LogoWidget from '@/Components/Layout/LogoWidget.vue';
+import MainNav from '@/Components/Layout/MainNav.vue';
+import SidebarWidget from '@/Components/Layout/SidebarWidget.vue';
 
 timeout.setup();
 const activeFilters = ref({});

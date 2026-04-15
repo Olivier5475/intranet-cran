@@ -17,13 +17,13 @@ import { useShortcuts } from "@/Composables/useShortcuts";
 import { useFilteredChildren } from "@/Composables/useFiltres";
 
 // 4. Composants Internes
-import CreateFolderCardWidget from "@/Components/CreateFolderCardWidget.vue";
-import CreateFolderRowWidget from "@/Components/CreateFolderRowWidget.vue";
-import CreationWidget from "@/Components/CreationWidget.vue";
-import RepertoryWidget from "@/Components/RepertoryWidget.vue";
-import ResourceCard from "@/Components/ResourceCard.vue";
-import ResourceRow from "@/Components/ResourceRow.vue";
-import SearchBarWidget from "@/Components/SearchBarWidget.vue";
+import CreateFolderCardWidget from "@/Components/Features/Navigation/Creation/CreateFolderCardWidget.vue";
+import CreateFolderRowWidget from "@/Components/Features/Navigation/Creation/CreateFolderRowWidget.vue";
+import CreationWidget from "@/Components/Features/Navigation/Creation/CreationWidget.vue";
+import RepertoryWidget from "@/Components/Features/Navigation/RepertoryWidget.vue";
+import ResourceCard from "@/Components/Features/Navigation/ResourceCard.vue";
+import ResourceRow from "@/Components/Features/Navigation/ResourceRow.vue";
+import SearchBarWidget from "@/Components/Features/SearchBarWidget.vue";
 
 // 5. Routes
 import file_route from "@/routes/editor/file";

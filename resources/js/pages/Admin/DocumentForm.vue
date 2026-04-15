@@ -19,8 +19,8 @@ import route from "@/routes/editor/document";
 import { decodeEntities } from "@/Composables/useDecodeModule";
 
 // 4. Composants
-import CKEditor5Widget from "@/Components/CKEditor5Widget.vue";
-import WarningPermission from "@/Components/WarningPermission.vue";
+import CKEditor5Widget from "@/Components/Features/Document/CKEditor5Widget.vue";
+import WarningPermission from "@/Components/UI/WarningPermission.vue";
 import DepartementSelector from "@/Components/Forms/DepartementSelector.vue";
 
 const props = defineProps<{
