@@ -1,7 +1,18 @@
 <script setup lang="ts">
+import AddUserToDepartement from '@/Components/Features/Departement/AddUserToDepartement.vue';
+
+// 1. Vue & Core
+import { ref } from 'vue';
+import { router } from '@inertiajs/vue3';
+
+// 2. Types
 import { User } from '@/types';
 import { Departement } from '@/types/departement';
-import { TrashIcon } from '@heroicons/vue/24/outline';
+
+// 3. Librairies Tierces (Icons)
+import { UserPlusIcon, TrashIcon } from '@heroicons/vue/24/outline';
+
+// 4. Icons
 import dept_routes from '@/routes/admin/departements';
 import { router } from '@inertiajs/vue3';
 

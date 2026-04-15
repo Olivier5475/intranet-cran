@@ -23,6 +23,14 @@ interface UserRepositoryInterface
      */
     public function getUserById(int $id): User;
 
+
+    /**
+     * Récupère la liste des utilisateurs ayant un ID qui n'est pas dans la liste
+     * * @param array<int> $usersIds
+     * @return Collection<User>
+     */
+    public function getExcludeUsers(array $usersIds) : Collection;
+
     /**
      * Récupère la liste de tous les utilisateurs.
      * * @return Collection<int, User>

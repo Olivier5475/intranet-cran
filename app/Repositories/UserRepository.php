@@ -44,6 +44,16 @@ class UserRepository implements UserRepositoryInterface
     /**
      * @inheritDoc
      */
+    public function getExcludeUsers(array $usersIds) : Collection
+    {
+        return User::whereNotIn('id', $usersIds)
+            ->with("departements:id")
+            ->get();
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function performSearch(string $query): Collection
     {
         return User::search($query)->get();

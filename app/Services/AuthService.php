@@ -22,6 +22,9 @@ readonly class AuthService implements UserServiceInterface
 
     // --- AUTHENTIFICATION & SESSION ---
 
+    /**
+     * @inheritdoc
+     */
     public function logout(string $returnUrl): void
     {
         if (str_contains($returnUrl, '/logout')) {
@@ -36,11 +39,17 @@ readonly class AuthService implements UserServiceInterface
         ]);
     }
 
+    /**
+     * @inheritdoc
+     */
     public function getCurrentUserId(): int
     {
         return Auth::id() ?? 0;
     }
 
+    /**
+     * @inheritdoc
+     */
     public function getRole(): string
     {
         $userId = $this->getCurrentUserId();
@@ -54,6 +63,9 @@ readonly class AuthService implements UserServiceInterface
         }
     }
 
+    /**
+     * @inheritdoc
+     */
     public function isAdmin(): bool
     {
         return $this->getRole() === "admin";
@@ -61,7 +73,10 @@ readonly class AuthService implements UserServiceInterface
 
     // --- LECTURE & RECHERCHE ---
 
-    public function getUsers(?string $searchQuery): Collection
+    /**
+     * @inheritdoc
+     */
+    public function getUsers(?string $searchQuery = null): Collection
     {
         $users = ($searchQuery && trim($searchQuery) !== '')
             ? $this->userRepository->performSearch($searchQuery)
@@ -78,12 +93,29 @@ readonly class AuthService implements UserServiceInterface
         }
     }
 
-    public function readById(int $id): AuthDTO
+    /**
+     * @inheritdoc
+     */
+    public function getUsersWhereNotIn(array $usersIds) : Collection
     {
-        $user = $this->userRepository->getUserById($id);
-        return $this->mapDTOService->mapToAuthDTO($user);
+        return $this->mapDTOService->mapToAuthDTOsCollection(
+            users : $this->userRepository->getExcludeUsers($usersIds)
+        );
     }
 
+    /**
+     * @inheritdoc
+     */
+    public function readById(int $id): AuthDTO
+    {;
+        return $this->mapDTOService->mapToAuthDTO(
+            user : $this->userRepository->getUserById($id)
+        );
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function getUserByEmail(string $email): ?Authenticatable
     {
         return $this->userRepository->getUserByEmail($email);
@@ -91,6 +123,9 @@ readonly class AuthService implements UserServiceInterface
 
     // --- ECRITURES (CRUD) ---
 
+    /**
+     * @inheritdoc
+     */
     public function handleUserInDatabase(array $data): void
     {
         if (!$this->emailExistIn12Plus($data['email'])) {
@@ -112,6 +147,9 @@ readonly class AuthService implements UserServiceInterface
         }
     }
 
+    /**
+     * @inheritdoc
+     */
     public function update(int $id, array $data): void
     {
         try {
@@ -123,6 +161,9 @@ readonly class AuthService implements UserServiceInterface
         }
     }
 
+    /**
+     * @inheritdoc
+     */
     public function delete(int $id): void
     {
         try {
@@ -136,6 +177,9 @@ readonly class AuthService implements UserServiceInterface
 
     // --- VÉRIFICATIONS EXTERNES ---
 
+    /**
+     * @inheritdoc
+     */
     public function emailExistIn12Plus(string $email): bool
     {
         $url = config('services.12plus.url');

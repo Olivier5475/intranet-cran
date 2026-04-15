@@ -47,7 +47,7 @@ interface UserServiceInterface
      * @return Collection<int, AuthDTO> Collection de DTOs d'utilisateurs.
      * @throws \Throwable En cas d'erreur de mapping ou de base de données.
      */
-    public function getUsers(?string $searchQuery): Collection;
+    public function getUsers(?string $searchQuery = null): Collection;
 
     /**
      * Récupère les données complètes d'un utilisateur par son ID.
@@ -67,8 +67,17 @@ interface UserServiceInterface
     public function getUserByEmail(string $email): ?Authenticatable;
 
     /**
+     * Récupère tous les utilisateurs ayant un ID qui n'est pas dans la liste
+     * et les transforme en DTOs
+     *
+     * @param array<int> $usersIds
+     * @return Collection<AuthDTO>
+     */
+    public function getUsersWhereNotIn(array $usersIds) : Collection;
+
+    /**
      * Assure la présence de l'utilisateur en base de données lors de la connexion CAS.
-     * Si l'utilisateur n'existe pas mais est autorisé (12Plus), il est créé.
+     * Si l'utilisateur n'existe pas, mais est autorisé (12Plus), il est créé.
      *
      * @param array{email: string, nom: string, prenom: string} $data
      * @return void

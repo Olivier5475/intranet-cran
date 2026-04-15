@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SaveDepartementRequest;
 use App\Services\Interfaces\DepartementsServiceInterface;
+use App\Services\Interfaces\UserServiceInterface;
 use App\Exception\{DepartementNotFoundException, PersistenceException, UserNotFoundException};
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
@@ -16,6 +17,7 @@ class DepartementController extends Controller {
 
     public function __construct(
         private readonly DepartementsServiceInterface $departementsService,
+        private readonly UserServiceInterface $usersService,
     ){}
 
     // --- VUES ---
@@ -25,11 +27,19 @@ class DepartementController extends Controller {
         return Inertia::render("Admin/Departements");
     }
 
-    public function users(int $id) {
+    public function users(int $id)
+    {
         try {
+            $users = $this->departementsService->getUsers($id);
+            $usersIds = $users->pluck('id')->toArray();
+
+            // On ne récupère que les utilisateurs qui ne sont PAS dans le département
+            $otherUsers = $this->usersService->getUsersWhereNotIn($usersIds);
+
             return Inertia::render("Admin/UsersByDepartement", [
-                "users" => $this->departementsService->getUsers($id),
-                "departement" => $this->departementsService->readById($id)
+                "users" => $users,
+                "departement" => $this->departementsService->readById($id),
+                "othersUsers" => $otherUsers->values(), // values() pour réindexer proprement le tableau
             ]);
         } catch (Throwable $t) {
             return $this->handleException($t, "chargement des utilisateurs", $id);
