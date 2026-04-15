@@ -12,12 +12,12 @@ class SaveFileRequest extends FormRequest
         FoldersServiceInterface $foldersService
     ): bool
     {
-        $fileId = $this->route('id');
-        $parentId = $this->input('parent_id');
+        $fileId = $this->route('file_id');
 
         // Modification : a-t-on accès au fichier ?
         if ($fileId && !$filesService->hasEditAccess((int)$fileId)) return false;
 
+        $parentId = $this->input('parent_id');
         // Création ou Déplacement : a-t-on accès au dossier de destination ?
         if ($parentId) {
             // Si c'est une update, on vérifie si le parent change avant de check les droits
@@ -36,28 +36,28 @@ class SaveFileRequest extends FormRequest
 
     public function rules(): array
     {
-        $isUpdate = !empty($this->route('id'));
-
+        $isUpdate = !empty($this->route('file_id'));
         return [
             'name' => [
                 $isUpdate ? 'sometimes' : ($this->hasFile('files') ? 'nullable' : 'required'),
                 'string',
                 'max:255'
             ],
-            'files' => [$isUpdate ? 'sometimes' : 'required', 'array'],
+            'files' => [$isUpdate ? 'nullable' : 'required', 'array'],
             'files.*' => ['file', 'max:102400'],
             'departements' => ['sometimes', 'array'],
-            'parent_id' => ['required', 'integer'],
+            'parent_id' => [$isUpdate ? 'nullable' : 'required', 'integer'],
         ];
     }
 
     public function toServiceData(): array
     {
         $data = $this->validated();
-
         // On mappe parent_id vers folder_id pour le service
-        $data['folder_id'] = $data['parent_id'];
-        unset($data['parent_id']);
+        if(isset($data["parent_id"])) {
+            $data['folder_id'] = $data['parent_id'];
+            unset($data['parent_id']);
+        }
 
         // On extrait le premier fichier du tableau 'files' (ton service attend un seul fichier)
         if ($this->hasFile('files')) {

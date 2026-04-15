@@ -26,11 +26,11 @@ Route::prefix("editor")
         Route::prefix("folders")->group(function () {
             // GET (form)
             Route::get("/create/p/{parent_id}", [Controllers\Admin\FolderController::class, "create"])->name("editor.folder.create");
-            Route::get("/update/{folder_id}", [Controllers\Admin\FolderController::class, "update"])->name("editor.folder.update");
+            Route::get("/update/{folder_id}", [Controllers\Admin\FolderController::class, "edit"])->name("editor.folder.update");
 
             // POST (submit)
             Route::post("/", [Controllers\Admin\FolderController::class, "store"])->name("editor.folder.post.create");
-            Route::post("/{folder_id}", [Controllers\Admin\FolderController::class, "store"])->name("editor.folder.post.update");
+            Route::post("/{folder_id}", [Controllers\Admin\FolderController::class, "update"])->name("editor.folder.post.update");
 
             // PATCH (submit)
             Route::patch("/restore/{folder_id}", [Controllers\Admin\FolderController::class, "restore"])->name("editor.folder.post.restore");

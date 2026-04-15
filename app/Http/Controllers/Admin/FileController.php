@@ -45,13 +45,13 @@ class FileController extends Controller {
         }
     }
 
-    public function update(SaveFileRequest $request, int $id) {
+    public function update(SaveFileRequest $request, int $file_id) {
         try {
-            $file = $this->filesService->update($id, $request->toServiceData());
+            $file = $this->filesService->update($file_id, $request->toServiceData());
             return redirect()->route("navigate.folder", ["folder_id" => $file->folder_id])
                 ->with("success", "Le fichier a été mis à jour avec succès.");
         } catch (Throwable $t) {
-            return $this->handleException($t, "mise à jour", $id);
+            return $this->handleException($t, "mise à jour", $file_id);
         }
     }
 
