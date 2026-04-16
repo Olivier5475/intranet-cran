@@ -9,7 +9,6 @@ import { ArrowDownTrayIcon, ArrowTurnDownRightIcon } from "@heroicons/vue/24/sol
 // 3. Composables & Utilitaires
 import { decodeEntities } from "@/Composables/useDecodeModule";
 import { useResource } from "@/Composables/useResource";
-import { isImageFile } from '@/Composables/useDocumentsTypeRegex';
 
 // 4. Composants
 import ResourceIcon from "@/Components/Features/Navigation/ResourceIcon.vue";
@@ -22,8 +21,8 @@ import { Departement } from "@/types/departement";
 import folder_route from '@/routes/editor/folder';
 import document_route from '@/routes/editor/document';
 import file_route from '@/routes/editor/file';
-import download_route from '@/routes/download/file'
 import EditorActionsWidget from '@/Components/Features/EditorActionsWidget.vue';
+import FilePreviewWidget from '@/Components/Features/Navigation/FilePreviewWidget.vue';
 
 const props = defineProps<{
     child: Child;
@@ -51,14 +50,12 @@ const handleMouseEnter = () => {
     wasShown.value = true;
 };
 
-let route;
-if(props.child.type == "folder") {
-    route = folder_route.post.update;
-} else if (props.child.type == "document") {
-    route = document_route.post.update;
-} else {
-    route = file_route.post.update;
-}
+const route = props.child.type == "folder"
+    ? folder_route.post.update
+    : props.child.type == "document"
+        ? document_route.post.update
+        : file_route.post.update;
+
 
 const form = useForm({
     name: props.child.name,
@@ -87,25 +84,11 @@ const handleRename = (value: boolean) => {
 </script>
 
 <template>
-    <div v-if="wasShown && child.storage_path" v-show="showImage" class="absolute">
-        <div class="fixed pointer-events-none z-[100] shadow-2xl border-4 bg-white
-        text-black rounded-lg overflow-hidden top-20 right-20">
-            <p class="text-center font-extrabold">Prévisualisation</p>
-
-            <img
-                v-if="child.mimetype && isImageFile(child.mimetype)"
-                :src="download_route.preview.url(child.id)"
-                class="min-w-[12rem] max-w-[18rem] h-auto object-cover"
-                alt=""
-            />
-
-            <iframe
-                v-else-if="child.mimetype && child.mimetype.includes('pdf')"
-                :src="download_route.preview.url(child.id)"
-                width="350px" height="600px"
-            ></iframe>
-        </div>
-    </div>
+    <FilePreviewWidget
+        :was-shown="wasShown"
+        :show-image="showImage"
+        :child="child"
+    />
 
     <div
         class="group py-3 px-4 border-gray-100 dark:border-zinc-800
