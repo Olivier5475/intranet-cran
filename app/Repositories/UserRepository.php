@@ -38,7 +38,7 @@ class UserRepository implements UserRepositoryInterface
      */
     public function readAll(): Collection
     {
-        return User::all();
+        return User::with('departements:id')->get();
     }
 
     /**
@@ -56,7 +56,9 @@ class UserRepository implements UserRepositoryInterface
      */
     public function performSearch(string $query): Collection
     {
-        return User::search($query)->get();
+        return User::search($query)
+            ->with('departements:id')
+            ->get();
     }
 
     // --- ÉCRITURE (CRUD) ---

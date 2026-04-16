@@ -8,6 +8,7 @@ use App\Exception\UserNotFoundException;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Collection;
 use Illuminate\Validation\UnauthorizedException;
+use Throwable;
 
 interface UserServiceInterface
 {
@@ -45,7 +46,7 @@ interface UserServiceInterface
      *
      * @param string|null $searchQuery Terme de recherche (nom, prénom, email).
      * @return Collection<int, AuthDTO> Collection de DTOs d'utilisateurs.
-     * @throws \Throwable En cas d'erreur de mapping ou de base de données.
+     * @throws Throwable En cas d'erreur de mapping ou de base de données.
      */
     public function getUsers(?string $searchQuery = null): Collection;
 
