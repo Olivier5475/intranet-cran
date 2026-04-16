@@ -1,30 +1,28 @@
 <script setup lang="ts">
 // 1. Vue & Core
-import { Link, useForm } from '@inertiajs/vue3';
+import { useForm } from '@inertiajs/vue3';
 
-// 2. Librairies tierces (Icônes)
-import { PencilIcon } from '@heroicons/vue/24/outline';
-
-// 3. Composables & Utilitaires (Logique)
+// 2. Composables & Utilitaires (Logique)
 import { useDragAndDrop } from '@/Composables/useDragAndDrop';
 import { decodeEntities } from '@/Composables/useDecodeModule';
-import { useCanEdit } from '@/Composables/useCanEdit';
+import { useResource } from '@/Composables/useResource';
 
-// 4. Routes
-import editor_route from '@/routes/editor';
+// 3. Routes
 import route from '@/routes/editor/document';
 
-// 5. Types
+// 4. Types
 import { Document } from '@/types/document';
 import DisplayContentWidget from '@/Components/Features/Document/DisplayContentWidget.vue';
 import DisplayAttachments from '@/Components/Features/Document/DisplayAttachments.vue';
+import EditorActionsWidget from '@/Components/Features/EditorActionsWidget.vue';
 
 const props = defineProps<{
     document: Document;
 }>();
 
-// On définie si l'utilisateur à ou non les droit de modification sur le document
-const canEdit = useCanEdit(props.document.departements)
+// On défini si l'utilisateur à ou non les droits de modification sur le document
+
+const { links, canEdit } = useResource(props.document);
 
 // Logique du Drag & Drop pour les fichiers
 const { isDragging } = useDragAndDrop({
@@ -63,14 +61,14 @@ const { isDragging } = useDragAndDrop({
                 {{ decodeEntities(document.name) }}
             </h1>
 
-            <Link
-                v-if="canEdit"
-                :href="editor_route.document.update.url(document.id)"
+            <div
                 class="right-4 p-3 bg-white dark:bg-slate-700 shadow-sm hover:shadow-md rounded-xl text-sky-600 dark:text-sky-400 border-slate-100 dark:border-slate-600 absolute top-1/2 -translate-y-1/2 border transition-all hover:scale-110"
-                title="Modifier le document"
             >
-                <PencilIcon class="w-6 h-6" />
-            </Link>
+                <EditorActionsWidget
+                    :links="links"
+                    :is_archived="document.is_archived"
+                />
+            </div>
         </header>
 
         <DisplayContentWidget :content="document.content" />

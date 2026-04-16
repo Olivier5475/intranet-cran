@@ -4,7 +4,7 @@ import { ref } from 'vue';
 import { Link, useForm, usePage } from '@inertiajs/vue3';
 
 // 2. Librairies tierces (Icônes)
-import { EllipsisHorizontalIcon, ArrowDownTrayIcon } from "@heroicons/vue/24/solid";
+import { ArrowDownTrayIcon, ArrowTurnDownRightIcon } from "@heroicons/vue/24/solid";
 
 // 3. Composables & Utilitaires
 import { decodeEntities } from "@/Composables/useDecodeModule";
@@ -12,19 +12,18 @@ import { useResource } from "@/Composables/useResource";
 import { isImageFile } from '@/Composables/useDocumentsTypeRegex';
 
 // 4. Composants
-import DeleteModal from "@/Components/UI/DeleteModal.vue";
 import ResourceIcon from "@/Components/Features/Navigation/ResourceIcon.vue";
 
 // 5. Types
 import { Child } from "@/types/child";
 import { Departement } from "@/types/departement";
-import { ArrowTurnDownRightIcon } from '@heroicons/vue/24/outline';
 
 // 6. Routes
 import folder_route from '@/routes/editor/folder';
 import document_route from '@/routes/editor/document';
 import file_route from '@/routes/editor/file';
 import download_route from '@/routes/download/file'
+import EditorActionsWidget from '@/Components/Features/EditorActionsWidget.vue';
 
 const props = defineProps<{
     child: Child;
@@ -32,20 +31,11 @@ const props = defineProps<{
 }>();
 
 // Utilisation du composable
-const { links, itemColor, canEdit } = useResource(props);
+const { links, itemColor, canEdit } = useResource(props.child);
 
-// Menu = Menu dropdown d'action d'un dossier (avec bouton modifier et supprimer)
-// pour savoir si le menu est étendu. sert pour quand on passe dessus
-const isMenuExpend = ref(false);
 
-// pour garder le menu ouvert même quand la souris n'est pas dessus
-const toggleMenu = ref(false);
-
-// savoir si le Modal de validation de suppression est ouvert
-const isActiveValidation = ref(false);
-
-//
 const page = usePage();
+
 // Récupère les informations d'un département grâce à son id
 const getDep = (id: number) => {
     return page.props.departements.find((d: Departement) => d.id === id);
@@ -61,7 +51,6 @@ const handleMouseEnter = () => {
     wasShown.value = true;
 };
 
-const activeRename = ref(false);
 let route;
 if(props.child.type == "folder") {
     route = folder_route.post.update;
@@ -73,13 +62,12 @@ if(props.child.type == "folder") {
 
 const form = useForm({
     name: props.child.name,
-    departements: props.child.departements
 });
 
 const submit = () => {
+    console.log(route.url(props.child.id))
     form.post(route.url(props.child.id));
 }
-
 
 const handleDragStart = (e: DragEvent) => {
     if (e.dataTransfer) {
@@ -92,11 +80,16 @@ const handleDragStart = (e: DragEvent) => {
     }
 };
 
+const activeRename = ref(false);
+const handleRename = (value: boolean) => {
+    activeRename.value = value;
+}
 </script>
 
 <template>
     <div v-if="wasShown && child.storage_path" v-show="showImage" class="absolute">
-        <div class="fixed pointer-events-none z-[100] shadow-2xl border-4 bg-white text-black rounded-lg overflow-hidden top-20 right-20">
+        <div class="fixed pointer-events-none z-[100] shadow-2xl border-4 bg-white
+        text-black rounded-lg overflow-hidden top-20 right-20">
             <p class="text-center font-extrabold">Prévisualisation</p>
 
             <img
@@ -109,7 +102,6 @@ const handleDragStart = (e: DragEvent) => {
             <iframe
                 v-else-if="child.mimetype && child.mimetype.includes('pdf')"
                 :src="download_route.preview.url(child.id)"
-                frameborder="0"
                 width="350px" height="600px"
             ></iframe>
         </div>
@@ -230,70 +222,15 @@ const handleDragStart = (e: DragEvent) => {
                 <ArrowDownTrayIcon class="w-5 h-5 text-gray-400"/>
             </a>
 
-            <!--            ACTION EDITEUR            -->
-            <div
-                class="relative  flex justify-end"
+            <!--            EDITOR ACTIONS            -->
+            <EditorActionsWidget
                 v-if="canEdit"
-                @mouseenter="isMenuExpend = true"
-                @mouseleave="isMenuExpend = false"
-            >
-                <button
-                    @click="toggleMenu = !toggleMenu"
-                    class="p-1 hover:bg-gray-100 dark:hover:bg-zinc-700
-                rounded-full transition-all group-hover:opacity-100"
-                >
-                    <EllipsisHorizontalIcon class="w-5 h-5 text-gray-400" />
-                </button>
-
-                <div
-                    v-if="toggleMenu || isMenuExpend"
-                    class="top-6 -right-7 w-32 bg-white dark:bg-zinc-900 shadow-xl rounded-xl border-gray-100 dark:border-zinc-700 absolute z-50 border"
-                >
-                    <Link
-                        v-if="links.history"
-                        :href="links.history"
-                        class="px-4 py-2 text-xs hover:bg-gray-40 dark:hover:bg-sky-900/50 text-sky-500 block"
-                    >
-                        Historique
-                    </Link>
-                    <Link
-                        :href="links.update"
-                        class="px-4 py-2 text-xs hover:bg-gray-40 dark:hover:bg-yellow-900/50 text-yellow-600 block"
-                    >
-                        Modifier
-                    </Link>
-
-                    <button
-                        v-if="!child.is_archived"
-                        @click="isActiveValidation = true"
-                        class="px-4 py-2 text-xs hover:bg-red-400 text-left dark:hover:bg-red-900/50 text-red-600 block w-full"
-                    >
-                        Archiver
-                    </button>
-                    <Link
-                        v-if="child.is_archived"
-                        :href="links.restore"
-                        method="patch"
-                        class="px-4 py-2 text-xs hover:bg-emerald-400 w-full text-left block dark:hover:bg-emerald-900/50 text-emerald-600 dark:text-emerald-500"
-                    >
-                        Restaurer
-                    </Link>
-                    <button
-                        class="px-4 py-2 text-xs hover:bg-purple-400 text-left dark:hover:bg-purple-900/50 text-purple-600 block w-full"
-                        @click="activeRename = true"
-                    >
-                        Renommer
-                    </button>
-                </div>
-            </div>
+                :links="links"
+                :is_archived="child.is_archived"
+                @active-rename="handleRename"
+            />
         </div>
-
     </div>
-    <DeleteModal
-        :show="isActiveValidation"
-        :delete-href="links.delete as string"
-        @close="isActiveValidation = false"
-    />
 </template>
 
 <style scoped></style>

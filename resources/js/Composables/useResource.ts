@@ -1,18 +1,23 @@
 import { computed } from 'vue';
-import { usePage } from '@inertiajs/vue3';
 import download from '@/routes/download';
 import editor from '@/routes/editor';
 import navigate from '@/routes/navigate';
 import { isGifFile, isImageFile } from '@/Composables/useDocumentsTypeRegex';
+import { Child } from '@/types/child';
+import { Folder } from '@/types/folder';
+import { FileEntry } from '@/types/fileEntry';
+import { Document } from '@/types/document';
+import { useCanEdit } from '@/Composables/useCanEdit';
 
-export function useResource(props: any) {
-    const page = usePage();
-
+export function useResource(child: Child|Document|FileEntry|Folder) {
     // Calcul des liens (href, update, delete)
     const links = computed(() => {
-        const { type, id } = props.child;
+        const { type, id } = child;
+        // Si le type est 'file' c'est un fichier
         if (type === 'file') {
-            const mimetype = props.child.mimetype;
+            // Donc soit un FileEntry, soit un Child possédant un mimetype
+            // On dit mimetype est forcément un string
+            const mimetype = ((child as FileEntry|Child).mimetype as string);
             const conditions = isImageFile(mimetype) || isGifFile(mimetype) || mimetype.includes("pdf")
             return {
                 href: conditions
@@ -43,35 +48,19 @@ export function useResource(props: any) {
     });
 
     // Gestion de la couleur
-    const itemColor = computed(() => props.child.color);
+    const itemColor = computed(() => {
+        // Si ce n'ai pas un fichier
+        if (child.type != "file") {
+            // On retourne Color en disant
+            // "c'est l'un de ces trois types-là donc tu peux récupérer 'color'".
+            return (child as Child|Document|Folder).color;
+        }
+        // Sinon 'itemColor' est null si c'est un fichier
+        return undefined
+    });
 
     // Gestion des permissions
-    const canEdit = computed(() => {
-        // On récupère les départements de la page
-        const parentDpts = props.child.departements as number[];
-
-        // On récupère l'utilisateur
-        const user = page.props.auth.user;
-
-        // On récupère les départements de l'utilisateur
-        const userDpts = user.departements as number[];
-
-        // On récupère les départements en commun
-        const compareParentAndUser = parentDpts.filter((value) =>
-            userDpts.includes(value),
-        );
-        return (
-            user.role === "admin" || // Si l'utilisateur est un admin, il peut créer.
-            // Si c'est un editeur et qu'il a des roles en commun avec la page, il peut créer.
-            (
-                user.role === "editeur" &&
-                (
-                    parentDpts.length === 0 ||
-                    compareParentAndUser.length > 0
-                )
-            )
-        );
-    });
+    const canEdit = useCanEdit(child.departements ?? [])
 
     return {
         links,

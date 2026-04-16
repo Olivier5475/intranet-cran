@@ -17,7 +17,7 @@ const adjustHeight = () => {
             doc.body.scrollHeight,
             doc.documentElement.scrollHeight
         );
-        iframe.style.height = `${height}px`;
+        iframe.style.height = `${height - 20}px`;
     }
 };
 
@@ -33,7 +33,7 @@ const onIframeLoad = (event: Event) => {
 </script>
 
 <template>
-    <article class="bg-white p-8 md:p-12 text-xl leading-relaxed text-justify dark:bg-transparent">
+    <article class="bg-white px-8 pt-6 md:px-12 md:pt-6 text-xl leading-relaxed text-justify dark:bg-transparent">
         <iframe
             ref="iframeRef"
             :srcdoc="injectStyles(DOMPurify.sanitize(content))"

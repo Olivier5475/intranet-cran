@@ -1,5 +1,8 @@
 export interface FileEntry {
     id: number,
     name: string,
-    departements: number[]
+    departements: number[],
+    type: string,
+    mimetype: string,
+    is_archived: boolean
 }

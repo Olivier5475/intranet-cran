@@ -25,7 +25,7 @@ const props = defineProps<{
 }>();
 
 // Utilisation du composable
-const { links, itemColor, canEdit } = useResource(props);
+const { links, itemColor, canEdit } = useResource(props.child);
 
 // Menu = Menu dropdown d'action d'un dossier (avec bouton modifier et supprimer)
 // pour savoir si le menu est étendu. sert pour quand on passe dessus

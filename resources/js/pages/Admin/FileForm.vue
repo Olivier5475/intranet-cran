@@ -22,7 +22,7 @@ import DepartementSelector from "@/Components/Forms/DepartementSelector.vue";
 
 
 const props = defineProps<{
-    parent_id: number;
+    parent_id?: number;
     file?: FileEntry;
     departements: Departement[];
 }>();
@@ -46,7 +46,13 @@ const submit = () => {
     form.post(
         props.file
             ? route.post.update.url(props.file.id)
-            : route.post.create.url()
+            : route.post.create.url(),
+        {
+            forceFormData: true, // Force l'envoi en FormData (indispensable pour les fichiers)
+            onSuccess: () => {
+                // Optionnel
+            },
+        }
     );
 };
 
