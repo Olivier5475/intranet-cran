@@ -22,7 +22,11 @@ const getDep = (id: number) => page.props.departements.find((d: any) => d.id ===
         </span>
     </div>
 
-    <div v-else class="absolute top-1 left-1 flex gap-x-3.5 max-w-[90%] z-10">
+    <div
+        v-else
+        class="absolute top-1 left-1 flex max-w-[90%] z-10"
+        :class="departementIds.length > 2 ? 'gap-x-3.5' : 'gap-x-1'"
+    >
         <div
             v-for="depId in departementIds"
             :key="depId"
