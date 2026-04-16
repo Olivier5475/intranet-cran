@@ -130,16 +130,16 @@ const submit = () => {
             <form @submit.prevent="submit" class="flex flex-col gap-1">
                 <input
                     v-model="form.name"
-                    class="text-sm font-medium dark:bg-slate-700 w-[140%] rounded-lg
+                    class="text-xs font-medium dark:bg-slate-700 w-[130%] rounded-lg
                         focus:ring-0 hover:border-violet-300 hover:border-1
                         focus:border-violet-500 focus:border-2 text-gray-700
-                        dark:text-zinc-200 truncate mx-auto left-[20%] -translate-x-[15%]"
+                        dark:text-zinc-200 truncate mx-auto -translate-x-[11%] break-words"
                 >
                 <button
                     @click="submit"
                     class="group flex items-center justify-center
                        bg-purple-600 hover:bg-purple-700 active:scale-95
-                       text-white rounded-full shadow-sm hover:shadow-md
+                       text-white rounded-md shadow-sm hover:shadow-md text-xs
                        transition-all duration-200 ease-in-out focus:outline-none
                        focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 w-full"
                     aria-label="Envoyer"

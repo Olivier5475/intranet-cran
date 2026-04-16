@@ -132,7 +132,7 @@ const { isDragging } = useDragAndDrop({
     <!------ AFFICHAGE EN MODE ICON ------->
     <div
         v-show="view_mod == 'icon'"
-        class="mt-6 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-4 grid grid-cols-2"
+        class="mt-6 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-4 grid grid-cols-2"
     >
         <ResourceCard
             v-for="child in filteredChildren"
