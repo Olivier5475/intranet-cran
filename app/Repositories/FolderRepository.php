@@ -54,9 +54,12 @@ class FolderRepository implements FolderRepositoryInterface
         return Folder::with([
             'departements:id',
             'parent.parent.parent.parent.parent',
-            'children' => fn($q) => $q->where('is_archived', $archived),
-            'files' => fn($q) => $q->where('is_archived', $archived),
-            'documents' => fn($q) => $q->where('is_archived', $archived)
+            'children' => fn($q) => $q->with("departements:id")
+                                      ->where('is_archived', $archived),
+            'files' => fn($q) => $q->with("departements:id")
+                                   ->where('is_archived', $archived),
+            'documents' => fn($q) => $q->with("departements:id")
+                                       ->where('is_archived', $archived)
         ])->findOrFail($id);
     }
 

@@ -18,8 +18,8 @@ import { useCanEdit } from '@/Composables/useCanEdit';
 // 4. Composants Internes
 import CreateFolderCardWidget from "@/Components/Features/Navigation/Creation/CreateFolderCardWidget.vue";
 import CreateFolderRowWidget from "@/Components/Features/Navigation/Creation/CreateFolderRowWidget.vue";
-import ResourceCard from "@/Components/Features/Navigation/ResourceCard.vue";
-import ResourceRow from "@/Components/Features/Navigation/ResourceRow.vue";
+import ResourceCard from "@/Components/Features/Navigation/Resource/ResourceCard.vue";
+import ResourceRow from "@/Components/Features/Navigation/Resource/ResourceRow.vue";
 import SearchBarWidget from "@/Components/Features/SearchBarWidget.vue";
 import NavigationHeader from '@/Components/Features/Navigation/NavigationHeader.vue';
 
