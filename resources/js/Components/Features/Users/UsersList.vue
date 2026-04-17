@@ -1,10 +1,18 @@
 <script setup lang="ts">
-import { PencilSquareIcon, TrashIcon } from '@heroicons/vue/24/outline';
-import { User } from '@/types';
 import { router } from '@inertiajs/vue3';
+
+import { PencilSquareIcon, TrashIcon } from '@heroicons/vue/24/outline';
+
+import { User } from '@/types';
+import { Departement } from '@/types/departement';
+
 import user_route from '@/routes/admin/user'
-defineProps<{
+import dept_routes from '@/routes/admin/departements';
+import { ref } from 'vue';
+
+const props =  defineProps<{
     users: User[]
+    departement?: Departement
 }>();
 
 const emit = defineEmits(["selectedUser", "showModal"]);
@@ -13,8 +21,15 @@ const openEdit = (user: User) => {
     emit("showModal", true)
 };
 
-const deleteUser = (id: number) => {
-    if (confirm('Supprimer ?')) router.delete(user_route.delete.url(id));
+
+const deleteUser = (user_id: number) => {
+    if(props.departement) {
+        if (confirm('Voulez-vous vraiment retirer cet utilisateur de ce departement ?')) {
+            router.delete(dept_routes.users.remove.url([props.departement.id, user_id]));
+        }
+    } else {
+        if (confirm('Supprimer ?')) router.delete(user_route.delete.url(user_id));
+    }
 };
 </script>
 

@@ -175,7 +175,8 @@ readonly class MapDTOService implements MapDTOServiceInterface
             id: $departement->id,
             name: $departement->name,
             initials: $departement->initials,
-            color: $departement->color
+            color: $departement->color,
+            users: $this->getDeptUsers($departement),
         );
     }
 
@@ -213,5 +214,12 @@ readonly class MapDTOService implements MapDTOServiceInterface
         }
 
         return [];
+    }
+
+    private function getDeptUsers(Departement $departement): ?Collection {
+        if($departement->relationLoaded('users')) {
+            return $this->mapToAuthDTOsCollection($departement->users);
+        }
+        return null;
     }
 }

@@ -55,13 +55,15 @@ interface DepartementRepositoryInterface
     public function delete(int $id): void;
 
     /**
-     * Récupère la collection des utilisateurs rattachés au département.
+     * Récupère un département selon un ID,
+     * avec la collection des utilisateurs rattachés au département
+     * et les Departements relier à l'utilisateur
      *
      * @param int $id
-     * @return Collection
+     * @return Departement
      * @throws DepartementNotFoundException
      */
-    public function readUsers(int $id): Collection;
+    public function readWithUsers(int $id): Departement;
 
     /**
      * Retire un utilisateur de la relation pivot du département.

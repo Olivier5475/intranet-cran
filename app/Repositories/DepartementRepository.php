@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use App\Models\User;
 use App\Exception\{DepartementNotFoundException, PersistenceException, UserNotFoundException};
 use App\Models\Departement;
 use App\Repositories\Interfaces\DepartementRepositoryInterface;
@@ -105,9 +106,11 @@ class DepartementRepository implements DepartementRepositoryInterface
     /**
      * @inheritDoc
      */
-    public function readUsers(int $id): Collection
+    public function readWithUsers(int $id): Departement
     {
-        return $this->read($id)->users;
+        return Departement::where("id", $id)->with([
+            'users' => fn ($q) => $q->with("departements:id"),
+        ])->first();
     }
 
     /**

@@ -30,15 +30,14 @@ class DepartementController extends Controller {
     public function users(int $id)
     {
         try {
-            $users = $this->departementsService->getUsers($id);
+            $departement = $this->departementsService->readById($id);
+            $users = $departement->users;
             $usersIds = $users->pluck('id')->toArray();
 
             // On ne récupère que les utilisateurs qui ne sont PAS dans le département
             $otherUsers = $this->usersService->getUsersWhereNotIn($usersIds);
-
             return Inertia::render("Admin/UsersByDepartement", [
-                "users" => $users,
-                "departement" => $this->departementsService->readById($id),
+                "departement" => $departement,
                 "othersUsers" => $otherUsers->values(), // values() pour réindexer proprement le tableau
             ]);
         } catch (Throwable $t) {
