@@ -1,21 +1,16 @@
 <script setup lang="ts">
-// 1. Vue & Core (Vue, Inertia, etc.)
 import { DeepReadonly, inject, ref, Ref, toRef, watch } from 'vue';
-import { Link, useForm } from "@inertiajs/vue3";
+import { Link } from "@inertiajs/vue3";
 
-// 2. Librairies tierces (Icônes, etc.)
 import {
     ArchiveBoxIcon,
     ArrowUturnLeftIcon,
 } from "@heroicons/vue/24/solid";
 
-// 3. Composables & Fonctions Utilitaires
-import { useDragAndDrop } from "@/Composables/useDragAndDrop";
 import { useShortcuts } from "@/Composables/useShortcuts";
 import { useFilteredChildren } from "@/Composables/useFiltres";
 import { useCanEdit } from '@/Composables/useCanEdit';
 
-// 4. Composants Internes
 import CreateFolderCardWidget from "@/Components/Features/Navigation/Creation/CreateFolderCardWidget.vue";
 import CreateFolderRowWidget from "@/Components/Features/Navigation/Creation/CreateFolderRowWidget.vue";
 import ResourceCard from "@/Components/Features/Navigation/Resource/ResourceCard.vue";
@@ -23,14 +18,12 @@ import ResourceRow from "@/Components/Features/Navigation/Resource/ResourceRow.v
 import SearchBarWidget from "@/Components/Features/SearchBarWidget.vue";
 import NavigationHeader from '@/Components/Features/Navigation/NavigationHeader.vue';
 
-// 5. Routes
-import file_route from "@/routes/editor/file";
 import navigate_route from "@/routes/navigate";
 
-// 6. Types
 import { Child } from "@/types/child";
 import { Folder } from "@/types/folder";
 import { FilterState } from '@/types/filtres';
+import PageDragDropWidget from '@/Components/Features/PageDragDropWidget.vue';
 
 const props = defineProps<{
     children: Array<Child>;
@@ -39,25 +32,28 @@ const props = defineProps<{
     isArchived: boolean;
 }>();
 
+// INITIALISATION DES VARIABLES
 const lastParent = props.parents.at(-1);
 const folder_id = ref(lastParent ? lastParent.id : 0);
 
+const navigation = { lastParent : lastParent };
+const view_mod = ref(localStorage.getItem('view_mode') || "list");
+
 const filters = inject<DeepReadonly<Ref<FilterState>>>("activeFilters");
 
+const canEdit = useCanEdit(lastParent?.departements as number[]);
+const fastFolderCreation = ref(false);
+
+// RECUPERATION DES ELEMENTS FILTRER
 const filteredChildren = useFilteredChildren(
     toRef(props, "children"), // Convertit la prop en Ref réactive
     filters as Ref<FilterState | null>, // On force le type pour le composable
 );
 
 // VIEW MOD :
-const view_mod = ref(localStorage.getItem('view_mode') || "list");
-
 watch(view_mod, (newValue) => {
     localStorage.setItem('view_mode', newValue);
 });
-
-const canEdit = useCanEdit(lastParent?.departements as number[]);
-const fastFolderCreation = ref(false);
 
 // Logique raccourci pour le dossier rapide
 useShortcuts({
@@ -66,34 +62,13 @@ useShortcuts({
     action: () => (fastFolderCreation.value = !fastFolderCreation.value),
 });
 
-// Logique du Drag & Drop pour les fichiers
-const { isDragging } = useDragAndDrop({
-    canDrop: canEdit.value,
-    onDrop: (file) => {
-        useForm({
-            files: Array.from(file),
-            departements: lastParent?.departements ?? [],
-            parent_id: lastParent?.id ?? null,
-        }).post(file_route.post.create.url());
-    },
-});
 </script>
 
 <template>
-    <!------ ZONE DE DRAGGING ------->
-    <div
-        v-if="isDragging"
-        class="left-0 top-0 bg-sky-400/40 fixed z-50 flex h-full w-full"
-    >
-        <div
-            class="bg-sky-900/30 rounded-2xl border-sky-900 z-10 mx-auto my-auto
-            flex h-[92%] w-[92%] border-4 border-dashed"
-        >
-            <p class="text-sky-900 text-4xl font-black mx-auto my-auto">
-                Déposez votre fichier
-            </p>
-        </div>
-    </div>
+    <PageDragDropWidget
+        :can-edit="canEdit"
+        :navigation="navigation"
+    />
 
     <!-- HEADER NAVIGATION (Fil d'Ariane, Mode Affichage, Menu Creation) -->
     <NavigationHeader

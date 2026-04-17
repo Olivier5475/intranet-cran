@@ -65,7 +65,7 @@ const getDep = (id: number) => page.props.departements.find((d: any) => d.id ===
                     transition-all duration-300 shadow-sm whitespace-nowrap"
             >
                     <span
-                        v-if="departementIds.length <= 3
+                        v-if="departementIds.length <= 2
                                 || hoveredDepId === depId"
                         class="text-[0.5rem] font-black uppercase text-white p-1"
                         :class="getDep(depId)?.color === '#ffffff' ? '!text-black' : ''"
