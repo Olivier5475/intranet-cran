@@ -3,7 +3,7 @@
 import { provide, readonly, ref } from 'vue';
 
 // 2. Librairies & Utilitaires tiers
-import timeout from '@/autologout';
+import timeout from '@/Composables/useAutoLogout';
 
 // 3. Types
 import { Departement } from '@/types/departement';
