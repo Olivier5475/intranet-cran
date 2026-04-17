@@ -100,7 +100,7 @@ const submit = () => {
         </header>
 
         <form @submit.prevent="submit" class="space-y-10">
-            <div class="md:flex-row gap-6 flex flex-col">
+            <div class="md:flex-row gap-6 flex flex-col ">
                 <NameInputWidget
                     v-model="form.name"
                     label="Titre du document"
@@ -108,6 +108,7 @@ const submit = () => {
                     :error="form.errors.name"
                     :disabled="parent_id == 0"
                     input-class="text-xl font-bold"
+                    class="grow"
                 />
 
                 <ColorPickerWidget

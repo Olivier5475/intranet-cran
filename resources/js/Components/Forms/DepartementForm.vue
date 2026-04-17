@@ -55,6 +55,7 @@ const submit = () => {
                 placeholder="Ex: Direction Technique"
                 :error="form.errors.name"
                 @input="updateInitials"
+                class="md:col-span-3"
             />
 
             <div class="space-y-2">

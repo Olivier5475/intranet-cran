@@ -93,6 +93,7 @@ const showExternalWarning = computed(() => {
                     label="Nom du dossier"
                     placeholder="Ex: Factures 2026"
                     :error="form.errors.name"
+                    class="grow"
                 />
 
                 <ColorPickerWidget
