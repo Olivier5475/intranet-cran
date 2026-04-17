@@ -4,11 +4,7 @@ import { computed, onMounted } from "vue";
 import { Head, useForm, usePage } from "@inertiajs/vue3";
 
 // 2. Librairies tierces (Icônes)
-import {
-    CloudArrowUpIcon,
-    DocumentIcon,
-    CheckIcon,
-} from "@heroicons/vue/24/solid";
+import { DocumentIcon, } from "@heroicons/vue/24/solid";
 
 // 3. Types, Routes & Utilitaires
 import { Departement } from "@/types/departement";
@@ -19,6 +15,7 @@ import { decodeEntities } from "@/Composables/useDecodeModule";
 // 4. Composants
 import WarningPermission from "@/Components/UI/WarningPermission.vue";
 import DepartementSelector from "@/Components/Forms/DepartementSelector.vue";
+import FileUploadZone from '@/Components/Forms/FileUploadZone.vue';
 
 
 const props = defineProps<{
@@ -36,11 +33,6 @@ const form = useForm({
 
 const page = usePage();
 const userDepartementIds = page.props.auth.user.departements;
-
-const handleNewFileUpload = (event: Event) => {
-    const target = event.target as HTMLInputElement;
-    form.files = Array.from(target.files || []) as File[];
-};
 
 const submit = () => {
     form.post(
@@ -113,78 +105,11 @@ const showExternalWarning = computed(() => {
                 </div>
             </div>
 
-            <div class="space-y-2">
-                <label
-                    class="font-black text-gray-400 ml-1 text-[10px] tracking-[0.2em] uppercase"
-                    >Source du document</label
-                >
-
-                <label
-                    for="files_input"
-                    class="group p-10 rounded-3xl shadow-sm hover:shadow-xl group relative flex cursor-pointer flex-col items-center justify-center border-2 border-dashed transition-all"
-                    :class="
-                        form.files.length
-                            ? 'border-emerald-500 bg-emerald-500/5'
-                            : 'border-sky-200 dark:border-zinc-800 hover:border-sky-400 dark:hover:border-zinc-700'
-                    "
-                >
-                    <span
-                        class="p-4 bg-sky-50 dark:bg-zinc-800 rounded-full transition-transform duration-300 group-hover:scale-110"
-                    >
-                        <CloudArrowUpIcon
-                            class="w-8 h-8 text-sky-600 dark:text-sky-400"
-                        />
-                    </span>
-
-                    <span class="mt-4 text-center">
-                        <span
-                            class="text-sm font-bold text-gray-700 dark:text-gray-200 block"
-                        >
-                            {{
-                                form.files.length
-                                    ? "Fichier sélectionné"
-                                    : "Cliquez ou glissez un fichier ici"
-                            }}
-                        </span>
-                        <span class="text-xs text-gray-400 mt-1 block">
-                            {{
-                                file
-                                    ? "(Laissez vide pour conserver le fichier actuel)"
-                                    : "PDF, Image, Word, Excel..."
-                            }}
-                        </span>
-                    </span>
-
-                    <input
-                        id="files_input"
-                        type="file"
-                        @change="handleNewFileUpload"
-                        class="sr-only"
-                    />
-
-                    <span
-                        v-if="form.files.length"
-                        class="top-4 right-4 gap-1 bg-emerald-500 text-white px-3 py-1 font-black absolute flex items-center rounded-full text-[10px]"
-                    >
-                        <CheckIcon class="w-3 h-3" /> PRÊT
-                    </span>
-                </label>
-
-                <div
-                    v-if="form.files.length"
-                    class="mt-3 gap-2 text-emerald-600 dark:text-emerald-400 font-bold text-sm flex items-center justify-center"
-                >
-                    <DocumentIcon class="w-4 h-4" />
-                    {{ form.files[0].name }}
-                </div>
-
-                <div
-                    v-if="form.errors.files"
-                    class="text-xs text-red-500 font-bold mt-2 text-center"
-                >
-                    {{ form.errors.files }}
-                </div>
-            </div>
+            <FileUploadZone
+                v-model="form.files"
+                :error="form.errors.files"
+                :is-edit="!!file"
+            />
 
             <div class="pt-6 dark:border-zinc-800 border-t">
                 <DepartementSelector

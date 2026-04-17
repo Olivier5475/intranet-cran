@@ -5,9 +5,7 @@ import { Head, useForm, usePage } from "@inertiajs/vue3";
 
 // 2. Librairies tierces (Icônes)
 import {
-    CloudArrowUpIcon,
     DocumentTextIcon,
-    CheckIcon,
     TrashIcon,
     PaperClipIcon,
 } from "@heroicons/vue/24/solid";
@@ -22,6 +20,7 @@ import { decodeEntities } from "@/Composables/useDecodeModule";
 import CKEditor5Widget from "@/Components/Features/Document/CKEditor5Widget.vue";
 import WarningPermission from "@/Components/UI/WarningPermission.vue";
 import DepartementSelector from "@/Components/Forms/DepartementSelector.vue";
+import FileUploadZone from '@/Components/Forms/FileUploadZone.vue';
 
 const props = defineProps<{
     parent_id: number;
@@ -65,10 +64,7 @@ const showExternalWarning = computed(() =>
         (selectedId) => !userDepartementIds.includes(selectedId),
     ),
 );
-const handleNewFileUpload = (event: Event) => {
-    const target = event.target as HTMLInputElement;
-    form.new_attachments = Array.from(target.files || []) as File[];
-};
+
 const removeExistingAttachment = (index: number) =>
     form.existing_attachments.splice(index, 1);
 
@@ -166,47 +162,13 @@ const submit = () => {
             </div>
 
             <div class="lg:grid-cols-2 gap-8">
-                <div class="space-y-4 w-full">
-                    <label
-                        class="font-black text-gray-400 ml-1 text-[10px] tracking-[0.2em] uppercase"
-                        >Ajouter des fichiers</label
-                    >
-                    <label
-                        for="new_attachments_input"
-                        class="group p-8 rounded-3xl border-sky-200 dark:border-zinc-800 hover:border-sky-400 hover:bg-sky-500/5 flex w-full cursor-pointer flex-col items-center justify-center border-2 border-dashed transition-all"
-                    >
-                        <CloudArrowUpIcon
-                            class="w-10 h-10 text-sky-500 mb-3 transition-transform group-hover:scale-110"
-                        />
-                        <span
-                            class="text-sm font-bold text-gray-600 dark:text-zinc-300"
-                            >Glissez ou cliquez pour uploader</span
-                        >
-                        <span class="text-gray-400 mt-1 text-[10px] uppercase"
-                            >Multiples fichiers autorisés</span
-                        >
-                        <input
-                            id="new_attachments_input"
-                            type="file"
-                            multiple
-                            @change="handleNewFileUpload"
-                            class="sr-only"
-                        />
-                    </label>
-
-                    <div
-                        v-if="form.new_attachments.length"
-                        class="gap-2 flex flex-wrap"
-                    >
-                        <div
-                            v-for="file in form.new_attachments"
-                            :key="file.name"
-                            class="gap-2 px-3 py-1 bg-emerald-500/10 text-emerald-600 text-xs font-bold border-emerald-500/20 flex items-center rounded-full border"
-                        >
-                            <CheckIcon class="w-3 h-3" /> {{ file.name }}
-                        </div>
-                    </div>
-                </div>
+                <FileUploadZone
+                    v-model="form.new_attachments"
+                    :error="form.errors.new_attachments"
+                    multiple
+                >
+                    <template #label>Ajouter des pièces jointes</template>
+                </FileUploadZone>
 
                 <div
                     class="space-y-4"
