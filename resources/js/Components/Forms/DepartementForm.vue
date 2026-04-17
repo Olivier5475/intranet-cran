@@ -6,6 +6,8 @@ import { ref } from "vue";
 // 2. Routes
 import dpts_route from "@/routes/admin/departements";
 import { Departement } from "@/types/departement";
+import NameInputWidget from '@/Components/Forms/NameInputWidget.vue';
+import ColorPickerWidget from '@/Components/Forms/ColorPickerWidget.vue';
 
 const props = defineProps<{
     departement: Departement | null;
@@ -47,26 +49,13 @@ const submit = () => {
 <template>
     <form @submit.prevent="submit" class="space-y-8">
         <div class="grid grid-cols-1 md:grid-cols-5 gap-6">
-            <div class="md:col-span-3 space-y-2">
-                <label
-                    class="text-[11px] font-black uppercase tracking-widest text-zinc-400 ml-1"
-                >
-                    Nom du département
-                </label>
-                <input
-                    type="text"
-                    v-model="form.name"
-                    @input="updateInitials"
-                    placeholder="Ex: Direction Technique"
-                    class="w-full px-5 py-4 rounded-2xl border-zinc-200 dark:border-zinc-700 dark:bg-zinc-800 focus:ring-4 focus:ring-sky-500/10 focus:border-sky-500 transition-all font-medium"
-                />
-                <div
-                    v-if="form.errors.name"
-                    class="text-xs text-red-500 font-bold ml-1"
-                >
-                    {{ form.errors.name }}
-                </div>
-            </div>
+            <NameInputWidget
+                v-model="form.name"
+                label="Nom du département"
+                placeholder="Ex: Direction Technique"
+                :error="form.errors.name"
+                @input="updateInitials"
+            />
 
             <div class="space-y-2">
                 <label
@@ -90,17 +79,7 @@ const submit = () => {
                 </div>
             </div>
 
-            <div class="space-y-2">
-                <label
-                    class="text-[11px] font-black uppercase tracking-widest text-zinc-400 ml-1"
-                    >Couleur</label
-                >
-                <input
-                    type="color"
-                    v-model="form.color"
-                    class="w-full h-2/3 px-4 py-4 rounded-2xl border-zinc-200 dark:border-zinc-700 dark:bg-zinc-800 focus:ring-4 focus:ring-sky-500/10 focus:border-sky-500 transition-all font-black text-center text-sky-600 dark:text-sky-400"
-                />
-            </div>
+            <ColorPickerWidget v-model="form.color" />
         </div>
 
         <div

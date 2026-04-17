@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { useForm } from "@inertiajs/vue3";
-import DepartementSelector from "@/Components/Forms/DepartementSelector.vue";
+import DepartementSelectorWidget from "@/Components/Forms/DepartementSelectorWidget.vue";
 import { Departement } from "@/types/departement";
 import { User } from "@/types";
+import NameInputWidget from '@/Components/Forms/NameInputWidget.vue';
 
 const props = defineProps<{
     user?: User;
@@ -30,30 +31,19 @@ const submit = () => {
 <template>
     <form @submit.prevent="submit" class="space-y-6">
         <div class="gap-4 grid grid-cols-2">
-            <div class="space-y-1">
-                <label
-                    class="font-black text-zinc-400 ml-1 text-[10px] uppercase"
-                >
-                    Prénom
-                </label>
-                <input
-                    v-model="form.prenom"
-                    type="text"
-                    class="px-4 py-3 rounded-xl border-zinc-200 dark:border-zinc-700 dark:bg-zinc-800 focus:ring-sky-500/20 focus:border-sky-500 text-sm w-full transition-all"
-                />
-            </div>
-            <div class="space-y-1">
-                <label
-                    class="font-black text-zinc-400 ml-1 text-[10px] uppercase"
-                >
-                    Nom
-                </label>
-                <input
-                    v-model="form.nom"
-                    type="text"
-                    class="px-4 py-3 rounded-xl border-zinc-200 dark:border-zinc-700 dark:bg-zinc-800 focus:ring-sky-500/20 focus:border-sky-500 text-sm w-full transition-all"
-                />
-            </div>
+            <NameInputWidget
+                v-model="form.prenom"
+                label="Prénom"
+                variant="compact"
+                :error="form.errors.prenom"
+            />
+
+            <NameInputWidget
+                v-model="form.nom"
+                label="Nom"
+                variant="compact"
+                :error="form.errors.nom"
+            />
         </div>
 
         <div class="w-full">
@@ -81,7 +71,7 @@ const submit = () => {
         </div>
 
         <div class="pt-6 dark:border-zinc-800 border-t">
-            <DepartementSelector
+            <DepartementSelectorWidget
                 v-model="form.departements"
                 :all-departements="departements"
             />

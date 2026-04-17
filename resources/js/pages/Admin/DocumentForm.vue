@@ -1,26 +1,24 @@
 <script setup lang="ts">
-// 1. Vue & Core
 import { computed, onMounted } from "vue";
 import { Head, useForm, usePage } from "@inertiajs/vue3";
 
-// 2. Librairies tierces (Icônes)
 import {
     DocumentTextIcon,
     TrashIcon,
     PaperClipIcon,
 } from "@heroicons/vue/24/solid";
 
-// 3. Types, Routes & Utilitaires
 import { Departement } from "@/types/departement";
 import { Document } from "@/types/document";
 import route from "@/routes/editor/document";
 import { decodeEntities } from "@/Composables/useDecodeModule";
 
-// 4. Composants
 import CKEditor5Widget from "@/Components/Features/Document/CKEditor5Widget.vue";
 import WarningPermission from "@/Components/UI/WarningPermission.vue";
-import DepartementSelector from "@/Components/Forms/DepartementSelector.vue";
+import DepartementSelectorWidget from "@/Components/Forms/DepartementSelectorWidget.vue";
 import FileUploadZone from '@/Components/Forms/FileUploadZone.vue';
+import NameInputWidget from '@/Components/Forms/NameInputWidget.vue';
+import ColorPickerWidget from '@/Components/Forms/ColorPickerWidget.vue';
 
 const props = defineProps<{
     parent_id: number;
@@ -103,40 +101,21 @@ const submit = () => {
 
         <form @submit.prevent="submit" class="space-y-10">
             <div class="md:flex-row gap-6 flex flex-col">
-                <div class="space-y-2 flex-grow">
-                    <label
-                        class="font-black text-gray-400 ml-1 text-[10px] tracking-[0.2em] uppercase"
-                        >Titre du document</label
-                    >
-                    <input
-                        type="text"
-                        v-model="form.name"
-                        placeholder="Ex: Procédure de sécurité"
-                        :disabled="parent_id == 0"
-                        class="px-5 py-4 rounded-2xl border-gray-200 dark:border-zinc-800 dark:bg-zinc-900/50 focus:ring-sky-500/10 focus:border-sky-500 text-xl font-bold dark:text-white w-full transition-all focus:ring-4 disabled:opacity-50"
-                    />
-                    <div
-                        v-if="form.errors.name"
-                        class="text-xs text-red-500 font-bold ml-1"
-                    >
-                        {{ form.errors.name }}
-                    </div>
-                </div>
+                <NameInputWidget
+                    v-model="form.name"
+                    label="Titre du document"
+                    placeholder="Ex: Procédure de sécurité"
+                    :error="form.errors.name"
+                    :disabled="parent_id == 0"
+                    input-class="text-xl font-bold"
+                />
 
-                <div
-                    v-if="page.props.auth.user.role == 'admin'"
-                    class="md:w-1/4 space-y-2"
-                >
-                    <label
-                        class="font-black text-gray-400 ml-1 text-[10px] tracking-[0.2em] uppercase"
-                        >Couleur d'accent</label
-                    >
-                    <input
-                        type="color"
-                        v-model="form.color"
-                        class="p-1 bg-white dark:bg-zinc-900/50 border-gray-200 dark:border-zinc-800 rounded-2xl h-[62px] w-full cursor-pointer border"
-                    />
-                </div>
+                <ColorPickerWidget
+                    v-if="page.props.auth.user.role === 'admin'"
+                    v-model="form.color as string"
+                    label="Couleur d'accent"
+                    class="md:w-1/4"
+                />
             </div>
 
             <div class="space-y-2">
@@ -207,7 +186,7 @@ const submit = () => {
             </div>
 
             <div class="pt-6 dark:border-zinc-800 border-t">
-                <DepartementSelector
+                <DepartementSelectorWidget
                     v-model="form.departements"
                     :all-departements="departements"
                 />

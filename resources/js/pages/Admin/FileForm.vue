@@ -14,8 +14,9 @@ import { decodeEntities } from "@/Composables/useDecodeModule";
 
 // 4. Composants
 import WarningPermission from "@/Components/UI/WarningPermission.vue";
-import DepartementSelector from "@/Components/Forms/DepartementSelector.vue";
+import DepartementSelectorWidget from "@/Components/Forms/DepartementSelectorWidget.vue";
 import FileUploadZone from '@/Components/Forms/FileUploadZone.vue';
+import NameInputWidget from '@/Components/Forms/NameInputWidget.vue';
 
 
 const props = defineProps<{
@@ -86,24 +87,12 @@ const showExternalWarning = computed(() => {
         </header>
 
         <form @submit.prevent="submit" class="space-y-8">
-            <div class="space-y-2">
-                <label
-                    class="font-black text-gray-400 ml-1 text-[10px] tracking-[0.2em] uppercase"
-                    >Désignation du fichier</label
-                >
-                <input
-                    type="text"
-                    v-model="form.name"
-                    placeholder="Ex: Rapport_Annuel_2025.pdf"
-                    class="px-5 py-4 rounded-2xl border-gray-200 dark:border-zinc-800 dark:bg-zinc-900/50 focus:ring-sky-500/10 focus:border-sky-500 text-gray-900 dark:text-white font-medium w-full transition-all focus:ring-4"
-                />
-                <div
-                    v-if="form.errors.name"
-                    class="text-xs text-red-500 font-bold ml-1"
-                >
-                    {{ form.errors.name }}
-                </div>
-            </div>
+            <NameInputWidget
+                v-model="form.name"
+                label="Désignation du fichier"
+                placeholder="Ex: Rapport_Annuel_2025.pdf"
+                :error="form.errors.name"
+            />
 
             <FileUploadZone
                 v-model="form.files"
@@ -112,7 +101,7 @@ const showExternalWarning = computed(() => {
             />
 
             <div class="pt-6 dark:border-zinc-800 border-t">
-                <DepartementSelector
+                <DepartementSelectorWidget
                     v-model="form.departements"
                     :all-departements="departements"
                 />
