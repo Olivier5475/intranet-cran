@@ -18,7 +18,6 @@ export const isPresentationFile = (mimeType: string): boolean => {
 export const isDocFile = (mimeType: string): boolean => {
     // Les documents texte et de traitement de texte
     return (
-        mimeType.includes('text/plain') ||
         mimeType.includes('application/msword') || // .doc
         mimeType.includes('vnd.openxmlformats-officedocument.wordprocessingml') || // .docx
         mimeType.includes('vnd.oasis.opendocument.text') || // .odt
@@ -57,6 +56,25 @@ export const isGifFile = (mimeType: string): boolean => {
 export const isAudioFile = (mimeType: string): boolean => {
     return mimeType.startsWith('audio/');
 }
+
+/**
+ * Fonction générique pour vérifier si c'est un fichier text
+ * @param mimetype
+ */
+export const isTextFile = (mimetype: string): boolean => {
+    const textTypes = [
+        'text/plain',
+        'text/csv',
+        'text/markdown',
+        'text/xml',
+        'application/xml',
+        'application/json',
+        'text/javascript',
+        'text/css'
+    ];
+    // On vérifie si c'est dans la liste OU si ça commence par "text/"
+    return textTypes.includes(mimetype) || mimetype.startsWith('text/');
+};
 
 /**
  * Fonction générique pour vérifier si c'est une archive compressée

@@ -8,12 +8,13 @@ import {
     isGifFile,
     isImageFile,
     isPresentationFile,
-    isTabFile,
-    isVideoFile,
-} from "@/Composables/useDocumentsTypeRegex";
+    isTabFile, isTextFile,
+    isVideoFile
+} from '@/Composables/useDocumentsTypeRegex';
 
 // 3. Librairies tierces (Icônes)
 import * as SolidIcons from "@heroicons/vue/24/solid";
+import { DocumentTextIcon } from '@heroicons/vue/24/outline';
 
 const props = defineProps<{
     child: { id: number; type: string; mimetype?: string; name?: string };
@@ -59,7 +60,11 @@ const iconConfig = computed(() => {
             icon: SolidIcons.TableCellsIcon,
             colorClass: "text-emerald-600",
         };
-
+    if (isTextFile(mime))
+        return {
+            icon: DocumentTextIcon,
+            colorClass: "text-black dark:text-white",
+        };
     return { icon: SolidIcons.PaperClipIcon, colorClass: "text-slate-400" };
 });
 
