@@ -82,6 +82,10 @@ watch(() => props.child.id, async () => {
                     <li v-for="file in zipFiles" :key="file" class="truncate">📦 {{ file }}</li>
                 </ul>
             </div>
+
+            <div v-else class="p-10 text-center">
+                <p>Aperçu non disponible</p>
+            </div>
         </div>
     </div>
 </template>
