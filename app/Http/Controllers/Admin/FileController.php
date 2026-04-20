@@ -89,4 +89,14 @@ class FileController extends Controller {
 
         return redirect()->back()->with('error', $message);
     }
+
+    public function archive(string $file_id)
+    {
+        try {
+            $this->filesService->archive($file_id);
+            return redirect()->back()->with("success", "Le fichier a été archivé avec succès.");
+        } catch (Throwable $t) {
+            return $this->handleException($t, "suppression", $file_id);
+        }
+    }
 }

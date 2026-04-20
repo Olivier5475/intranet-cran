@@ -83,13 +83,7 @@ interface FoldersServiceInterface
      */
     public function update(int $id, array $data): FolderDTO;
 
-    /**
-     * Archive un dossier (suppression logique).
-     *
-     * @param int $id
-     * @return void
-     * @throws \Throwable
-     */
+
     public function delete(int $id): void;
 
     /**
@@ -100,4 +94,13 @@ interface FoldersServiceInterface
      * @throws \Throwable
      */
     public function restore(int $folder_id): void;
+
+    /**
+     * Archive un dossier (suppression logique).
+     *
+     * @param int $folder_id
+     * @return void
+     * @throws \Throwable
+     */
+    public function archive(int $folder_id);
 }

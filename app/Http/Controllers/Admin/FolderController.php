@@ -109,4 +109,19 @@ class FolderController extends Controller
 
         return redirect()->back()->with('error', $message);
     }
+
+    public function archive(int $folder_id)
+    {
+        try {
+            // La sécurité logicielle (hasEditAccess) peut être mise ici ou en middleware
+            if (!$this->foldersService->hasEditAccess($folder_id)) {
+                return redirect()->back()->with("error", "Permissions insuffisantes.");
+            }
+
+            $this->foldersService->archive($folder_id);
+            return redirect()->back()->with("success", "Le dossier a été archivé avec succès.");
+        } catch (Throwable $t) {
+            return $this->handleException($t, "suppression", $folder_id);
+        }
+    }
 }

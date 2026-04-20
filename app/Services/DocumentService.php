@@ -188,7 +188,26 @@ readonly class DocumentService implements DocumentsServiceInterface
             return $result;
         } catch (Throwable $e) {
             DB::rollBack();
-            Log::error("Erreur lors de l'archivage du document", ['id' => $id, 'error' => $e->getMessage()]);
+            Log::error("Erreur lors de la suppression du document", ['id' => $id, 'error' => $e->getMessage()]);
+            throw $e;
+        }
+    }
+    /**
+     * @inheritDoc
+     */
+    public function archive(int $document_id): bool
+    {
+        try {
+            DB::beginTransaction();
+            $result = $this->documentRepository->archive($document_id);
+            DB::commit();
+            return $result;
+        } catch (Throwable $e) {
+            DB::rollBack();
+            Log::error("Erreur lors de l'archivage du document", [
+                'id' => $document_id,
+                'error' => $e->getMessage()
+            ]);
             throw $e;
         }
     }

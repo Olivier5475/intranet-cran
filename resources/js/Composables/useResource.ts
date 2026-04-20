@@ -1,13 +1,17 @@
 import { computed } from 'vue';
+
 import download from '@/routes/download';
 import editor from '@/routes/editor';
+import admin from '@/routes/admin';
 import navigate from '@/routes/navigate';
+
 import { isGifFile, isImageFile } from '@/Composables/useDocumentsTypeRegex';
+import { useCanEdit } from '@/Composables/useCanEdit';
+
 import { Child } from '@/types/child';
 import { Folder } from '@/types/folder';
 import { FileEntry } from '@/types/fileEntry';
 import { Document } from '@/types/document';
-import { useCanEdit } from '@/Composables/useCanEdit';
 
 export function useResource(child: Child|Document|FileEntry|Folder) {
     // Calcul des liens (href, update, delete)
@@ -24,7 +28,8 @@ export function useResource(child: Child|Document|FileEntry|Folder) {
                         ? download.file.preview.url(id)
                         : download.file.url(id),
                 update: editor.file.update.url(id),
-                delete: editor.file.delete.url(id),
+                archive: editor.file.archive.url(id),
+                delete: admin.file.delete.url(id),
                 history: editor.model.history.url(["files", id]),
                 restore: editor.file.post.restore.url(id),
                 download: download.file.url(id)
@@ -32,15 +37,17 @@ export function useResource(child: Child|Document|FileEntry|Folder) {
         } else if (type === 'folder') {
             return {
                 href: navigate.folder.url(id),
-                update: editor.folder.update(id),
-                delete: editor.folder.delete(id),
-                restore: editor.folder.post.restore(id),
+                update: editor.folder.update.url(id),
+                archive: editor.folder.archive.url(id),
+                delete: admin.folder.delete.url(id),
+                restore: editor.folder.post.restore.url(id),
             };
         } else {
             return {
                 href: navigate.document.url(id),
-                update: editor.document.update(id),
-                delete: editor.document.delete.url(id),
+                update: editor.document.update.url(id),
+                archive: editor.document.archive.url(id),
+                delete: admin.document.delete.url(id),
                 history: editor.model.history.url(["documents", id]),
                 restore: editor.document.post.restore.url(id),
             };

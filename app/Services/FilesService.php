@@ -95,7 +95,7 @@ readonly class FilesService implements FilesServiceInterface
         return Storage::disk('public')->download($path, $payload["name"] ?? "version_".$id);
     }
 
-    // --- ÉCRITURE & GESTION PHYSIQUE ---
+    // --- ÉCRITURE ET GESTION PHYSIQUE ---
 
     /**
      * @inheritDoc
@@ -132,7 +132,7 @@ readonly class FilesService implements FilesServiceInterface
             $data['mimetype'] = $uploadedFile->getMimeType();
             $data['size'] = $uploadedFile->getSize();
 
-            // Suffixe l'extension si absente du nom d'affichage
+            // suffixe l'extension si absente du nom d'affichage
             $displayName = $data["name"] ?? $originalName;
             $extension = "." . $fileExtension;
             $data["name"] = str_ends_with($displayName, $extension) ? $displayName : $displayName . $extension;
@@ -212,6 +212,22 @@ readonly class FilesService implements FilesServiceInterface
         } catch (Throwable $e) {
             DB::rollBack();
             Log::critical("Échec archivage fichier", ["id" => $id, "error" => $e->getMessage()]);
+            throw new PersistenceException("Erreur lors de la suppression.");
+        }
+    }
+
+    public function archive(int $file_id): bool {
+        try {
+            DB::beginTransaction();
+            $res = $this->filesRepository->archive($file_id);
+            DB::commit();
+            return $res;
+        } catch (Throwable $e) {
+            DB::rollBack();
+            Log::critical("Échec archivage fichier", [
+                "id" => $file_id,
+                "error" => $e->getMessage()
+            ]);
             throw new PersistenceException("Erreur lors de la suppression.");
         }
     }

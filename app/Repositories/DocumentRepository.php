@@ -128,7 +128,17 @@ class DocumentRepository implements DocumentRepositoryInterface
      */
     public function delete(int $id): bool
     {
-        return $this->setIsArchived($id, true);
+        $document = $this->read($id);
+        $document->delete();
+        return true;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function archive(int $document_id): bool
+    {
+        return $this->setIsArchived($document_id, true);
     }
 
     /**

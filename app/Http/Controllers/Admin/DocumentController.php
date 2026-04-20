@@ -59,12 +59,22 @@ class DocumentController extends Controller {
 
     // --- SUPPRESSION / RESTAURATION ---
 
-    public function delete(int $id) {
+    public function delete(int $document_id) {
         try {
-            $this->documentsService->delete($id);
+            $this->documentsService->delete($document_id);
             return redirect()->back()->with("success", "Le document a été supprimé avec succès.");
         } catch (Throwable $t) {
-            return $this->handleException($t, "suppression", $id);
+            return $this->handleException($t, "suppression", $document_id);
+        }
+    }
+
+    public function archive(int $document_id)
+    {
+        try {
+            $this->documentsService->archive($document_id);
+            return redirect()->back()->with("success", "Le document a été archivé avec succès.");
+        } catch (Throwable $t) {
+            return $this->handleException($t, "suppression", $document_id);
         }
     }
 

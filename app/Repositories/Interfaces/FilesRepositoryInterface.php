@@ -38,7 +38,7 @@ interface FilesRepositoryInterface
     public function update(int $id, array $data): File;
 
     /**
-     * Archive un fichier (suppression logique).
+     * Supprime un fichier (suppression total).
      * * @param int $id
      * @return bool
      */
@@ -73,4 +73,11 @@ interface FilesRepositoryInterface
      * @return Version
      */
     public function findVersionWithParent(int $versionId): Version;
+
+    /**
+     * Archive un fichier (suppression logique).
+     * * @param int $file_id
+     * @return bool
+     */
+    public function archive(int $file_id);
 }

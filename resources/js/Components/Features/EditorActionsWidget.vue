@@ -1,7 +1,7 @@
 <script setup lang="ts">
 // 1. Vue & Core
 import { ref } from 'vue';
-import { Link } from '@inertiajs/vue3';
+import { Link, usePage } from '@inertiajs/vue3';
 
 // 2. Librairies tierces (Icônes)
 import { PencilIcon } from '@heroicons/vue/24/solid';
@@ -26,12 +26,15 @@ const isMenuExpend = ref(false);
 const toggleMenu = ref(false);
 
 // savoir si le Modal de validation de suppression est ouvert
-const isActiveValidation = ref(false);
+const isActiveArchiveValidation = ref(false);
+const isActiveDeleteValidation = ref(false);
 
 const toggleRename = () => {
     activeRename.value = !activeRename.value
     emit('activeRename', activeRename.value)
 }
+
+const user = usePage().props.auth.user
 </script>
 
 <template>
@@ -69,7 +72,7 @@ const toggleRename = () => {
 
             <button
                 v-if="!is_archived"
-                @click="isActiveValidation = true"
+                @click="isActiveArchiveValidation = true"
                 class="px-4 py-2 text-xs hover:bg-red-400 text-left dark:hover:bg-red-900/50 text-red-600 block w-full"
             >
                 Archiver
@@ -83,6 +86,13 @@ const toggleRename = () => {
                 Restaurer
             </Link>
             <button
+                v-if="is_archived && user.role == 'admin'"
+                @click="isActiveDeleteValidation = true"
+                class="px-4 py-2 text-xs hover:bg-red-400 text-left dark:hover:bg-red-900/50 text-red-600 block w-full"
+            >
+                Supprimer Définitivement
+            </button>
+            <button
                 class="px-4 py-2 text-xs hover:bg-purple-400 text-left dark:hover:bg-purple-900/50 text-purple-600 block w-full"
                 @click="toggleRename()"
             >
@@ -93,8 +103,16 @@ const toggleRename = () => {
 
 
     <DeleteModal
-        :show="isActiveValidation"
+        :show="isActiveArchiveValidation"
+        :delete-href="links.archive as string"
+        @close="isActiveArchiveValidation = false"
+        :is-archived="false"
+    />
+
+    <DeleteModal
+        :show="isActiveDeleteValidation"
         :delete-href="links.delete as string"
-        @close="isActiveValidation = false"
+        @close="isActiveDeleteValidation = false"
+        :is-archived="true"
     />
 </template>

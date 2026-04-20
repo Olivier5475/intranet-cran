@@ -71,7 +71,7 @@ interface FolderRepositoryInterface
     public function update(int $id, array $data): Folder;
 
     /**
-     * Archive un dossier (is_archived = true).
+     * Supprime définitivement un dossier
      *
      * @param int $id
      * @return bool
@@ -85,4 +85,12 @@ interface FolderRepositoryInterface
      * @return bool
      */
     public function restore(int $folder_id): bool;
+
+    /**
+     * Archive un dossier (is_archived = true).
+     *
+     * @param int $folder_id
+     * @return bool
+     */
+    public function archive(int $folder_id);
 }

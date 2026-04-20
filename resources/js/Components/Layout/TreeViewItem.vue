@@ -231,7 +231,7 @@ const handleDragOver = (e: DragEvent) => {
     <DeleteModal
         v-if="canEdit"
         :show="isActiveValidation"
-        :delete-href="folder_route.delete.url(child.id)"
+        :delete-href="folder_route.archive.url(child.id)"
         @close="isActiveValidation = false"
     />
 </template>

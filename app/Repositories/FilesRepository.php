@@ -100,7 +100,16 @@ class FilesRepository implements FilesRepositoryInterface
      */
     public function delete(int $id): bool
     {
-        return $this->setIsArchived($id, true);
+        $file = $this->read($id);
+        $file->delete();
+        return true;
+    }
+    /**
+     * @inheritDoc
+     */
+    public function archive(int $file_id): bool
+    {
+        return $this->setIsArchived($file_id, true);
     }
 
     /**

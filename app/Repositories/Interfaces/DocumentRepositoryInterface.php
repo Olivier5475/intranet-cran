@@ -43,11 +43,18 @@ interface DocumentRepositoryInterface
     public function update(int $id, array $data): Document;
 
     /**
-     * Archive un document (suppression logique).
+     * Supprime un document (suppression total).
      * * @param int $id
      * @return bool
      */
     public function delete(int $id): bool;
+
+    /**
+     * Archive un document (suppression logique).
+     * * @param int $document_id
+     * @return bool
+     */
+    public function archive(int $document_id) : bool;
 
     /**
      * Restaure un document archivé.

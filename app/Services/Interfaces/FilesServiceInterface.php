@@ -5,6 +5,7 @@ namespace App\Services\Interfaces;
 use App\DTO\FileDTO;
 use App\Exception\{DiskWriteException, PersistenceException};
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
+use Illuminate\Http\UploadedFile;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -57,7 +58,7 @@ interface FilesServiceInterface
      * Crée un fichier : gère l'upload physique avec renommage sécurisé (UUID)
      * et l'enregistrement des métadonnées en base.
      *
-     * @param array{folder_id: int, file: \Illuminate\Http\UploadedFile, name?: string} $data
+     * @param array{folder_id: int, file: UploadedFile, name?: string} $data
      * @return FileDTO
      * @throws BadRequestException Si le fichier ou le dossier parent est manquant.
      * @throws DiskWriteException Si le stockage physique échoue.
@@ -77,7 +78,7 @@ interface FilesServiceInterface
     public function update(int $id, array $data): FileDTO;
 
     /**
-     * Archive un fichier (suppression logique).
+     * Supprime un fichier (suppression total).
      *
      * @param int $id
      * @return bool
@@ -93,4 +94,13 @@ interface FilesServiceInterface
      * @throws PersistenceException
      */
     public function restore(int $file_id): bool;
+
+    /**
+     * Archive un fichier (suppression logique).
+     *
+     * @param int $file_id
+     * @return bool
+     * @throws PersistenceException
+     */
+    public function archive(int $file_id) : bool;
 }

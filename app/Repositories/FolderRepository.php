@@ -153,12 +153,19 @@ class FolderRepository implements FolderRepositoryInterface
         }
     }
 
+    public function delete(int $id): bool
+    {
+        $folder = $this->read($id);
+        $folder->delete();
+        return true;
+    }
+
     /**
      * @inheritDoc
      */
-    public function delete(int $id): bool
+    public function archive(int $folder_id): bool
     {
-        return $this->setIsArchived($id, true);
+        return $this->setIsArchived($folder_id, true);
     }
 
     /**

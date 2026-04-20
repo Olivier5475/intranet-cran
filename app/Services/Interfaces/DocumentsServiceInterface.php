@@ -64,12 +64,20 @@ interface DocumentsServiceInterface
     public function update(int $id, array $data): DocumentDTO;
 
     /**
-     * Archive (suppression logique) un document.
+     * Suppression (total) un document.
      *
      * @param int $id
      * @return bool
      */
     public function delete(int $id): bool;
+
+    /**
+     * Archive (suppression logique) un document.
+     *
+     * @param int $document_id
+     * @return bool
+     */
+    public function archive(int $document_id);
 
     /**
      * Restaure un document archivé.
@@ -78,4 +86,5 @@ interface DocumentsServiceInterface
      * @return bool
      */
     public function restore(int $document_id): bool;
+
 }

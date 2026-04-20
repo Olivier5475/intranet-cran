@@ -167,6 +167,22 @@ readonly class FoldersService implements FoldersServiceInterface
     /**
      * @inheritDoc
      */
+    public function archive(int $folder_id): void
+    {
+        try {
+            DB::beginTransaction();
+            $this->folderRepository->archive($folder_id);
+            DB::commit();
+        } catch (Throwable $e) {
+            DB::rollBack();
+            Log::error("Erreur lors de la suppression du dossier", ['id' => $id, 'error' => $e->getMessage()]);
+            throw $e;
+        }
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function restore(int $folder_id): void
     {
         try {

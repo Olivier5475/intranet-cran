@@ -36,7 +36,7 @@ Route::prefix("editor")
             Route::patch("/restore/{folder_id}", [Controllers\Admin\FolderController::class, "restore"])->name("editor.folder.post.restore");
 
             // DELETE
-            Route ::delete("/{folder_id}", [Controllers\Admin\FolderController::class, "delete"])->name("editor.folder.delete");
+            Route::delete("/{folder_id}", [Controllers\Admin\FolderController::class, "archive"])->name("editor.folder.archive");
         });
 
         Route::prefix("documents")->group(function () {
@@ -52,7 +52,7 @@ Route::prefix("editor")
             Route::patch("/restore/{document_id}", [Controllers\Admin\DocumentController::class, "restore"])->name("editor.document.post.restore");
 
             // DELETE
-            Route::delete("/{document_id}", [Controllers\Admin\DocumentController::class, "delete"])->name('editor.document.delete');
+            Route::delete("/{document_id}", [Controllers\Admin\DocumentController::class, "archive"])->name('editor.document.archive');
         });
 
         Route::prefix("files")->group(function () {
@@ -68,7 +68,7 @@ Route::prefix("editor")
             Route::patch("/restore/{file_id}", [Controllers\Admin\FileController::class, "restore"])->name("editor.file.post.restore");
 
             // DELETE
-            Route::delete("/{file_id}", [Controllers\Admin\FileController::class, "delete"])->name('editor.file.delete');
+            Route::delete("/{file_id}", [Controllers\Admin\FileController::class, "archive"])->name('editor.file.archive');
         });
 
         Route::get("/{model}/history/{model_id}", [Controllers\Admin\VersionController::class, "history"])->name('editor.model.history');
@@ -78,34 +78,39 @@ Route::prefix("editor")
 Route::prefix("admin")
     ->middleware(Middleware\IsAdmin::class)
     ->group(function () {
-    Route::prefix("users")->group(function () {
-        // GET
-        Route::get("/", [Controllers\Admin\UsersController::class, "index"])->name("admin.user");
+        // SUPPRESSION DEFINITIVE
+        Route::delete("/folders/{folder_id}", [Controllers\Admin\FolderController::class, "delete"])->name("admin.folder.delete");
+        Route::delete("/documents/{document_id}", [Controllers\Admin\DocumentController::class, "delete"])->name("admin.document.delete");
+        Route::delete("/files/{document_id}", [Controllers\Admin\FileController::class, "delete"])->name("admin.file.delete");
 
-        // POST
-        Route::post("/", [Controllers\Admin\UsersController::class, "store"])->name("admin.user.post.create");
+        Route::prefix("users")->group(function () {
+            // GET
+            Route::get("/", [Controllers\Admin\UsersController::class, "index"])->name("admin.user");
 
-        // PATCH
-        Route::patch("/{id}", [Controllers\Admin\UsersController::class, "update"])->name("admin.user.post.update");
+            // POST
+            Route::post("/", [Controllers\Admin\UsersController::class, "store"])->name("admin.user.post.create");
 
-        // DELETE
-        Route::delete("/{id}", [Controllers\Admin\UsersController::class, "delete"])->name("admin.user.delete");
-    });
+            // PATCH
+            Route::patch("/{id}", [Controllers\Admin\UsersController::class, "update"])->name("admin.user.post.update");
 
-    Route::prefix("departements")->group(function () {
-        // GET
-        Route::get("/", [Controllers\Admin\DepartementController::class, "index"])->name("admin.departements");
-        Route::get("/{id}/users", [Controllers\Admin\DepartementController::class, "users"])->name("admin.departements.users");
+            // DELETE
+            Route::delete("/{id}", [Controllers\Admin\UsersController::class, "delete"])->name("admin.user.delete");
+        });
 
-        // POST
-        Route::post("/", [Controllers\Admin\DepartementController::class, "store"])->name("admin.departements.post.create");
+        Route::prefix("departements")->group(function () {
+            // GET
+            Route::get("/", [Controllers\Admin\DepartementController::class, "index"])->name("admin.departements");
+            Route::get("/{id}/users", [Controllers\Admin\DepartementController::class, "users"])->name("admin.departements.users");
 
-        // PATCH
-        Route::patch("/{id}", [Controllers\Admin\DepartementController::class, "update"])->name("admin.departements.post.update");
+            // POST
+            Route::post("/", [Controllers\Admin\DepartementController::class, "store"])->name("admin.departements.post.create");
 
-        // DELETE
-        Route::delete("/{id}", [Controllers\Admin\DepartementController::class, "delete"])->name("admin.departements.delete");
-        Route::delete("/{id}/user/{user_id}", [Controllers\Admin\DepartementController::class, "removeUser"])->name("admin.departements.users.remove");
-    });
+            // PATCH
+            Route::patch("/{id}", [Controllers\Admin\DepartementController::class, "update"])->name("admin.departements.post.update");
+
+            // DELETE
+            Route::delete("/{id}", [Controllers\Admin\DepartementController::class, "delete"])->name("admin.departements.delete");
+            Route::delete("/{id}/user/{user_id}", [Controllers\Admin\DepartementController::class, "removeUser"])->name("admin.departements.users.remove");
+        });
 });
 
