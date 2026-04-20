@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Child } from '@/types/child';
-import { isImageFile } from '@/Composables/useDocumentsTypeRegex';
+import { isGifFile, isImageFile, isVideoFile } from '@/Composables/useDocumentsTypeRegex';
 import download from '@/routes/download';
 
 defineProps<{
@@ -19,10 +19,17 @@ defineProps<{
             <p class="text-center font-extrabold">Prévisualisation</p>
 
             <img
-                v-if="child.mimetype && isImageFile(child.mimetype)"
+                v-if="child.mimetype && (isImageFile(child.mimetype) || isGifFile(child.mimetype))"
                 :src="download.file.preview.url(child.id)"
                 class="min-w-[12rem] max-w-[18rem] h-auto object-cover"
                 :alt="child.name"
+            />
+
+            <video
+                v-else-if="child.mimetype && (isVideoFile(child.mimetype))"
+                :src="download.file.preview.url(child.id)"
+                class="min-w-[12rem] max-w-[25rem] h-auto object-cover"
+                autoplay loop
             />
 
             <iframe
