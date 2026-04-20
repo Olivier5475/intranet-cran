@@ -28,7 +28,7 @@ import PageDragDropWidget from '@/Components/Features/PageDragDropWidget.vue';
 const props = defineProps<{
     children: Array<Child>;
     parents: Folder[];
-    currentSearch: string;
+    currentSearch?: string;
     isArchived: boolean;
 }>();
 

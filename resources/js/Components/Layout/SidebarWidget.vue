@@ -23,6 +23,7 @@ import TreeViewItem from '@/Components/Layout/TreeViewItem.vue';
 import { Folder } from '@/types/folder';
 
 const page = usePage();
+const user = page.props.auth.user;
 
 defineProps<{
     name: string;
@@ -93,6 +94,7 @@ const isActive = ref(true);
 
                     <li class="mt-4 pt-2 border-t border-gray-50 dark:border-slate-800/50">
                         <Link
+                            v-if="user.role == 'admin'"
                             class="group flex items-center px-3 py-2 text-xs font-bold text-gray-400 hover:text-amber-500 dark:text-zinc-500 dark:hover:text-amber-400 transition-colors uppercase tracking-widest"
                             :href="folder_route.create.url(0)"
                         >

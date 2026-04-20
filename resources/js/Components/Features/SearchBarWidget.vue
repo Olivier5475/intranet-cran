@@ -7,7 +7,7 @@ import { router } from "@inertiajs/vue3";
 import { MagnifyingGlassIcon, XMarkIcon } from "@heroicons/vue/24/solid";
 
 const props = defineProps<{
-    currentSearch: string | null;
+    currentSearch?: string | null;
     placeholder: string;
 }>();
 

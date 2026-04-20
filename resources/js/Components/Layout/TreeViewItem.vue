@@ -189,7 +189,7 @@ const handleDragOver = (e: DragEvent) => {
                             @click="isActiveValidation = true"
                             class="px-4 py-2 text-xs hover:bg-red-50 dark:hover:bg-red-900/50 text-red-500 block w-full text-left"
                         >
-                            Supprimer
+                            Archiver
                         </button>
                     </div>
                 </div>
@@ -232,6 +232,7 @@ const handleDragOver = (e: DragEvent) => {
         v-if="canEdit"
         :show="isActiveValidation"
         :delete-href="folder_route.archive.url(child.id)"
+        :is-archived="false"
         @close="isActiveValidation = false"
     />
 </template>
