@@ -47,6 +47,7 @@ watch(() => props.child.id, async () => {
             zipFiles.value = Object.keys(zip.files);
         } catch (e) {
             zipFiles.value = ['Impossible de lire l\'archive'];
+            console.log(e)
         } finally { isLoading.value = false; }
     }
 }, { immediate: true });
