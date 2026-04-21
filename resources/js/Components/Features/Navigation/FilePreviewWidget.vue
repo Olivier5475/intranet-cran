@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue';
 import { Child } from '@/types/child';
-import { isGifFile, isImageFile, isVideoFile, isTextFile } from '@/Composables/useDocumentsTypeRegex';
+import { isGifFile, isImageFile, isVideoFile, isTextFile, isArchiveFile } from '@/Composables/useDocumentsTypeRegex';
 import download from '@/routes/download';
 import JSZip from 'jszip'; // Import pour les ZIP
 
@@ -16,7 +16,6 @@ const zipFiles = ref<string[]>([]);
 const isLoading = ref(false);
 
 // Détecter si c'est un ZIP
-const isZipFile = (mime: string) => ['application/zip', 'application/x-zip-compressed'].includes(mime);
 
 watch(() => props.child.id, async () => {
     if (!props.child.storage_path) return;
@@ -38,7 +37,7 @@ watch(() => props.child.id, async () => {
     }
 
     // Cas 2 : Archive ZIP
-    else if (isZipFile(mime)) {
+    else if (isArchiveFile(mime)) {
         isLoading.value = true;
         try {
             const res = await fetch(url);
@@ -77,7 +76,7 @@ watch(() => props.child.id, async () => {
                 <pre v-else class="whitespace-pre-wrap break-words">{{ textContent }}</pre>
             </div>
 
-            <div v-else-if="child.mimetype && isZipFile(child.mimetype)" class="p-3 max-h-[300px] overflow-auto">
+            <div v-else-if="child.mimetype && isArchiveFile(child.mimetype)" class="p-3 max-h-[300px] overflow-auto">
                 <p class="text-xs font-bold text-gray-500 mb-2">Contenu de l'archive :</p>
                 <ul class="text-[10px] space-y-1">
                     <li v-for="file in zipFiles" :key="file" class="truncate">📦 {{ file }}</li>
