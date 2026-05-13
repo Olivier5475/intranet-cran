@@ -27,13 +27,31 @@ const updateRoute = computed(() => {
 });
 
 const handleMouseEnter = () => { showImage.value = wasShown.value = true; };
+
+// --- LOGIQUE DE DRAG ---
+const handleDragStart = (e: DragEvent) => {
+    if (e.dataTransfer) {
+        e.dataTransfer.setData('resource_id', props.child.id.toString());
+        e.dataTransfer.setData('resource_type', props.child.type);
+        e.dataTransfer.effectAllowed = 'move';
+        if (e.target instanceof HTMLElement) e.target.classList.add('opacity-40');
+    }
+};
+
+const handleDragEnd = (e: DragEvent) => {
+    if (e.target instanceof HTMLElement) e.target.classList.remove('opacity-40');
+};
 </script>
 
 <template>
     <FilePreviewWidget :was-shown="wasShown" :show-image="showImage" :child="child" />
 
-    <div class="group py-3 px-4 border-gray-100 dark:border-zinc-800 hover:bg-sky-50/50 dark:hover:bg-slate-900/10 grid grid-cols-12 items-center border-t transition-colors duration-150" draggable="true">
-
+    <div
+        class="group py-3 px-4 border-gray-100 dark:border-zinc-800 hover:bg-sky-50/50 dark:hover:bg-slate-900/10 grid grid-cols-12 items-center border-t transition-colors duration-150 cursor-grab active:cursor-grabbing"
+        draggable="true"
+        @dragstart="handleDragStart"
+        @dragend="handleDragEnd"
+    >
         <component v-if="!activeRename" :is="child.type !== 'file' ? Link : 'a'" :href="links.href" :target="child.type == 'file' ? '_blank' : ''"
                    class="space-x-3 col-span-6 flex items-center overflow-hidden" @mouseenter="handleMouseEnter" @mouseleave="showImage = false">
             <div class="w-9 h-9 flex-shrink-0">
@@ -55,12 +73,7 @@ const handleMouseEnter = () => { showImage.value = wasShown.value = true; };
 
         <p class="text-xs text-gray-400 col-span-2 text-center">{{ child.created_at }}</p>
 
-        <ResourceBadges
-            v-if="child.departements"
-            :departement-ids="child.departements"
-            mode="row"
-            class="col-span-2"
-        />
+        <ResourceBadges v-if="child.departements" :departement-ids="child.departements" mode="row" class="col-span-2" />
 
         <div class="col-start-12 flex justify-center">
             <a v-if="child.type == 'file'" :href="links.download" class="p-1 hover:bg-gray-100 rounded-full" title="Télécharger">
