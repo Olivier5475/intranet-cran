@@ -38,10 +38,10 @@ const isActiveValidation = ref(false);
 
 // PERMISSIONS
 const user = page.props.auth.user;
-const parentDpts = props.child.departements as number[];
-const userDpts = user.departements as number[];
-const compareDpts = parentDpts.filter((v) => userDpts.includes(v));
-const canEdit = ref(user.role === "admin" || (user.role === "editeur" && (parentDpts.length === 0 || compareDpts.length > 0)));
+const parentGrps = props.child.groupes as number[];
+const userGrps = user.groupes as number[];
+const compareGrps = parentGrps.filter((v) => userGrps.includes(v));
+const canEdit = ref(user.role === "admin" || (user.role === "editeur" && (parentGrps.length === 0 || compareGrps.length > 0)));
 
 // --- LOGIQUE DE DROP ---
 const handleDragEnter = (e: DragEvent) => {

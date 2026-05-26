@@ -4,11 +4,11 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class SaveDepartementRequest extends FormRequest
+class SaveGroupeRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        // Seul un admin peut gérer les départements
+        // Seul un admin peut gérer les groupes
         return auth()->user()->role === 'admin';
     }
 

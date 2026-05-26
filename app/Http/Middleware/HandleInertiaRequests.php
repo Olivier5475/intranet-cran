@@ -2,7 +2,7 @@
 
 namespace App\Http\Middleware;
 
-use App\Services\Interfaces\DepartementsServiceInterface;
+use App\Services\Interfaces\GroupesServiceInterface;
 use App\Services\Interfaces\DocumentsServiceInterface;
 use App\Services\Interfaces\FoldersServiceInterface;
 use Illuminate\Foundation\Inspiring;
@@ -12,8 +12,8 @@ use Inertia\Middleware;
 class HandleInertiaRequests extends Middleware {
 
     public function __construct(
-        private readonly FoldersServiceInterface $foldersService,
-        private readonly DepartementsServiceInterface $departementsService,
+        private readonly FoldersServiceInterface   $foldersService,
+        private readonly GroupesServiceInterface   $groupesService,
         private readonly DocumentsServiceInterface $documentsService,
     ) {}
 
@@ -57,9 +57,9 @@ class HandleInertiaRequests extends Middleware {
                     'prenom' => $request->user()->prenom,
                     'email' => $request->user()->email,
                     'role' => $request->user()->role,
-                    'departements' => $request->user()
-                        ->load('departements:id')
-                        ->departements
+                    'groupes' => $request->user()
+                        ->load('groupes:id')
+                        ->groupes
                         ->pluck('id')
                         ->toArray(),
                 ] : null,
@@ -71,7 +71,7 @@ class HandleInertiaRequests extends Middleware {
             ],
             'racineChildren' => fn() => $this->foldersService->getRacineChildren(),
             'racineDocument' => fn() => $this->documentsService->readRacineDoc(),
-            'departements'   => fn() => $this->departementsService->readAll(),
+            'groupes'   => fn() => $this->groupesService->readAll(),
         ];
     }
 }

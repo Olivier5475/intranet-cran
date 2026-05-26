@@ -6,7 +6,7 @@ export interface Child {
     color?: string; // couleur (uniquement pour document et folder)
     mimetype?: string; // mimetype (pour les files) donne le type de fichier (ex : pdf, image, video etc ...)
     storage_path?: string;
-    departements?: number[]; // departements associés
+    groupes?: number[]; // groupes associés
     created_at: string; // date de creation de la ressource
     is_archived: boolean; // true si l'élément est archivé, false sinon
 }

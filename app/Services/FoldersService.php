@@ -96,11 +96,11 @@ readonly class FoldersService implements FoldersServiceInterface
 
         $folder = $this->read($folder_id);
 
-        if (count($folder->departements) === 0) {
+        if (count($folder->groupes) === 0) {
             return true;
         }
 
-        return (bool) array_intersect($user->departements, $folder->departements);
+        return (bool) array_intersect($user->groupes, $folder->groupes);
     }
 
     // --- SECTION : GESTION (CRUD) ---

@@ -25,7 +25,7 @@ defineProps<{
                     <h3 class="text-sm font-medium text-yellow-800">Attention aux droits d'accès</h3>
                     <div class="mt-2 text-sm text-yellow-700">
                         <p>
-                            En cochant un autre département, le(s) responsable(s) de ce département aura
+                            En cochant un autre groupes, le(s) responsable(s) de ce département aura
                             <strong>les droits d'édition</strong> sur votre {{ objectType ?? 'élément' }}.
                         </p>
                         <div>

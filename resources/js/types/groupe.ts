@@ -1,6 +1,6 @@
 import { User } from '@/types/index';
 
-export interface Departement {
+export interface Groupe {
     id: number;
     name: string;
     initials: string;

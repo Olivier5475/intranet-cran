@@ -18,7 +18,7 @@ class FilesRepository implements FilesRepositoryInterface
      */
     public function read(int $id): File
     {
-        $file = File::with("departements")->find($id);
+        $file = File::with("groupes")->find($id);
 
         if (!$file) {
             throw new FileNotFoundException("Le fichier avec l'ID $id est introuvable.");
@@ -47,11 +47,11 @@ class FilesRepository implements FilesRepositoryInterface
             $file->size = $data['size'];
             $file->save();
 
-            if (!empty($data['departements'])) {
-                $file->departements()->attach($data['departements']);
+            if (!empty($data['groupes'])) {
+                $file->groupes()->attach($data['groupes']);
             }
 
-            return $file->load('departements');
+            return $file->load('groupes');
         } catch (Throwable $e) {
             Log::error('Erreur SQL : Création de fichier échouée', [
                 'message' => $e->getMessage(),
@@ -81,11 +81,11 @@ class FilesRepository implements FilesRepositoryInterface
 
             $file->save();
 
-            if (isset($data["departements"])) {
-                $file->departements()->sync($data['departements']);
+            if (isset($data["groupes"])) {
+                $file->groupes()->sync($data['groupes']);
             }
 
-            return $file->fresh('departements');
+            return $file->fresh('groupes');
         } catch (Throwable $e) {
             Log::error("Erreur SQL : Mise à jour du fichier $id échouée", [
                 'message' => $e->getMessage(),

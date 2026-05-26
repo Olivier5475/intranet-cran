@@ -1,25 +1,10 @@
 <script setup lang="ts">
-// 1. Vue & Core
-import { ref } from 'vue';
 import { Link, usePage } from '@inertiajs/vue3';
-
-// 2. Librairies tierces (Icônes)
-import {
-    ChevronDownIcon,
-    ChevronRightIcon,
-    HomeIcon,
-    PlusIcon
-} from '@heroicons/vue/24/solid';
-
-// 3. Routes
+import { ChevronDownIcon, ChevronRightIcon, HomeIcon, PlusIcon } from '@heroicons/vue/24/solid';
 import editor from '@/routes/editor';
 import folder_route from '@/routes/editor/folder';
 import { home } from '@/routes';
-
-// 4. Composants
 import TreeViewItem from '@/Components/Layout/TreeViewItem.vue';
-
-// 5. Types
 import { Folder } from '@/types/folder';
 
 const page = usePage();
@@ -28,13 +13,11 @@ const user = page.props.auth.user;
 defineProps<{
     name: string;
     children?: Array<Folder>;
-    racineDocument: {
-        id: number;
-        name: string;
-    } | null;
+    racineDocument: { id: number; name: string; } | null;
 }>();
 
-const isActive = ref(true);
+// Liaison bi-directionnelle de l'état actif avec le MainLayout
+const isActive = defineModel<boolean>('isActive', { default: true });
 </script>
 
 <template>
@@ -54,15 +37,14 @@ const isActive = ref(true);
 
         <Transition
             enter-active-class="transition-all duration-300 ease-in-out"
-            enter-from-class="max-h-0 opacity-0"
-            enter-to-class="opacity-100"
+            enter-from-class="max-h-0 opacity-0 transform -translate-y-2"
+            enter-to-class="max-h-[1000px] opacity-100 transform translate-y-0"
             leave-active-class="transition-all duration-200 ease-in-out"
-            leave-from-class="opacity-100"
-            leave-to-class="max-h-0 opacity-0"
+            leave-from-class="max-h-[1000px] opacity-100 transform translate-y-0"
+            leave-to-class="max-h-0 opacity-0 transform -translate-y-2"
         >
-            <div v-if="isActive" class="dark:bg-sky-900/5 p-3">
+            <div v-if="isActive" class="dark:bg-sky-900/5 p-3 overflow-hidden">
                 <ul class="lg:min-h-[65svh] max-h-[calc(100vh-2rem)] overflow-y-auto no-scrollbar space-y-1">
-
                     <Link
                         v-if="racineDocument"
                         :href="home.url()"

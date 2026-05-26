@@ -2,8 +2,8 @@
 
 namespace App\Services;
 
-use App\DTO\{FolderDTO, FileDTO, DocumentDTO, VersionDTO, DepartementDTO, AuthDTO, AttachmentDTO};
-use App\Models\{Folder, File, Document, Version, Departement, User, Attachment};
+use App\DTO\{FolderDTO, FileDTO, DocumentDTO, VersionDTO, GroupeDTO, AuthDTO, AttachmentDTO};
+use App\Models\{Folder, File, Document, Version, Groupe, User, Attachment};
 use App\Services\Interfaces\MapDTOServiceInterface;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Support\Collection;
@@ -30,7 +30,7 @@ readonly class MapDTOService implements MapDTOServiceInterface
         return new FolderDTO(
             id: $folder->id,
             name: $folder->name,
-            departements: $this->getDeptIds($folder), // On passe l'objet entier ici
+            groupes: $this->getDeptIds($folder), // On passe l'objet entier ici
             color: $folder->color,
             children: $children,
             created_at: $folder->created_at,
@@ -77,7 +77,7 @@ readonly class MapDTOService implements MapDTOServiceInterface
             storage_path: $file->storage_path,
             mimetype: $file->mimetype,
             is_archived: $file->is_archived ?? false,
-            departements: $this->getDeptIds($file), // On passe l'objet entier
+            groupes: $this->getDeptIds($file), // On passe l'objet entier
             folder_id: $file->folder_id,
         );
     }
@@ -99,7 +99,7 @@ readonly class MapDTOService implements MapDTOServiceInterface
             id: $document->id,
             name: $document->name,
             content: $cleanHtml,
-            departements: $this->getDeptIds($document), // On passe l'objet entier
+            groupes: $this->getDeptIds($document), // On passe l'objet entier
             attachments: $attachments,
             folder_id: $document->folder_id,
             created_at: $document->created_at,
@@ -121,7 +121,7 @@ readonly class MapDTOService implements MapDTOServiceInterface
                 email: $user['email'],
                 nom: $user['nom'],
                 prenom: $user['prenom'],
-                departements: is_array($user['departements']) ? $user['departements'] : [],
+                groupes: is_array($user['groupes']) ? $user['groupes'] : [],
                 role: $user['role'],
                 id: $user['id']
             );
@@ -131,13 +131,13 @@ readonly class MapDTOService implements MapDTOServiceInterface
             email: $user->email,
             nom: $user->nom,
             prenom: $user->prenom,
-            departements: $this->getDeptIds($user), // On passe l'objet entier
+            groupes: $this->getDeptIds($user), // On passe l'objet entier
             role: $user->role,
             id: $user->id
         );
     }
 
-    // ... (mapToVersionDTO, mapToDepartementDTO, mapToAttachmentDTO etc. restent identiques)
+    // ... (mapToVersionDTO, mapToGroupeDTO, mapToAttachmentDTO etc. restent identiques)
 
     /**
      * @inheritDoc
@@ -169,23 +169,23 @@ readonly class MapDTOService implements MapDTOServiceInterface
     /**
      * @inheritDoc
      */
-    public function mapToDepartementDTO(Departement $departement): DepartementDTO
+    public function mapToGroupeDTO(Groupe $groupe): GroupeDTO
     {
-        return new DepartementDTO(
-            id: $departement->id,
-            name: $departement->name,
-            initials: $departement->initials,
-            color: $departement->color,
-            users: $this->getDeptUsers($departement),
+        return new GroupeDTO(
+            id: $groupe->id,
+            name: $groupe->name,
+            initials: $groupe->initials,
+            color: $groupe->color,
+            users: $this->getDeptUsers($groupe),
         );
     }
 
     /**
      * @inheritDoc
      */
-    public function mapToDepartementDTOsCollection(Collection $departements): Collection
+    public function mapToGroupeDTOsCollection(Collection $groupes): Collection
     {
-        return $departements->map(fn($dept) => $this->mapToDepartementDTO($dept));
+        return $groupes->map(fn($dept) => $this->mapToGroupeDTO($dept));
     }
 
     /**
@@ -199,15 +199,15 @@ readonly class MapDTOService implements MapDTOServiceInterface
     // --- HELPERS PRIVÉS OPTIMISÉS ---
 
     /**
-     * Extrait les IDs de départements sans déclencher de nouvelle requête SQL.
+     * Extrait les IDs de groupes sans déclencher de nouvelle requête SQL.
      */
     private function getDeptIds(mixed $model): array
     {
         // Si c'est un modèle Eloquent (File, Document, Folder, User)
         if ($model instanceof \Illuminate\Database\Eloquent\Model) {
             // Crucial : On vérifie si la relation est déjà chargée
-            if ($model->relationLoaded('departements')) {
-                return $model->departements->pluck('id')->toArray();
+            if ($model->relationLoaded('groupes')) {
+                return $model->groupes->pluck('id')->toArray();
             }
             // Si pas chargée, on ne fait RIEN (retourne vide) pour éviter le N+1
             return [];
@@ -216,9 +216,9 @@ readonly class MapDTOService implements MapDTOServiceInterface
         return [];
     }
 
-    private function getDeptUsers(Departement $departement): ?Collection {
-        if($departement->relationLoaded('users')) {
-            return $this->mapToAuthDTOsCollection($departement->users);
+    private function getDeptUsers(Groupe $groupe): ?Collection {
+        if($groupe->relationLoaded('users')) {
+            return $this->mapToAuthDTOsCollection($groupe->users);
         }
         return null;
     }

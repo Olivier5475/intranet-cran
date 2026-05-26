@@ -69,7 +69,7 @@ const handleDragEnd = (e: DragEvent) => {
         </div>
 
         <div class="absolute top-1 left-1 flex flex-wrap gap-1 max-w-[90%] z-50 pointer-events-none">
-            <ResourceBadges v-if="child.departements" :departement-ids="child.departements" mode="card" />
+            <ResourceBadges v-if="child.groupes" :groupe-ids="child.groupes" mode="card" />
         </div>
 
         <div class="top-0 right-0 absolute flex">

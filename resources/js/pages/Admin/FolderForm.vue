@@ -7,13 +7,13 @@ import { Head, useForm, usePage } from "@inertiajs/vue3";
 import { FolderIcon } from "@heroicons/vue/24/solid";
 
 // 3. Types, Routes & Utilitaires
-import { Departement } from "@/types/departement";
+import { Groupe } from "@/types/groupe";
 import route from "@/routes/editor/folder";
 import { decodeEntities } from "@/Composables/useDecodeModule";
 
 // 4. Composants
 import WarningPermission from "@/Components/UI/WarningPermission.vue";
-import DepartementSelectorWidget from "@/Components/Forms/DepartementSelectorWidget.vue";
+import GroupeSelectorWidget from "@/Components/Forms/GroupeSelectorWidget.vue";
 import NameInputWidget from '@/Components/Forms/NameInputWidget.vue';
 import ColorPickerWidget from '@/Components/Forms/ColorPickerWidget.vue';
 
@@ -23,20 +23,20 @@ const props = defineProps<{
         id: number;
         name: string;
         color: string;
-        departements: number[];
+        groupes: number[];
     };
-    departements: Departement[];
+    groupes: Groupe[];
 }>();
 
 const form = useForm({
     name: props.folder ? decodeEntities(props.folder.name) : "",
     color: props.folder?.color ?? "#d7ac53",
-    departements: props.folder?.departements ?? [],
+    groupes: props.folder?.groupes ?? [],
     parent_id: props.folder ? null : (props.parent_id ?? null),
 });
 
 const page = usePage();
-const userDepartementsIds = page.props.auth.user.departements;
+const userGroupesIds = page.props.auth.user.groupes;
 
 const submit = () => {
     form.post(
@@ -47,16 +47,16 @@ const submit = () => {
 
 onMounted(() => {
     if (!props.folder) {
-        const allAvailableDeps = props.departements?.map((d) => d.id) ?? [];
-        form.departements = allAvailableDeps.filter((id) =>
-            userDepartementsIds.includes(id),
+        const allAvailableDeps = props.groupes?.map((d) => d.id) ?? [];
+        form.groupes = allAvailableDeps.filter((id) =>
+            userGroupesIds.includes(id),
         );
     }
 });
 
 const showExternalWarning = computed(() => {
-    return form.departements.some(
-        (selectedId) => !userDepartementsIds.includes(selectedId),
+    return form.groupes.some(
+        (selectedId) => !userGroupesIds.includes(selectedId),
     );
 });
 </script>
@@ -104,9 +104,9 @@ const showExternalWarning = computed(() => {
             </div>
 
             <div class="pt-6 dark:border-zinc-800 border-t">
-                <DepartementSelectorWidget
-                    v-model="form.departements"
-                    :all-departements="departements"
+                <GroupeSelectorWidget
+                    v-model="form.groupes"
+                    :all-groupes="groupes"
                 />
             </div>
 
@@ -116,8 +116,7 @@ const showExternalWarning = computed(() => {
             >
                 <div class="text-sm space-y-1">
                     <p class="font-bold text-amber-600 dark:text-amber-400">
-                        Attention : Ce dossier sera visible par des départements
-                        externes.
+                        Attention : Ce dossier sera modifiables par d'autres groupes.
                     </p>
                     <ul class="ml-5 list-disc opacity-80">
                         <li>

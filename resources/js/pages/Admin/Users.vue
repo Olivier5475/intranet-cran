@@ -10,7 +10,7 @@ import {
 
 // 3. Types & Routes
 import { User } from '@/types';
-import { Departement } from '@/types/departement';
+import { Groupe } from '@/types/groupe';
 
 // 4. Composants
 import Modal from '@/Components/UI/Modal.vue';
@@ -20,7 +20,7 @@ import UsersList from '@/Components/Features/Users/UsersList.vue';
 
 defineProps<{
     users: User[];
-    departements: Departement[];
+    groupes: Groupe[];
     currentSearch: string;
 }>();
 
@@ -70,7 +70,7 @@ const openCreate = () => {
         <Modal :show="showModal" :title="selectedUser ? 'Modifier l\'utilisateur' : 'Créer un utilisateur'" @close="showModal = false">
             <UserForm
                 :user="selectedUser"
-                :departements="departements"
+                :groupes="groupes"
                 @success="showModal = false"
             />
         </Modal>

@@ -63,7 +63,7 @@ class Folder extends Model {
         return $this->belongsTo(User::class);
     }
 
-    public function departements() : BelongsToMany {
-        return $this->belongsToMany(Departement::class);
+    public function groupes() : BelongsToMany {
+        return $this->belongsToMany(Groupe::class);
     }
 }

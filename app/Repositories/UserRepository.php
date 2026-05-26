@@ -38,7 +38,7 @@ class UserRepository implements UserRepositoryInterface
      */
     public function readAll(): Collection
     {
-        return User::with('departements:id')->get();
+        return User::with('groupes:id')->get();
     }
 
     /**
@@ -47,7 +47,7 @@ class UserRepository implements UserRepositoryInterface
     public function getExcludeUsers(array $usersIds) : Collection
     {
         return User::whereNotIn('id', $usersIds)
-            ->with("departements:id")
+            ->with("groupes:id")
             ->get();
     }
 
@@ -57,7 +57,7 @@ class UserRepository implements UserRepositoryInterface
     public function performSearch(string $query): Collection
     {
         return User::search($query)
-            ->with('departements:id')
+            ->with('groupes:id')
             ->get();
     }
 
@@ -76,8 +76,8 @@ class UserRepository implements UserRepositoryInterface
             $user->role = $data['role'] ?? 'user';
             $user->save();
 
-            if (!empty($data['departements'])) {
-                $user->departements()->attach($data['departements']);
+            if (!empty($data['groupes'])) {
+                $user->groupes()->attach($data['groupes']);
             }
 
             return $user;
@@ -109,8 +109,8 @@ class UserRepository implements UserRepositoryInterface
 
             $user->save();
 
-            if (isset($data['departements'])) {
-                $user->departements()->sync($data['departements']);
+            if (isset($data['groupes'])) {
+                $user->groupes()->sync($data['groupes']);
             }
         } catch (Throwable $t) {
             Log::error("Erreur SQL lors de la mise à jour de l'utilisateur $id", [

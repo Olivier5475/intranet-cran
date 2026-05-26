@@ -1,6 +1,6 @@
 import { Folder } from "@/types/folder";
 import { Document } from "@/types/document"
-import { Departement } from "@/types/departement";
+import { Groupe } from "@/types/groupe";
 export interface Auth {
     user: User;
 }
@@ -11,7 +11,7 @@ export type AppPageProps<T extends Record<string, unknown> = Record<string, unkn
     auth: Auth;
     document? : Document
     parents?: Folder[];
-    departements: Departement[];
+    groupes: Groupe[];
 };
 
 export interface User {
@@ -23,6 +23,6 @@ export interface User {
     email_verified_at?: string | null;
     created_at?: string;
     updated_at?: string;
-    departements: number[];
+    groupes: number[];
     role: string;
 }

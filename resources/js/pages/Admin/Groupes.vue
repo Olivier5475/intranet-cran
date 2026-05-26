@@ -7,30 +7,30 @@ import { Link, router } from '@inertiajs/vue3';
 import { PlusIcon, TrashIcon, PencilSquareIcon, BuildingOfficeIcon } from '@heroicons/vue/24/outline';
 
 // 3. Types & Routes
-import { Departement } from '@/types/departement';
-import dept_routes from '@/routes/admin/departements';
+import { Groupe } from '@/types/groupe';
+import dept_routes from '@/routes/admin/groupes';
 
 // 4. Composants
-import DepartementForm from '@/Components/Forms/DepartementForm.vue';
+import GroupeForm from '@/Components/Forms/GroupeForm.vue';
 import Modal from '@/Components/UI/Modal.vue';
 
 defineProps<{
-    departements: Departement[];
+    groupes: Groupe[];
 }>();
 
 const showModal = ref(false);
-const selectedDept = ref<Departement | null>(null);
+const selectedDept = ref<Groupe | null>(null);
 
 const openCreate = () => {
     selectedDept.value = null;
     showModal.value = true;
 };
-const openEdit = (dept: Departement) => {
+const openEdit = (dept: Groupe) => {
     selectedDept.value = dept;
     showModal.value = true;
 };
 const deleteDept = (id: number) => {
-    if (confirm('Voulez-vous vraiment supprimer ce département ?')) {
+    if (confirm('Voulez-vous vraiment supprimer ce groupe ?')) {
         router.delete(dept_routes.delete.url(id));
     }
 };
@@ -42,7 +42,7 @@ const deleteDept = (id: number) => {
             <div>
                 <h1 class="text-3xl font-black dark:text-white gap-3 flex items-center">
                     <BuildingOfficeIcon class="w-8 h-8 text-sky-500" />
-                    Départements
+                    Groupes
                 </h1>
                 <p class="text-zinc-500 text-sm mt-1">Gérez les entités et services de l'intranet</p>
             </div>
@@ -52,21 +52,21 @@ const deleteDept = (id: number) => {
                 class="gap-2 bg-sky-600 hover:bg-sky-700 text-white px-5 py-2.5 rounded-xl shadow-lg shadow-sky-500/20 flex items-center transition-all active:scale-95"
             >
                 <PlusIcon class="w-5 h-5 stroke-[3]" />
-                <span class="font-bold">Nouveau département</span>
+                <span class="font-bold">Nouveau groupe</span>
             </button>
         </div>
 
         <div
-            v-if="departements.length === 0"
+            v-if="groupes.length === 0"
             class="py-20 bg-zinc-50 dark:bg-zinc-900/50 rounded-3xl border-zinc-200 dark:border-zinc-800 border-2 border-dashed text-center"
         >
             <BuildingOfficeIcon class="w-12 h-12 text-zinc-300 mb-4 mx-auto" />
-            <p class="text-zinc-500">Aucun département n'a encore été créé.</p>
+            <p class="text-zinc-500">Aucun groupe n'a encore été créé.</p>
         </div>
 
         <div v-else class="gap-4 grid">
             <div
-                v-for="dept in departements"
+                v-for="dept in groupes"
                 :key="dept.id"
                 class="group bg-white dark:bg-zinc-900 p-5 rounded-2xl border-zinc-100 dark:border-zinc-800 hover:shadow-xl hover:border-sky-200 dark:hover:border-sky-900/50 flex items-center justify-between border transition-all duration-200"
             >
@@ -104,8 +104,8 @@ const deleteDept = (id: number) => {
             </div>
         </div>
 
-        <Modal :show="showModal" :title="selectedDept ? 'Modifier le département' : 'Créer un département'" @close="showModal = false">
-            <DepartementForm :departement="selectedDept" @success="showModal = false" />
+        <Modal :show="showModal" :title="selectedDept ? 'Modifier le groupe' : 'Créer un groupe'" @close="showModal = false">
+            <GroupeForm :groupe="selectedDept" @success="showModal = false" />
         </Modal>
     </div>
 </template>

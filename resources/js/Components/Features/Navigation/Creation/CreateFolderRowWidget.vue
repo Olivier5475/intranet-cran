@@ -7,14 +7,14 @@ const props = defineProps<{
     parent?: {
         id: number;
         name: string;
-        departements: number[];
+        groupes: number[];
     },
 }>()
 
 const form = useForm({
     name: '',
     color: '#d7ac53',
-    departements: props.parent?.departements ?? [],
+    groupes: props.parent?.groupes ?? [],
     parent_id: props.parent?.id ?? null,
 });
 const model = defineModel<boolean>();

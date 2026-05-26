@@ -4,15 +4,15 @@ import { router } from '@inertiajs/vue3';
 import { PencilSquareIcon, TrashIcon } from '@heroicons/vue/24/outline';
 
 import { User } from '@/types';
-import { Departement } from '@/types/departement';
+import { Groupe } from '@/types/groupe';
 
 import user_route from '@/routes/admin/user'
-import dept_routes from '@/routes/admin/departements';
+import dept_routes from '@/routes/admin/groupes';
 import { ref } from 'vue';
 
 const props =  defineProps<{
     users: User[]
-    departement?: Departement
+    groupe?: Groupe
 }>();
 
 const emit = defineEmits(["selectedUser", "showModal"]);
@@ -23,9 +23,9 @@ const openEdit = (user: User) => {
 
 
 const deleteUser = (user_id: number) => {
-    if(props.departement) {
-        if (confirm('Voulez-vous vraiment retirer cet utilisateur de ce departement ?')) {
-            router.delete(dept_routes.users.remove.url([props.departement.id, user_id]));
+    if(props.groupe) {
+        if (confirm('Voulez-vous vraiment retirer cet utilisateur de ce groupe ?')) {
+            router.delete(dept_routes.users.remove.url([props.groupe.id, user_id]));
         }
     } else {
         if (confirm('Supprimer ?')) router.delete(user_route.delete.url(user_id));

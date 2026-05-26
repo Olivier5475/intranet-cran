@@ -64,9 +64,9 @@ readonly class VersionsService implements VersionsServiceInterface
             // 2. Préparation des attributs (exclusion des données techniques)
             $attributes = collect($payload)->except(['archived_path', '_relations'])->toArray();
 
-            // 3. Restauration des relations simples (Départements)
-            if (isset($payload['_relations']['departements'])) {
-                $attributes['departements'] = $payload['_relations']['departements'];
+            // 3. Restauration des relations simples (Groupes)
+            if (isset($payload['_relations']['groupes'])) {
+                $attributes['groupes'] = $payload['_relations']['groupes'];
             }
 
             // 4. Restauration des relations complexes (Attachments pour Documents)

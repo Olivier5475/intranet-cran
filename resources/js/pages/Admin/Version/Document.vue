@@ -14,7 +14,7 @@ interface DocumentPayload {
     content: string;
     color: string;
     _relations: {
-        departements: number[];
+        groupes: number[];
         attachments: Array<Attachment>;
     };
 }

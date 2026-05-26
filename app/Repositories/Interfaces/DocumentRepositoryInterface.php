@@ -24,7 +24,7 @@ interface DocumentRepositoryInterface
 
     /**
      * Crée un nouveau document en vérifiant l'unicité du nom dans le dossier.
-     * * @param array{name: string, content: string, folder_id?: int, user_id: int, color?: string, departements?: array} $data
+     * * @param array{name: string, content: string, folder_id?: int, user_id: int, color?: string, groupes?: array} $data
      * @return Document
      * @throws AlreadyExistsException Si le nom est déjà pris (Fichier ou Document).
      * @throws PersistenceException

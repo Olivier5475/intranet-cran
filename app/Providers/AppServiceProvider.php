@@ -39,8 +39,8 @@ class AppServiceProvider extends ServiceProvider
         );
 
         $this->app->bind(
-            Services\Interfaces\DepartementsServiceInterface::class,
-            Services\DepartementsService::class
+            Services\Interfaces\GroupesServiceInterface::class,
+            Services\GroupesService::class
         );
 
         $this->app->bind(
@@ -64,8 +64,8 @@ class AppServiceProvider extends ServiceProvider
         );
 
         $this->app->bind(
-            Repositories\Interfaces\DepartementRepositoryInterface::class,
-            Repositories\DepartementRepository::class
+            Repositories\Interfaces\GroupeRepositoryInterface::class,
+            Repositories\GroupeRepository::class
         );
         $this->app->bind(
             Repositories\Interfaces\UserRepositoryInterface::class,

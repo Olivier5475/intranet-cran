@@ -2,8 +2,8 @@
 
 namespace App\Services\Interfaces;
 
-use App\Models\{Folder, File, Document, Version, Departement, User, Attachment};
-use App\DTO\{FolderDTO, FileDTO, DocumentDTO, VersionDTO, DepartementDTO, AuthDTO, AttachmentDTO};
+use App\Models\{Folder, File, Document, Version, Groupe, User, Attachment};
+use App\DTO\{FolderDTO, FileDTO, DocumentDTO, VersionDTO, GroupeDTO, AuthDTO, AttachmentDTO};
 use Illuminate\Support\Collection;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 
@@ -62,20 +62,20 @@ interface MapDTOServiceInterface
     public function mapToVersionDTO(Version $version): VersionDTO;
 
     /**
-     * Transforme un modèle Departement en DepartementDTO.
+     * Transforme un modèle Groupe en GroupeDTO.
      *
-     * @param Departement $departement
-     * @return DepartementDTO
+     * @param Groupe $groupe
+     * @return GroupeDTO
      */
-    public function mapToDepartementDTO(Departement $departement): DepartementDTO;
+    public function mapToGroupeDTO(Groupe $groupe): GroupeDTO;
 
     /**
-     * Transforme une collection de départements en collection de DTOs.
+     * Transforme une collection de groupes en collection de DTOs.
      *
-     * @param Collection<int, Departement> $departements
-     * @return Collection<int, DepartementDTO>
+     * @param Collection<int, Groupe> $groupes
+     * @return Collection<int, GroupeDTO>
      */
-    public function mapToDepartementDTOsCollection(Collection $departements): Collection;
+    public function mapToGroupeDTOsCollection(Collection $groupes): Collection;
 
     /**
      * Transforme un modèle User ou un tableau de données utilisateur en AuthDTO.

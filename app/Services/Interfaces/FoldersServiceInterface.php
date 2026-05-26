@@ -55,7 +55,7 @@ interface FoldersServiceInterface
 
     /**
      * Vérifie si l'utilisateur actuel a les droits d'édition sur le dossier.
-     * Basé sur les départements rattachés ou le rôle administrateur.
+     * Basé sur les groupes rattachés ou le rôle administrateur.
      *
      * @param int $folder_id
      * @return bool

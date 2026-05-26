@@ -4,5 +4,5 @@ export interface FilterState {
     endDate?: string | null;
     fileType?: string;
     sortBy?: string;
-    selectedDepartments?: number[];
+    selectedGroupes?: number[];
 }

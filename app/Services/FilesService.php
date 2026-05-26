@@ -6,7 +6,7 @@ use App\DTO\FileDTO;
 use App\Exception\{DiskWriteException, PersistenceException};
 use App\Repositories\Interfaces\FilesRepositoryInterface;
 use App\Services\Interfaces\{
-    DepartementsServiceInterface,
+    GroupesServiceInterface,
     FoldersServiceInterface,
     MapDTOServiceInterface,
     UserServiceInterface,
@@ -24,10 +24,10 @@ readonly class FilesService implements FilesServiceInterface
 {
     public function __construct(
         private FilesRepositoryInterface $filesRepository,
-        private FoldersServiceInterface $foldersService,
-        private UserServiceInterface $userService,
-        private DepartementsServiceInterface $departementsService,
-        private MapDTOServiceInterface $mapDTOService,
+        private FoldersServiceInterface  $foldersService,
+        private UserServiceInterface     $userService,
+        private GroupesServiceInterface  $groupesService,
+        private MapDTOServiceInterface   $mapDTOService,
     ){}
 
     // --- LECTURE & ACCÈS ---
@@ -48,12 +48,12 @@ readonly class FilesService implements FilesServiceInterface
         $user = $this->userService->readById($this->userService->getCurrentUserId());
         $file = $this->filesRepository->read($file_id);
 
-        if ($user->role === "admin" || empty($file->folder_id) || count($file->departements) === 0) {
+        if ($user->role === "admin" || empty($file->folder_id) || count($file->groupes) === 0) {
             return true;
         }
 
-        $fileDeptIds = $this->departementsService->departementsIDs($file->departements);
-        return (bool) array_intersect($user->departements, $fileDeptIds);
+        $fileDeptIds = $this->groupesService->groupesIDs($file->groupes);
+        return (bool) array_intersect($user->groupes, $fileDeptIds);
     }
 
     /**

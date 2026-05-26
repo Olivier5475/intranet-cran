@@ -1,36 +1,36 @@
 <script setup lang="ts">
 import { usePage } from "@inertiajs/vue3";
 import { CheckIcon } from "@heroicons/vue/24/solid";
-import { Departement } from "@/types/departement";
+import { Groupe } from "@/types/groupe";
 
 const props = defineProps<{
-    allDepartements: Departement[];
+    allGroupes: Groupe[];
 }>();
 
-// Le v-model automatique lié au tableau form.departements du parent
+// Le v-model automatique lié au tableau form.groupes du parent
 const selectedDeps = defineModel<number[]>({ default: [] });
 
 const page = usePage();
 const user = page.props.auth.user;
-const userDepartementIds = user.departements as number[];
-const allDepartementsIds = props.allDepartements.map((d) => d.id);
+const userGroupeIds = user.groupes as number[];
+const allGroupesIds = props.allGroupes.map((d) => d.id);
 
 // Empêcher de se désélectionner de son propre service s'il n'en reste qu'un
-const isCheckboxDisabled = (departementId: number) => {
+const isCheckboxDisabled = (groupeId: number) => {
     let mySelectedDeps;
     if (user.role == "admin") {
-        if (!allDepartementsIds.includes(departementId)) return false;
+        if (!allGroupesIds.includes(groupeId)) return false;
         mySelectedDeps = selectedDeps.value.filter((id) =>
-            allDepartementsIds.includes(id),
+            allGroupesIds.includes(id),
         );
     } else {
-        if (!userDepartementIds.includes(departementId)) return false;
+        if (!userGroupeIds.includes(groupeId)) return false;
         mySelectedDeps = selectedDeps.value.filter((id) =>
-            userDepartementIds.includes(id),
+            userGroupeIds.includes(id),
         );
     }
     return (
-        selectedDeps.value.includes(departementId) && mySelectedDeps.length <= 1
+        selectedDeps.value.includes(groupeId) && mySelectedDeps.length <= 1
     );
 };
 </script>
@@ -40,12 +40,12 @@ const isCheckboxDisabled = (departementId: number) => {
         <label
             class="font-black text-gray-400 ml-1 block text-center text-[10px] tracking-[0.2em] uppercase"
         >
-            Départements ayant accès
+            Groupes ayant accès
         </label>
 
         <div class="sm:grid-cols-2 lg:grid-cols-3 gap-3 grid grid-cols-1">
             <label
-                v-for="dep in allDepartements"
+                v-for="dep in allGroupes"
                 :key="dep.id"
                 :class="[
                     'p-4 rounded-2xl group relative flex cursor-pointer items-center border-2 transition-all',

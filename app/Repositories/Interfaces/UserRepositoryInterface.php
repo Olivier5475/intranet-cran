@@ -46,7 +46,7 @@ interface UserRepositoryInterface
 
     /**
      * Crée un nouvel utilisateur en base de données.
-     * * @param array{email: string, nom: string, prenom: string, role?: string, departements?: array} $data
+     * * @param array{email: string, nom: string, prenom: string, role?: string, groupes?: array} $data
      * @return User
      * @throws PersistenceException
      */

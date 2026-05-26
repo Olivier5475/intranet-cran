@@ -27,7 +27,7 @@ interface DocumentsServiceInterface
 
     /**
      * Vérifie si l'utilisateur actuel a le droit de modifier le document.
-     * Basé sur le rôle admin ou l'intersection des départements.
+     * Basé sur le rôle admin ou l'intersection des groupes.
      *
      * @param int $document_id
      * @return bool

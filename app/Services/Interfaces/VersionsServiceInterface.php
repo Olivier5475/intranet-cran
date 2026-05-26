@@ -20,7 +20,7 @@ interface VersionsServiceInterface
 
     /**
      * Restaure une entité à partir d'un état historique (Version).
-     * Gère la restauration des attributs, des fichiers physiques et des relations (départements, attachements).
+     * Gère la restauration des attributs, des fichiers physiques et des relations (groupes, attachements).
      *
      * @param int $versionId Identifiant de la version à restaurer.
      * @param string $modelString Type d'entité cible ('files' ou 'documents').

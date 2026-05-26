@@ -55,7 +55,7 @@ class User extends Authenticatable
         return $this->hasMany(Document::class);
     }
 
-    public function departements() : BelongsToMany {
-        return $this->belongsToMany(Departement::class);
+    public function groupes() : BelongsToMany {
+        return $this->belongsToMany(Groupe::class);
     }
 }

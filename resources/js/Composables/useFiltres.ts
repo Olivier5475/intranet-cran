@@ -37,14 +37,14 @@ export function useFilteredChildren(
             return items;
         }
 
-        const { selectedDepartments, fileType, startDate, endDate, sortBy } = currentFilters;
+        const { selectedGroupes, fileType, startDate, endDate, sortBy } = currentFilters;
 
         // ... (votre logique de FILTRAGE existante reste ici) ...
-        // a) Filtre Départements
-        if (selectedDepartments && selectedDepartments.length > 0) {
+        // a) Filtre Groupes
+        if (selectedGroupes && selectedGroupes.length > 0) {
             items = items.filter(child =>
-                child.departements &&
-                child.departements.some(dep => selectedDepartments.includes(dep))
+                child.groupes &&
+                child.groupes.some(grp => selectedGroupes.includes(grp))
             );
         }
         // b) Filtre Type de fichier

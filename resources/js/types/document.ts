@@ -6,7 +6,7 @@ export interface Document {
     content: string,
     color: string,
     attachments: Attachment[],
-    departements: number[],
+    groupes: number[],
     folder_id: number,
     is_archived: boolean
     type: string

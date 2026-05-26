@@ -7,7 +7,7 @@ use App\Exception\{DocumentNotFoundException, ServerException};
 use App\Repositories\Interfaces\DocumentRepositoryInterface;
 use App\Services\Interfaces\{
     AttachmentServiceInterface,
-    DepartementsServiceInterface,
+    GroupesServiceInterface,
     MapDTOServiceInterface,
     UserServiceInterface,
     DocumentsServiceInterface
@@ -20,10 +20,10 @@ readonly class DocumentService implements DocumentsServiceInterface
 {
     public function __construct(
         private DocumentRepositoryInterface $documentRepository,
-        private AttachmentServiceInterface $attachmentService,
-        private UserServiceInterface $userService,
-        private DepartementsServiceInterface $departementsService,
-        private MapDTOServiceInterface $mapDTOService,
+        private AttachmentServiceInterface  $attachmentService,
+        private UserServiceInterface        $userService,
+        private GroupesServiceInterface     $groupesService,
+        private MapDTOServiceInterface      $mapDTOService,
     ){}
 
     // --- LECTURE & ACCÈS ---
@@ -60,12 +60,12 @@ readonly class DocumentService implements DocumentsServiceInterface
         $document = $this->documentRepository->read($document_id);
 
         // Accès complet pour admin ou document hors dossier (racine)
-        if ($user->role === "admin" || empty($document->folder_id) || count($document->departements) === 0) {
+        if ($user->role === "admin" || empty($document->folder_id) || count($document->groupes) === 0) {
             return true;
         }
 
-        $docDeptIds = $this->departementsService->departementsIDs($document->departements);
-        return (bool) array_intersect($user->departements, $docDeptIds);
+        $docDeptIds = $this->groupesService->groupesIDs($document->groupes);
+        return (bool) array_intersect($user->groupes, $docDeptIds);
     }
 
     /**

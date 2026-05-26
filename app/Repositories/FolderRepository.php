@@ -19,10 +19,10 @@ class FolderRepository implements FolderRepositoryInterface
     public function read(int $id): Folder
     {
         $folder = Folder::with([
-            'departements:id',
-            'children' => fn($q) => $q->where('is_archived', false)->with('departements:id'),
-            'files.departements:id',
-            'documents.departements:id'
+            'groupes:id',
+            'children' => fn($q) => $q->where('is_archived', false)->with('groupes:id'),
+            'files.groupes:id',
+            'documents.groupes:id'
         ])->find($id);
 
         if (!$folder) {
@@ -40,8 +40,8 @@ class FolderRepository implements FolderRepositoryInterface
         return Folder::whereNull('parent_id')
             ->where('is_archived', false)
             ->with([
-                'departements:id',
-                'allChildren' => fn($q) => $q->where('is_archived', false)->with('departements:id'),
+                'groupes:id',
+                'allChildren' => fn($q) => $q->where('is_archived', false)->with('groupes:id'),
             ])
             ->get();
     }
@@ -52,13 +52,13 @@ class FolderRepository implements FolderRepositoryInterface
     public function getFolderWithContents(int $id, bool $archived): Folder
     {
         return Folder::with([
-            'departements:id',
+            'groupes:id',
             'parent.parent.parent.parent.parent',
-            'children' => fn($q) => $q->with("departements:id")
+            'children' => fn($q) => $q->with("groupes:id")
                                       ->where('is_archived', $archived),
-            'files' => fn($q) => $q->with("departements:id")
+            'files' => fn($q) => $q->with("groupes:id")
                                    ->where('is_archived', $archived),
-            'documents' => fn($q) => $q->with("departements:id")
+            'documents' => fn($q) => $q->with("groupes:id")
                                        ->where('is_archived', $archived)
         ])->findOrFail($id);
     }
@@ -68,7 +68,7 @@ class FolderRepository implements FolderRepositoryInterface
      */
     public function getFolderWithParents(int $id): Folder
     {
-        return Folder::with('departements:id')
+        return Folder::with('groupes:id')
             ->with('parent.parent.parent.parent.parent')
             ->findOrFail($id);
     }
@@ -112,11 +112,11 @@ class FolderRepository implements FolderRepositoryInterface
             $folder->is_archived = false;
             $folder->save();
 
-            if (!empty($data['departements'])) {
-                $folder->departements()->attach($data['departements']);
+            if (!empty($data['groupes'])) {
+                $folder->groupes()->attach($data['groupes']);
             }
 
-            return $folder->load('departements');
+            return $folder->load('groupes');
         } catch (Throwable $e) {
             Log::error('Erreur SQL : Création de dossier échouée', [
                 'message' => $e->getMessage(),
@@ -140,10 +140,10 @@ class FolderRepository implements FolderRepositoryInterface
 
             $folder->save();
 
-            if (isset($data['departements'])) {
-                $folder->departements()->sync($data['departements']);
+            if (isset($data['groupes'])) {
+                $folder->groupes()->sync($data['groupes']);
             }
-            return $folder->fresh('departements');
+            return $folder->fresh('groupes');
         } catch (Throwable $e) {
             Log::error("Erreur SQL : Mise à jour du dossier $id échouée", [
                 'message' => $e->getMessage(),

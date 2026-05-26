@@ -19,7 +19,7 @@ interface FilesRepositoryInterface
     /**
      * Crée une entrée de fichier en base de données.
      * Vérifie l'unicité du nom dans le dossier cible.
-     * * @param array{name: string, folder_id?: int, user_id: int, storage_path: string, mimetype: string, size: int, departements?: array} $data
+     * * @param array{name: string, folder_id?: int, user_id: int, storage_path: string, mimetype: string, size: int, groupes?: array} $data
      * @return File
      * @throws AlreadyExistsException Si un fichier ou document porte déjà ce nom.
      * @throws PersistenceException En cas d'erreur SQL.

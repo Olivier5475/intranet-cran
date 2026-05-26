@@ -7,14 +7,14 @@ import { Head, useForm, usePage } from "@inertiajs/vue3";
 import { DocumentIcon, } from "@heroicons/vue/24/solid";
 
 // 3. Types, Routes & Utilitaires
-import { Departement } from "@/types/departement";
+import { Groupe } from "@/types/groupe";
 import { FileEntry } from "@/types/fileEntry";
 import route from "@/routes/editor/file";
 import { decodeEntities } from "@/Composables/useDecodeModule";
 
 // 4. Composants
 import WarningPermission from "@/Components/UI/WarningPermission.vue";
-import DepartementSelectorWidget from "@/Components/Forms/DepartementSelectorWidget.vue";
+import GroupeSelectorWidget from "@/Components/Forms/GroupeSelectorWidget.vue";
 import FileUploadZone from '@/Components/Forms/FileUploadZone.vue';
 import NameInputWidget from '@/Components/Forms/NameInputWidget.vue';
 
@@ -22,18 +22,18 @@ import NameInputWidget from '@/Components/Forms/NameInputWidget.vue';
 const props = defineProps<{
     parent_id?: number;
     file?: FileEntry;
-    departements: Departement[];
+    groupes: Groupe[];
 }>();
 
 const form = useForm({
     name: props.file ? decodeEntities(props.file.name) : "",
     files: [] as File[],
-    departements: props.file?.departements ?? [],
+    groupes: props.file?.groupes ?? [],
     parent_id: props.file ? null : (props.parent_id ?? null),
 });
 
 const page = usePage();
-const userDepartementIds = page.props.auth.user.departements;
+const userGroupeIds = page.props.auth.user.groupes;
 
 const submit = () => {
     form.post(
@@ -51,16 +51,16 @@ const submit = () => {
 
 onMounted(() => {
     if (!props.file) {
-        const allAvailableDeps = props.departements?.map((d) => d.id) ?? [];
-        form.departements = allAvailableDeps.filter((id) =>
-            userDepartementIds.includes(id),
+        const allAvailableDeps = props.groupes?.map((d) => d.id) ?? [];
+        form.groupes = allAvailableDeps.filter((id) =>
+            userGroupeIds.includes(id),
         );
     }
 });
 
 const showExternalWarning = computed(() => {
-    return form.departements.some(
-        (selectedId) => !userDepartementIds.includes(selectedId),
+    return form.groupes.some(
+        (selectedId) => !userGroupeIds.includes(selectedId),
     );
 });
 </script>
@@ -101,9 +101,9 @@ const showExternalWarning = computed(() => {
             />
 
             <div class="pt-6 dark:border-zinc-800 border-t">
-                <DepartementSelectorWidget
-                    v-model="form.departements"
-                    :all-departements="departements"
+                <GroupeSelectorWidget
+                    v-model="form.groupes"
+                    :all-groupes="groupes"
                 />
             </div>
 
@@ -115,7 +115,7 @@ const showExternalWarning = computed(() => {
                     <p
                         class="font-bold text-amber-600 dark:text-amber-400 text-center italic"
                     >
-                        Ce fichier sera partagé hors de votre département.
+                        Ce fichier sera partagé hors de votre groupe.
                     </p>
                 </div>
             </WarningPermission>

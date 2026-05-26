@@ -8,7 +8,7 @@ interface File {
     storage_path: string;
     mimetype: string;
     _relations: {
-        departements: number[];
+        groupes: number[];
     };
 }
 interface Version {

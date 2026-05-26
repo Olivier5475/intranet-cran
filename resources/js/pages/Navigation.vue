@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { DeepReadonly, inject, ref, Ref, toRef, watch } from 'vue';
+import { DeepReadonly, inject, ref, Ref, toRef, watch, computed } from 'vue';
 import { Link } from "@inertiajs/vue3";
 
 import {
@@ -41,14 +41,29 @@ const view_mod = ref(localStorage.getItem('view_mode') || "list");
 
 const filters = inject<DeepReadonly<Ref<FilterState>>>("activeFilters");
 
-const canEdit = useCanEdit(lastParent?.departements as number[]);
+// Récupération réactive de l'état des barres latérales du Layout principal
+const sidebarActive = inject<Ref<boolean>>('sidebarActive', ref(true));
+const filterActive = inject<Ref<boolean>>('filterActive', ref(true));
+
+const canEdit = useCanEdit(lastParent?.groupes as number[]);
 const fastFolderCreation = ref(false);
 
-// RECUPERATION DES ELEMENTS FILTRER
+// RÉCUPÉRATION DES ELEMENTS FILTRER
 const filteredChildren = useFilteredChildren(
-    toRef(props, "children"), // Convertit la prop en Ref réactive
-    filters as Ref<FilterState | null>, // On force le type pour le composable
+    toRef(props, "children"),
+    filters as Ref<FilterState | null>,
 );
+
+// Calcul dynamique strict du nombre de colonnes de cartes
+const gridColsClass = computed(() => {
+    if (sidebarActive.value && filterActive.value) {
+        return 'lg:grid-cols-6'; // 6 colonnes si tout est déplié
+    }
+    if (!sidebarActive.value && !filterActive.value) {
+        return 'lg:grid-cols-8'; // 8 colonnes si tout est fermé
+    }
+    return 'lg:grid-cols-7'; // 7 colonnes si un seul des deux est fermé
+});
 
 // VIEW MOD :
 watch(view_mod, (newValue) => {
@@ -61,7 +76,6 @@ useShortcuts({
     isEnabled: canEdit.value,
     action: () => (fastFolderCreation.value = !fastFolderCreation.value),
 });
-
 </script>
 
 <template>
@@ -70,7 +84,6 @@ useShortcuts({
         :navigation="navigation"
     />
 
-    <!-- HEADER NAVIGATION (Fil d'Ariane, Mode Affichage, Menu Creation) -->
     <NavigationHeader
         :parents="parents"
         :folder-id="folder_id"
@@ -79,7 +92,6 @@ useShortcuts({
         v-model:fast-folder-creation="fastFolderCreation"
     />
 
-    <!------ SEARCH BAR, Mode "Archive" ------->
     <div class="flex">
         <SearchBarWidget
             class="mt-4"
@@ -104,10 +116,10 @@ useShortcuts({
         </Link>
     </div>
 
-    <!------ AFFICHAGE EN MODE ICON ------->
     <div
         v-show="view_mod == 'icon'"
-        class="mt-6 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-4 grid grid-cols-2"
+        class="mt-6 gap-4 grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 transition-all duration-300"
+        :class="gridColsClass"
     >
         <ResourceCard
             v-for="child in filteredChildren"
@@ -123,7 +135,6 @@ useShortcuts({
         />
     </div>
 
-    <!------ AFFICHAGE EN MODE LIST ------->
     <div
         v-show="view_mod == 'list'"
         class="mt-6 rounded-xl border-gray-200 dark:border-zinc-800 border"
@@ -134,7 +145,7 @@ useShortcuts({
             <p class="col-span-6">Nom</p>
             <p class="col-span-1 text-center">Type</p>
             <p class="col-span-2 text-center">Date de création</p>
-            <p class="col-span-2 text-center">Départements</p>
+            <p class="col-span-2 text-center">Groupes</p>
             <p class="col-span-1 text-right">Actions</p>
         </div>
 

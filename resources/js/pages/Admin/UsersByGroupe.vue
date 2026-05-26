@@ -5,7 +5,7 @@ import { ref } from 'vue';
 
 // 2. Types
 import { User } from '@/types';
-import { Departement } from '@/types/departement';
+import { Groupe } from '@/types/groupe';
 
 // 3. Librairies Tierces (Icons)
 import { UserPlusIcon } from '@heroicons/vue/24/outline';
@@ -13,12 +13,12 @@ import { UserPlusIcon } from '@heroicons/vue/24/outline';
 // 5. Composants
 import Modal from '@/Components/UI/Modal.vue';
 import UsersList from '@/Components/Features/Users/UsersList.vue';
-import AddUserToDepartement from '@/Components/Features/Departement/AddUserToDepartement.vue';
+import AddUserToGroupe from '@/Components/Features/Groupe/AddUserToGroupe.vue';
 import UserForm from '@/Components/Forms/UserForm.vue';
 
 defineProps<{
-    departements: Departement[];
-    departement: Departement;
+    groupes: Groupe[];
+    groupe: Groupe;
     othersUsers: User[]
 }>();
 
@@ -43,13 +43,13 @@ const openAddUser = () => {
                 <div
                     class="w-14 h-14 bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 rounded-2xl font-black text-lg tracking-tighter border-zinc-200 dark:border-zinc-700 group-hover:bg-sky-500 group-hover:text-white group-hover:border-sky-400 flex items-center justify-center border transition-colors"
                 >
-                    {{ departement.initials }}
+                    {{ groupe.initials }}
                 </div>
 
                 <div>
                     <h3 class="text-lg dark:text-white">
-                        Utilisateur du département
-                        <span class="font-bold dark:group-hover:text-sky-400 group-hover:text-sky-600 transition-colors">{{ departement.name }}</span>
+                        Utilisateur du groupes
+                        <span class="font-bold dark:group-hover:text-sky-400 group-hover:text-sky-600 transition-colors">{{ groupe.name }}</span>
                     </h3>
                     <p class="text-xs text-zinc-400 tracking-widest font-semibold mt-0.5 uppercase">Entité active</p>
                 </div>
@@ -65,32 +65,32 @@ const openAddUser = () => {
         </div>
 
         <UsersList
-            v-if="departement.users"
-            :users="departement.users"
+            v-if="groupe.users"
+            :users="groupe.users"
             @selected-user="selectedUser = $event"
             @show-modal="showModalEditUserUser = $event"
-            :departement="departement"
+            :groupe="groupe"
         />
 
         <Modal
             :show="showModalAddUser"
-            :title="'Ajouter un utilisateur au departement ' + departement.initials"
+            :title="'Ajouter un utilisateur au groupe ' + groupe.initials"
             @close="showModalAddUser = false"
         >
-            <AddUserToDepartement
-                :departement="departement"
+            <AddUserToGroupe
+                :groupe="groupe"
                 :users="othersUsers"
                 @success="showModalAddUser = false"
             />
         </Modal>
         <Modal
             :show="showModalEditUserUser"
-            :title="'Ajouter un utilisateur au departement ' + departement.initials"
+            :title="'Ajouter un utilisateur au groupe ' + groupe.initials"
             @close="showModalEditUserUser = false"
         >
             <UserForm
                 :user="selectedUser"
-                :departements="departements"
+                :groupes="groupes"
                 @success="showModalEditUserUser = false"
             />
         </Modal>

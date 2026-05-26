@@ -4,13 +4,13 @@ namespace App\DTO;
 
 readonly class FolderDTO {
     public function __construct(
-        public int $id,
-        public string $name,
-        public array $departements,
+        public int     $id,
+        public string  $name,
+        public array   $groupes,
         public ?string $color,
-        public ?array $children = null,
+        public ?array  $children = null,
         public ?string $created_at = null,
-        public ?bool $is_archived = null,
-        public string $type = "folder",
+        public ?bool   $is_archived = null,
+        public string  $type = "folder",
     ) {}
 }

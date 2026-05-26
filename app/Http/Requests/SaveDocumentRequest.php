@@ -50,7 +50,7 @@ class SaveDocumentRequest extends FormRequest
             'existing_attachments.*.name' => ['required', 'string', 'max:255'],
             'new_attachments' => ['sometimes', 'array'],
             'new_attachments.*' => ['file', 'max:51200'],
-            'departements' => ['sometimes', 'array'],
+            'groupes' => ['sometimes', 'array'],
             'parent_id' => ['integer', 'nullable'],
         ];
     }

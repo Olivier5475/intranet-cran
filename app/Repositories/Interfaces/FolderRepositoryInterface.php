@@ -54,7 +54,7 @@ interface FolderRepositoryInterface
     /**
      * Crée un nouveau dossier.
      *
-     * @param array{name: string, parent_id?: int, user_id: int, color?: string, departements?: array} $data
+     * @param array{name: string, parent_id?: int, user_id: int, color?: string, groupes?: array} $data
      * @return Folder
      * @throws PersistenceException
      */

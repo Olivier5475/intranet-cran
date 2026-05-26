@@ -91,7 +91,7 @@ interface UserServiceInterface
      * Met à jour les informations d'un utilisateur.
      *
      * @param int $id
-     * @param array $data Données à modifier (nom, rôle, départements, etc.).
+     * @param array $data Données à modifier (nom, rôle, groupes, etc.).
      * @return void
      * @throws UserNotFoundException
      * @throws PersistenceException

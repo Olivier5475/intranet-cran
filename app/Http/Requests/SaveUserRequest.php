@@ -19,7 +19,7 @@ class SaveUserRequest extends FormRequest
             'prenom' => ['required', 'string', 'max:255'],
             'role' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'max:255', 'email'],
-            'departements' => ['sometimes', 'array'],
+            'groupes' => ['sometimes', 'array'],
         ];
     }
 }

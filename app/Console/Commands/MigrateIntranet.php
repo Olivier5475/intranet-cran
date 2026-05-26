@@ -13,7 +13,7 @@ use Illuminate\Http\File;
 
 class MigrateIntranet extends Command
 {
-    protected $signature = 'intranet:migrate {path} {departement?}';
+    protected $signature = 'intranet:migrate {path} {groupe?}';
     protected $description = 'Migre récursivement un dossier local vers la nouvelle structure';
 
     public function __construct(
@@ -31,7 +31,7 @@ class MigrateIntranet extends Command
         \App\Models\File::unsetEventDispatcher();
 
         $rootPath = $this->argument('path');
-        $deptId = (int) ($this->argument('departement') ?? 1);
+        $deptId = (int) ($this->argument('groupe') ?? 1);
         $adminId = 1;
 
         if (!is_dir($rootPath)) {
@@ -54,7 +54,7 @@ class MigrateIntranet extends Command
                         'name' => $item->getFilename(),
                         'color' => '#9553E9',
                         'user_id' => $adminId,
-                        'departements' => [$deptId]
+                        'groupes' => [$deptId]
                     ];
                     if(!empty($parentId)) {
                         $fold_data['parent_id'] = $parentId;
@@ -75,7 +75,7 @@ class MigrateIntranet extends Command
                             'file' => $fileObject,
                             'name' => $item->getFilename(),
                             'user_id' => $adminId,
-                            'departements' => [$deptId]
+                            'groupes' => [$deptId]
                         ]);
                         $this->info("  Fichier migré : " . $item->getFilename());
                     } catch (\Throwable $e) {

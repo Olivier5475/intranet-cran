@@ -8,14 +8,14 @@ import {
     PaperClipIcon,
 } from "@heroicons/vue/24/solid";
 
-import { Departement } from "@/types/departement";
+import { Groupe } from "@/types/groupe";
 import { Document } from "@/types/document";
 import route from "@/routes/editor/document";
 import { decodeEntities } from "@/Composables/useDecodeModule";
 
 import CKEditor5Widget from "@/Components/Features/Document/CKEditor5Widget.vue";
 import WarningPermission from "@/Components/UI/WarningPermission.vue";
-import DepartementSelectorWidget from "@/Components/Forms/DepartementSelectorWidget.vue";
+import GroupeSelectorWidget from "@/Components/Forms/GroupeSelectorWidget.vue";
 import FileUploadZone from '@/Components/Forms/FileUploadZone.vue';
 import NameInputWidget from '@/Components/Forms/NameInputWidget.vue';
 import ColorPickerWidget from '@/Components/Forms/ColorPickerWidget.vue';
@@ -23,14 +23,14 @@ import ColorPickerWidget from '@/Components/Forms/ColorPickerWidget.vue';
 const props = defineProps<{
     parent_id: number;
     document?: Document;
-    departements: Departement[];
+    groupes: Groupe[];
 }>();
 
 const page = usePage();
 // récupération de l'utilisateur courant
 const user = page.props.auth.user;
-// récupération de ses departements
-const userDepartementIds = user.departements;
+// récupération de ses groupes
+const userGroupeIds = user.groupes;
 
 const form = useForm({
     name: props.document
@@ -41,7 +41,7 @@ const form = useForm({
     content: props.document?.content ?? "",
     existing_attachments: props.document?.attachments ?? [],
     new_attachments: [] as File[],
-    departements: props.document?.departements ?? [],
+    groupes: props.document?.groupes ?? [],
     ...(page.props.auth.user.role === "admin" && {
         color: props.document?.color ?? "#ffffff",
     }),
@@ -50,16 +50,16 @@ const form = useForm({
 
 onMounted(() => {
     if (!props.document) {
-        const allAvailableDeps = props.departements?.map((d) => d.id) ?? [];
-        form.departements = allAvailableDeps.filter((id) =>
-            userDepartementIds.includes(id),
+        const allAvailableDeps = props.groupes?.map((d) => d.id) ?? [];
+        form.groupes = allAvailableDeps.filter((id) =>
+            userGroupeIds.includes(id),
         );
     }
 });
 
 const showExternalWarning = computed(() =>
-    form.departements.some(
-        (selectedId) => !userDepartementIds.includes(selectedId),
+    form.groupes.some(
+        (selectedId) => !userGroupeIds.includes(selectedId),
     ),
 );
 
@@ -187,9 +187,9 @@ const submit = () => {
             </div>
 
             <div class="pt-6 dark:border-zinc-800 border-t">
-                <DepartementSelectorWidget
-                    v-model="form.departements"
-                    :all-departements="departements"
+                <GroupeSelectorWidget
+                    v-model="form.groupes"
+                    :all-groupes="groupes"
                 />
             </div>
 

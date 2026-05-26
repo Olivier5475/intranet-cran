@@ -3,7 +3,7 @@
 import { useForm } from '@inertiajs/vue3';
 
 // 2. Types
-import { Departement } from '@/types/departement';
+import { Groupe } from '@/types/groupe';
 import { User } from '@/types';
 
 // 3. Librairies Tierces (Icons)
@@ -14,18 +14,18 @@ import user_route from '@/routes/admin/user'
 
 defineProps<{
     users: User[];
-    departement: Departement
+    groupe: Groupe
 }>()
 const emit = defineEmits(["success"]);
 
-const addUser = (user : User, departement_id : number) => {
+const addUser = (user : User, groupe_id : number) => {
 
     const form = useForm({
         nom: user.nom,
         prenom: user.prenom,
         role: user.role,
         email: user.email,
-        departements: [...user.departements, departement_id] // On ajoute l'ID dynamiquement
+        groupes: [...user.groupes, groupe_id] // On ajoute l'ID dynamiquement
     })
 
     form.patch(user_route.post.update.url(user.id), {
@@ -67,7 +67,7 @@ const addUser = (user : User, departement_id : number) => {
                     </span>
                 <div class="gap-2 flex items-center opacity-0 transition-opacity group-hover:opacity-100">
                     <button
-                        @click="addUser(user, departement.id)"
+                        @click="addUser(user, groupe.id)"
                         class="p-2 hover:bg-red-50 dark:hover:bg-emerald-900/20 rounded-lg text-zinc-400 hover:text-emerald-500"
                     >
                         <UserPlusIcon class="w-5 h-5" />

@@ -22,7 +22,7 @@ class DocumentRepository implements DocumentRepositoryInterface
      */
     public function read(int $id): Document
     {
-        $document = Document::with("departements")
+        $document = Document::with("groupes")
             ->with("attachments")
             ->find($id);
 
@@ -43,7 +43,7 @@ class DocumentRepository implements DocumentRepositoryInterface
         }
 
         try {
-            self::$racineDocCache = Document::with('departements')
+            self::$racineDocCache = Document::with('groupes')
                 ->whereNull("folder_id")
                 ->orderBy("created_at")
                 ->with('attachments')
@@ -76,11 +76,11 @@ class DocumentRepository implements DocumentRepositoryInterface
             $document->user_id = $data['user_id'];
             $document->save();
 
-            if (!empty($data['departements'])) {
-                $document->departements()->attach($data['departements']);
+            if (!empty($data['groupes'])) {
+                $document->groupes()->attach($data['groupes']);
             }
 
-            return $document->load('departements');
+            return $document->load('groupes');
         } catch (Throwable $e) {
             Log::error('Échec SQL : Création du document', [
                 'message' => $e->getMessage(),
@@ -109,11 +109,11 @@ class DocumentRepository implements DocumentRepositoryInterface
 
             $document->save();
 
-            if (isset($data['departements'])) {
-                $document->departements()->sync($data['departements']);
+            if (isset($data['groupes'])) {
+                $document->groupes()->sync($data['groupes']);
             }
 
-            return $document->fresh('departements');
+            return $document->fresh('groupes');
         } catch (Throwable $e) {
             Log::error("Échec SQL : Mise à jour du document $id", [
                 'message' => $e->getMessage(),

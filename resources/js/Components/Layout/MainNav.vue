@@ -25,12 +25,12 @@ const isActive = (url: string) => page.url.startsWith(url);
         <div class="flex items-center space-x-2">
             <template v-if="page.props.auth.user.role === 'admin'">
                 <Link
-                    :href="admin_routes.departements.url()"
+                    :href="admin_routes.groupes.url()"
                     class="group flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-200"
-                    :class="isActive(admin_routes.departements.url()) ? 'bg-red-500/10 text-red-400' : 'text-slate-300 hover:bg-slate-700'"
+                    :class="isActive(admin_routes.groupes.url()) ? 'bg-red-500/10 text-red-400' : 'text-slate-300 hover:bg-slate-700'"
                 >
                     <BuildingOfficeIcon class="w-6 h-6 transition-transform group-hover:-rotate-12" />
-                    <span class="text-lg font-medium">Départements</span>
+                    <span class="text-lg font-medium">Groupes</span>
                 </Link>
 
                 <Link

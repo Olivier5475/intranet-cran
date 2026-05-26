@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\Departement;
+use App\Models\Groupe;
 use App\Models\Document;
 use App\Models\File;
 use App\Models\Folder;
@@ -22,16 +22,16 @@ class DatabaseSeeder extends Seeder
         Storage::makeDirectory('public/documents');
         Storage::makeDirectory('public/files');
 
-        Departement::create([
+        Groupe::create([
             'name' => 'Contrôle Identification Diagnostic ',
             'initials' => 'CID',
         ]);
-        Departement::create([
+        Groupe::create([
             'name' => 'Biologie, Signaux et Systèmes en Cancérologie et Neurosciences ',
             'initials' => 'BioSiS',
         ]);
 
-        Departement::create([
+        Groupe::create([
             'name' => 'Modélisation Pilotage des Systèmes Industriels ',
             'initials' => 'MPSI',
         ]);
@@ -130,18 +130,18 @@ class DatabaseSeeder extends Seeder
 //            ]);
         }
 
-//        $departements = Departement::pluck('id')->toArray();
+//        $groupes = Groupe::pluck('id')->toArray();
 //        $files = File::all();
 //        $documents = Document::all();
 //
 //        foreach ($files as $file) {
-//            // Chaque fichier est lié à entre 1 et 3 départements aléatoires
-//            $file->departements()->sync(fake()->randomElements($departements, rand(0, 3)));
+//            // Chaque fichier est lié à entre 1 et 3 groupes aléatoires
+//            $file->groupes()->sync(fake()->randomElements($groupes, rand(0, 3)));
 //        }
 //
 //        foreach ($documents as $document) {
-//            // Chaque document est lié à entre 1 et 3 départements aléatoires
-//            $document->departements()->sync(fake()->randomElements($departements, rand(0, 3)));
+//            // Chaque document est lié à entre 1 et 3 groupes aléatoires
+//            $document->groupes()->sync(fake()->randomElements($groupes, rand(0, 3)));
 //        }
 
 

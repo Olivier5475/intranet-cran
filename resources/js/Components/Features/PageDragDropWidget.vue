@@ -25,7 +25,7 @@ const { isDragging } = useDragAndDrop({
         if(props.navigation) {
             useForm({
                 files: Array.from(file),
-                departements: props.navigation.lastParent?.departements ?? [],
+                groupes: props.navigation.lastParent?.groupes ?? [],
                 parent_id: props.navigation.lastParent?.id ?? null
             }).post(file_route.post.create.url());
         } else if(props.document) {
@@ -34,7 +34,7 @@ const { isDragging } = useDragAndDrop({
                 content: props.document.content ?? '', // On récupère renvoie le meme contenu
                 existing_attachments: props.document?.attachments ?? [], // On renvoie les piece jointe deja existante
                 new_attachments: Array.from(file) as File[], // On prépare l'envoie de la nouvelle pièce jointe
-                departements: props.document?.departements ?? [], // On renvoie les meme departements
+                groupes: props.document?.groupes ?? [], // On renvoie les meme groupes
                 // On renvoie la meme couleur et du blanc si on ne trouve pas de couleur
                 color: props.document.color ?? '#ffffff',
                 parent_id: props.document.folder_id ?? null, // on renvoie le même parent

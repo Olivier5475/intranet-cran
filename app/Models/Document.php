@@ -22,7 +22,7 @@ class Document extends Model {
         'content',
         'user_id',
         'folder_id',
-        'departements',
+        'groupes',
         'color',
     ];
 
@@ -47,11 +47,11 @@ class Document extends Model {
     return $this->belongsTo(User::class);
     }
 
-    public function departements(): BelongsToMany {
-        return $this->belongsToMany(Departement::class);
+    public function groupes(): BelongsToMany {
+        return $this->belongsToMany(Groupe::class);
     }
 
-    public $historyRelations = ['departements', "attachments"];
+    public $historyRelations = ['groupes', "attachments"];
 
     protected function getRenderedContentAttribute(): string
     {
@@ -126,8 +126,8 @@ class Document extends Model {
             'content' => strip_tags($this->content),
             'folder_id' => (int) $this->folder_id,
             'is_archived' => (int) $this->is_archived,
-            // On peut même indexer le nom des départements pour chercher par service !
-            'departements' => $this->departements->pluck('name')->toArray(),
+            // On peut même indexer le nom des groupes pour chercher par service !
+            'Groupes' => $this->groupes->pluck('name')->toArray(),
         ];
     }
 }

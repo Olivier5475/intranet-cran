@@ -22,10 +22,10 @@ class File extends Model
         'storage_path',
         'mimetype',
         'size',
-        'departements',
+        'groupes',
     ];
 
-    public $historyRelations = ['departements'];
+    public $historyRelations = ['groupes'];
 
     /**
      * Le dossier auquel ce fichier appartient
@@ -43,8 +43,8 @@ class File extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function departements(): BelongsToMany {
-        return $this->belongsToMany(Departement::class);
+    public function groupes(): BelongsToMany {
+        return $this->belongsToMany(Groupe::class);
     }
 
     public function archivePhysicalFile($version)

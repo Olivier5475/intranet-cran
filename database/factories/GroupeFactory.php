@@ -2,21 +2,21 @@
 
 namespace Database\Factories;
 
-use App\Models\Departement;
+use App\Models\Groupe;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Departement>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Groupe>
  */
-class DepartementFactory extends Factory
+class GroupeFactory extends Factory
 {
     /**
      * Le nom du modèle correspondant à la factory.
      *
      * @var string
      */
-    protected $model = Departement::class;
+    protected $model = Groupe::class;
 
     /**
      * Définir l'état par défaut du modèle.

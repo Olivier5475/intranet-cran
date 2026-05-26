@@ -4,7 +4,7 @@ namespace App\DTO;
 
 use Illuminate\Support\Collection;
 
-readonly class DepartementDTO {
+readonly class GroupeDTO {
 
     public function __construct(
         public int $id,

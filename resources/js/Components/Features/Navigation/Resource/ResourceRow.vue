@@ -73,7 +73,7 @@ const handleDragEnd = (e: DragEvent) => {
 
         <p class="text-xs text-gray-400 col-span-2 text-center">{{ child.created_at }}</p>
 
-        <ResourceBadges v-if="child.departements" :departement-ids="child.departements" mode="row" class="col-span-2" />
+        <ResourceBadges v-if="child.groupes" :groupe-ids="child.groupes" mode="row" class="col-span-2" />
 
         <div class="col-start-12 flex justify-center">
             <a v-if="child.type == 'file'" :href="links.download" class="p-1 hover:bg-gray-100 rounded-full" title="Télécharger">

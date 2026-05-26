@@ -4,24 +4,24 @@ import { useForm } from "@inertiajs/vue3";
 import { ref } from "vue";
 
 // 2. Routes
-import dpts_route from "@/routes/admin/departements";
-import { Departement } from "@/types/departement";
+import grps_route from "@/routes/admin/groupes";
+import { Groupe } from "@/types/groupe";
 import NameInputWidget from '@/Components/Forms/NameInputWidget.vue';
 import ColorPickerWidget from '@/Components/Forms/ColorPickerWidget.vue';
 
 const props = defineProps<{
-    departement: Departement | null;
+    groupe: Groupe | null;
 }>();
 
 const emit = defineEmits(["success"]);
 
 const form = useForm({
-    name: props.departement?.name ?? "",
-    initials: props.departement?.initials ?? "",
-    color: props.departement?.color ?? "#ffffff",
+    name: props.groupe?.name ?? "",
+    initials: props.groupe?.initials ?? "",
+    color: props.groupe?.color ?? "#ffffff",
 });
 
-const userInteractedWith = ref(!!props.departement);
+const userInteractedWith = ref(!!props.groupe);
 
 const updateInitials = () => {
     if (!userInteractedWith.value) {
@@ -35,10 +35,10 @@ const updateInitials = () => {
 };
 
 const submit = () => {
-    const action = props.departement ? "patch" : "post";
-    const url = props.departement
-        ? dpts_route.post.update.url(props.departement.id)
-        : dpts_route.post.create.url();
+    const action = props.groupe ? "patch" : "post";
+    const url = props.groupe
+        ? grps_route.post.update.url(props.groupe.id)
+        : grps_route.post.create.url();
 
     form[action](url, {
         onSuccess: () => emit("success"),
@@ -51,7 +51,7 @@ const submit = () => {
         <div class="grid grid-cols-1 md:grid-cols-5 gap-6">
             <NameInputWidget
                 v-model="form.name"
-                label="Nom du département"
+                label="Nom du groupe"
                 placeholder="Ex: Direction Technique"
                 :error="form.errors.name"
                 @input="updateInitials"
@@ -98,9 +98,9 @@ const submit = () => {
             class="w-full py-4 bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 font-black rounded-2xl hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50 shadow-xl shadow-zinc-500/10"
         >
             {{
-                departement
+                groupe
                     ? "ENREGISTRER LES MODIFICATIONS"
-                    : "CRÉER LE DÉPARTEMENT"
+                    : "CRÉER LE GROUPE"
             }}
         </button>
     </form>

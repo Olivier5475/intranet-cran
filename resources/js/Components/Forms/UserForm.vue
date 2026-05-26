@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { useForm } from "@inertiajs/vue3";
-import DepartementSelectorWidget from "@/Components/Forms/DepartementSelectorWidget.vue";
-import { Departement } from "@/types/departement";
+import GroupeSelectorWidget from "@/Components/Forms/GroupeSelectorWidget.vue";
+import { Groupe } from "@/types/groupe";
 import { User } from "@/types";
 import NameInputWidget from '@/Components/Forms/NameInputWidget.vue';
 
 const props = defineProps<{
     user?: User;
-    departements: Departement[]
+    groupes: Groupe[]
 }>();
 const emit = defineEmits(["success"]);
 
@@ -16,7 +16,7 @@ const form = useForm({
     prenom: props.user?.prenom ?? "",
     email: props.user?.email ?? "",
     role: props.user?.role ?? "user",
-    departements: props.user?.departements ?? [],
+    groupes: props.user?.groupes ?? [],
 });
 const submit = () => {
     const action = props.user ? "patch" : "post";
@@ -71,9 +71,9 @@ const submit = () => {
         </div>
 
         <div class="pt-6 dark:border-zinc-800 border-t">
-            <DepartementSelectorWidget
-                v-model="form.departements"
-                :all-departements="departements"
+            <GroupeSelectorWidget
+                v-model="form.groupes"
+                :all-groupes="groupes"
             />
         </div>
 

@@ -97,20 +97,20 @@ Route::prefix("admin")
             Route::delete("/{id}", [Controllers\Admin\UsersController::class, "delete"])->name("admin.user.delete");
         });
 
-        Route::prefix("departements")->group(function () {
+        Route::prefix("groupes")->group(function () {
             // GET
-            Route::get("/", [Controllers\Admin\DepartementController::class, "index"])->name("admin.departements");
-            Route::get("/{id}/users", [Controllers\Admin\DepartementController::class, "users"])->name("admin.departements.users");
+            Route::get("/", [Controllers\Admin\GroupeController::class, "index"])->name("admin.groupes");
+            Route::get("/{id}/users", [Controllers\Admin\GroupeController::class, "users"])->name("admin.groupes.users");
 
             // POST
-            Route::post("/", [Controllers\Admin\DepartementController::class, "store"])->name("admin.departements.post.create");
+            Route::post("/", [Controllers\Admin\GroupeController::class, "store"])->name("admin.groupes.post.create");
 
             // PATCH
-            Route::patch("/{id}", [Controllers\Admin\DepartementController::class, "update"])->name("admin.departements.post.update");
+            Route::patch("/{id}", [Controllers\Admin\GroupeController::class, "update"])->name("admin.groupes.post.update");
 
             // DELETE
-            Route::delete("/{id}", [Controllers\Admin\DepartementController::class, "delete"])->name("admin.departements.delete");
-            Route::delete("/{id}/user/{user_id}", [Controllers\Admin\DepartementController::class, "removeUser"])->name("admin.departements.users.remove");
+            Route::delete("/{id}", [Controllers\Admin\GroupeController::class, "delete"])->name("admin.groupes.delete");
+            Route::delete("/{id}/user/{user_id}", [Controllers\Admin\GroupeController::class, "removeUser"])->name("admin.groupes.users.remove");
         });
 });
 

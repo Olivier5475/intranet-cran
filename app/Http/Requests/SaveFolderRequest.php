@@ -40,7 +40,7 @@ class SaveFolderRequest extends FormRequest
             'name' => ['sometimes', 'string', 'max:255'],
             'color' => ['sometimes', 'string', 'max:16'],
             'parent_id' => ['integer', 'nullable'],
-            'departements' => ['sometimes', 'array'],
+            'groupes' => ['sometimes', 'array'],
         ];
     }
 }

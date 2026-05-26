@@ -67,7 +67,7 @@ export function useResource(child: Child|Document|FileEntry|Folder) {
     });
 
     // Gestion des permissions
-    const canEdit = useCanEdit(child.departements ?? [])
+    const canEdit = useCanEdit(child.groupes ?? [])
 
     return {
         links,
