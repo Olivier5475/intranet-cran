@@ -8,17 +8,17 @@ defineProps<{
 }>();
 
 const page = usePage();
-const hoveredDepId = ref<number | null>(null);
+const hoveredGrpId = ref<number | null>(null);
 
-const getDep = (id: number) => page.props.groupes.find((d: any) => d.id === id);
+const getGrp = (id: number) => page.props.groupes.find((d: any) => d.id === id);
 </script>
 
 <template>
     <div v-if="mode == 'row'" class="flex flex-wrap justify-center gap-1">
         <span v-for="id in groupeIds" :key="id"
-              :style="{ backgroundColor: getDep(id)?.color }"
+              :style="{ backgroundColor: getGrp(id)?.color }"
               class="px-2 rounded-xl text-white text-[8px] font-semibold">
-            {{ getDep(id)?.initials }}
+            {{ getGrp(id)?.initials }}
         </span>
     </div>
 
@@ -28,8 +28,8 @@ const getDep = (id: number) => page.props.groupes.find((d: any) => d.id === id);
         :class="groupeIds.length > 2 ? 'gap-x-3.5' : 'gap-x-1'"
     >
         <div
-            v-for="depId in groupeIds"
-            :key="depId"
+            v-for="grpId in groupeIds"
+            :key="grpId"
             class="pointer-events-auto relative h-3 transition-all duration-300"
             :style="{
                     // Si moins de 2 groupes, largueur de base en auto,
@@ -38,13 +38,13 @@ const getDep = (id: number) => page.props.groupes.find((d: any) => d.id === id);
                                                 ? 'auto'
                                                 : '0.75rem'
                 }"
-            @mouseenter="hoveredDepId = depId"
-            @mouseleave="hoveredDepId = null"
+            @mouseenter="hoveredGrpId = grpId"
+            @mouseleave="hoveredGrpId = null"
         >
             <div
                 :style="{
-                        backgroundColor: getDep(depId)?.color,
-                        zIndex: hoveredDepId === depId ? 10 : 1
+                        backgroundColor: getGrp(grpId)?.color,
+                        zIndex: hoveredGrpId === grpId ? 10 : 1
                     }"
                 :class="[
                     // Si le nombre de groupe est supérieur à 2,
@@ -55,7 +55,7 @@ const getDep = (id: number) => page.props.groupes.find((d: any) => d.id === id);
                         : 'relative',
 
                     // S\'il y a 2 groupes, ou moins par-dessus le groupe
-                    (groupeIds.length <= 2 || hoveredDepId === depId)
+                    (groupeIds.length <= 2 || hoveredGrpId === grpId)
                         // On fix la largeur à 'fit' et le padding à 1
                         ? 'w-fit px-1'
                         // Sinon, on fix largeur à 3
@@ -66,11 +66,11 @@ const getDep = (id: number) => page.props.groupes.find((d: any) => d.id === id);
             >
                     <span
                         v-if="groupeIds.length <= 2
-                                || hoveredDepId === depId"
+                                || hoveredGrpId === grpId"
                         class="text-[0.5rem] font-black uppercase text-white p-1"
-                        :class="getDep(depId)?.color === '#ffffff' ? '!text-black' : ''"
+                        :class="getGrp(grpId)?.color === '#ffffff' ? '!text-black' : ''"
                     >
-                        {{ getDep(depId)?.initials }}
+                        {{ getGrp(grpId)?.initials }}
                     </span>
             </div>
         </div>

@@ -7,8 +7,7 @@ import { User } from '@/types';
 import { Groupe } from '@/types/groupe';
 
 import user_route from '@/routes/admin/user'
-import dept_routes from '@/routes/admin/groupes';
-import { ref } from 'vue';
+import grp_routes from '@/routes/admin/groupes';
 
 const props =  defineProps<{
     users: User[]
@@ -25,7 +24,7 @@ const openEdit = (user: User) => {
 const deleteUser = (user_id: number) => {
     if(props.groupe) {
         if (confirm('Voulez-vous vraiment retirer cet utilisateur de ce groupe ?')) {
-            router.delete(dept_routes.users.remove.url([props.groupe.id, user_id]));
+            router.delete(grp_routes.users.remove.url([props.groupe.id, user_id]));
         }
     } else {
         if (confirm('Supprimer ?')) router.delete(user_route.delete.url(user_id));

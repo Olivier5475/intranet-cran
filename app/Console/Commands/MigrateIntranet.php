@@ -31,7 +31,7 @@ class MigrateIntranet extends Command
         \App\Models\File::unsetEventDispatcher();
 
         $rootPath = $this->argument('path');
-        $deptId = (int) ($this->argument('groupe') ?? 1);
+        $grpId = (int) ($this->argument('groupe') ?? 1);
         $adminId = 1;
 
         if (!is_dir($rootPath)) {
@@ -54,7 +54,7 @@ class MigrateIntranet extends Command
                         'name' => $item->getFilename(),
                         'color' => '#9553E9',
                         'user_id' => $adminId,
-                        'groupes' => [$deptId]
+                        'groupes' => [$grpId]
                     ];
                     if(!empty($parentId)) {
                         $fold_data['parent_id'] = $parentId;
@@ -75,7 +75,7 @@ class MigrateIntranet extends Command
                             'file' => $fileObject,
                             'name' => $item->getFilename(),
                             'user_id' => $adminId,
-                            'groupes' => [$deptId]
+                            'groupes' => [$grpId]
                         ]);
                         $this->info("  Fichier migré : " . $item->getFilename());
                     } catch (\Throwable $e) {

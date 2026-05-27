@@ -9,5 +9,6 @@ export interface Document {
     groupes: number[],
     folder_id: number,
     is_archived: boolean
-    type: string
+    type: string,
+    deadline?: string
 }

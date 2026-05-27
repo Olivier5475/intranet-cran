@@ -8,7 +8,7 @@ import { PlusIcon, TrashIcon, PencilSquareIcon, BuildingOfficeIcon } from '@hero
 
 // 3. Types & Routes
 import { Groupe } from '@/types/groupe';
-import dept_routes from '@/routes/admin/groupes';
+import grp_routes from '@/routes/admin/groupes';
 
 // 4. Composants
 import GroupeForm from '@/Components/Forms/GroupeForm.vue';
@@ -19,19 +19,19 @@ defineProps<{
 }>();
 
 const showModal = ref(false);
-const selectedDept = ref<Groupe | null>(null);
+const selectedGrp = ref<Groupe | null>(null);
 
 const openCreate = () => {
-    selectedDept.value = null;
+    selectedGrp.value = null;
     showModal.value = true;
 };
-const openEdit = (dept: Groupe) => {
-    selectedDept.value = dept;
+const openEdit = (grp: Groupe) => {
+    selectedGrp.value = grp;
     showModal.value = true;
 };
-const deleteDept = (id: number) => {
+const deleteGrp = (id: number) => {
     if (confirm('Voulez-vous vraiment supprimer ce groupe ?')) {
-        router.delete(dept_routes.delete.url(id));
+        router.delete(grp_routes.delete.url(id));
     }
 };
 </script>
@@ -66,20 +66,20 @@ const deleteDept = (id: number) => {
 
         <div v-else class="gap-4 grid">
             <div
-                v-for="dept in groupes"
-                :key="dept.id"
+                v-for="grp in groupes"
+                :key="grp.id"
                 class="group bg-white dark:bg-zinc-900 p-5 rounded-2xl border-zinc-100 dark:border-zinc-800 hover:shadow-xl hover:border-sky-200 dark:hover:border-sky-900/50 flex items-center justify-between border transition-all duration-200"
             >
-                <Link class="gap-5 flex items-center" :href="dept_routes.users(dept.id)">
+                <Link class="gap-5 flex items-center" :href="grp_routes.users(grp.id)">
                     <div
                         class="w-14 h-14 bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 rounded-2xl font-black text-lg tracking-tighter border-zinc-200 dark:border-zinc-700 group-hover:bg-sky-500 group-hover:text-white group-hover:border-sky-400 flex items-center justify-center border transition-colors"
                     >
-                        {{ dept.initials }}
+                        {{ grp.initials }}
                     </div>
 
                     <div>
                         <h3 class="font-bold text-lg dark:text-white group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors">
-                            {{ dept.name }}
+                            {{ grp.name }}
                         </h3>
                         <p class="text-xs text-zinc-400 tracking-widest font-semibold mt-0.5 uppercase">Entité active</p>
                     </div>
@@ -87,14 +87,14 @@ const deleteDept = (id: number) => {
 
                 <div class="gap-2 flex items-center">
                     <button
-                        @click="openEdit(dept)"
+                        @click="openEdit(grp)"
                         class="p-2.5 hover:bg-sky-50 dark:hover:bg-sky-900/30 rounded-xl text-zinc-400 hover:text-sky-600 transition-all"
                         title="Modifier"
                     >
                         <PencilSquareIcon class="w-6 h-6" />
                     </button>
                     <button
-                        @click="deleteDept(dept.id)"
+                        @click="deleteGrp(grp.id)"
                         class="p-2.5 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-xl text-zinc-400 hover:text-red-500 transition-all"
                         title="Supprimer"
                     >
@@ -104,8 +104,8 @@ const deleteDept = (id: number) => {
             </div>
         </div>
 
-        <Modal :show="showModal" :title="selectedDept ? 'Modifier le groupe' : 'Créer un groupe'" @close="showModal = false">
-            <GroupeForm :groupe="selectedDept" @success="showModal = false" />
+        <Modal :show="showModal" :title="selectedGrp ? 'Modifier le groupe' : 'Créer un groupe'" @close="showModal = false">
+            <GroupeForm :groupe="selectedGrp" @success="showModal = false" />
         </Modal>
     </div>
 </template>

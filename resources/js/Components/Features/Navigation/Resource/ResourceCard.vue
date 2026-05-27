@@ -2,6 +2,7 @@
 import { ref, computed } from "vue";
 import { Link } from '@inertiajs/vue3';
 import { ArrowDownTrayIcon } from '@heroicons/vue/24/solid';
+import { ClipboardDocumentIcon, ClipboardDocumentCheckIcon } from "@heroicons/vue/24/outline";
 import { decodeEntities } from "@/Composables/useDecodeModule";
 import { useResource } from "@/Composables/useResource";
 import ResourceIcon from "@/Components/Features/Navigation/Resource/ResourceIcon.vue";
@@ -41,6 +42,23 @@ const handleDragStart = (e: DragEvent) => {
 const handleDragEnd = (e: DragEvent) => {
     if (e.target instanceof HTMLElement) e.target.classList.remove('opacity-40');
 };
+
+// --- LOGIQUE DE COPIE ABSOLUE ---
+const isCopied = ref(false);
+
+const copyToClipboard = async () => {
+    try {
+        const absoluteUrl = `${window.location.origin}${links.value.href}`;
+        await navigator.clipboard.writeText(absoluteUrl);
+
+        isCopied.value = true;
+        setTimeout(() => {
+            isCopied.value = false;
+        }, 2000);
+    } catch (err) {
+        console.error('Erreur lors de la copie : ', err);
+    }
+};
 </script>
 
 <template>
@@ -54,7 +72,7 @@ const handleDragEnd = (e: DragEvent) => {
         @mouseenter="handleMouseEnter"
         @mouseleave="showImage = false"
     >
-        <component v-if="!activeRename" :is="child.type !== 'file' ? Link : 'a'" :href="links.href" class="flex flex-col items-center">
+        <component v-if="!activeRename" :is="child.type !== 'file' ? Link : 'a'" :href="links.href" :target="child.type == 'file' ? '_blank' : ''" class="flex flex-col items-center">
             <div class="w-16 h-16 mb-3 transition-transform duration-200 group-hover:scale-110">
                 <ResourceIcon :child="child" :color="itemColor" class="h-full w-full" />
             </div>
@@ -68,13 +86,36 @@ const handleDragEnd = (e: DragEvent) => {
             <ResourceRenameForm v-model="child.name" :route-url="updateRoute" @success="activeRename = false" />
         </div>
 
-        <div class="absolute top-1 left-1 flex flex-wrap gap-1 max-w-[90%] z-50 pointer-events-none">
+        <div class="absolute top-2 left-2 flex flex-wrap gap-1 max-w-[65%] z-20 pointer-events-none">
             <ResourceBadges v-if="child.groupes" :groupe-ids="child.groupes" mode="card" />
         </div>
 
-        <div class="top-0 right-0 absolute flex">
-            <a v-if="child.type == 'file'" :href="links.download" class="p-1 hover:bg-gray-100 rounded-full"><ArrowDownTrayIcon class="w-5 h-5 text-gray-400"/></a>
-            <EditorActionsWidget v-if="canEdit" :links="links" :is_archived="child.is_archived" @active-rename="activeRename = $event" />
+        <div class="top-2 right-2 absolute flex flex-col items-end space-y-1 z-30">
+            <div class="flex items-center space-x-1">
+                <a v-if="child.type == 'file'" :href="links.download" class="p-1 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-full transition-colors" title="Télécharger">
+                    <ArrowDownTrayIcon class="w-4 h-4 text-gray-400 hover:text-sky-500"/>
+                </a>
+
+                <button
+                    @click.stop="copyToClipboard"
+                    class="p-1 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-full transition-colors"
+                    :title="isCopied ? 'Lien copié !' : 'Copier le lien'"
+                >
+                    <component
+                        :is="isCopied ? ClipboardDocumentCheckIcon : ClipboardDocumentIcon"
+                        class="w-4 h-4"
+                        :class="isCopied ? 'text-green-500' : 'text-gray-400 hover:text-sky-500'"
+                    />
+                </button>
+            </div>
+
+            <EditorActionsWidget
+                v-if="canEdit"
+                :links="links"
+                :is_archived="child.is_archived"
+                @active-rename="activeRename = $event"
+                class="transform translate-x-1"
+            />
         </div>
     </div>
 </template>

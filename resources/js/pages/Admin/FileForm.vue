@@ -51,8 +51,8 @@ const submit = () => {
 
 onMounted(() => {
     if (!props.file) {
-        const allAvailableDeps = props.groupes?.map((d) => d.id) ?? [];
-        form.groupes = allAvailableDeps.filter((id) =>
+        const allAvailableGrps = props.groupes?.map((d) => d.id) ?? [];
+        form.groupes = allAvailableGrps.filter((id) =>
             userGroupeIds.includes(id),
         );
     }

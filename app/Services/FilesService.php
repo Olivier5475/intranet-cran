@@ -52,8 +52,8 @@ readonly class FilesService implements FilesServiceInterface
             return true;
         }
 
-        $fileDeptIds = $this->groupesService->groupesIDs($file->groupes);
-        return (bool) array_intersect($user->groupes, $fileDeptIds);
+        $fileGrpIds = $this->groupesService->groupesIDs($file->groupes);
+        return (bool) array_intersect($user->groupes, $fileGrpIds);
     }
 
     /**

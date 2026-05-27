@@ -73,6 +73,13 @@ class DocumentRepository implements DocumentRepositoryInterface
             $document->content = $data['content'];
             $document->color = $data['color'] ?? '#ffffff';
             $document->folder_id = $data['folder_id'] ?? null;
+            $document->type = $data['type'] ?? "document";
+            if ($document->type == "appelprojet") {
+                $document->deadline = $data['deadline'] ?? null;
+                if(is_null($document->deadline)) {
+                    $document->type = "document";
+                }
+            }
             $document->user_id = $data['user_id'];
             $document->save();
 
@@ -106,6 +113,31 @@ class DocumentRepository implements DocumentRepositoryInterface
             if (isset($data["content"])) $document->content = $data['content'];
             if (isset($data["color"])) $document->color = $data['color'];
             if (isset($data["folder_id"])) $document->folder_id = $data['folder_id'];
+
+            // --- GESTION DU TYPE ET DE LA DEADLINE ---
+            if (isset($data['type'])) {
+                $document->type = $data['type'];
+
+                if ($document->type === "appelprojet") {
+                    // On met à jour la deadline si elle est fournie, sinon on garde l'existante ou null
+                    $document->deadline = $data['deadline'] ?? $document->deadline;
+
+                    // Sécurité : Si après traitement la deadline est absente, on rétrograde en document classique
+                    if (is_null($document->deadline)) {
+                        $document->type = "document";
+                    }
+                } else {
+                    // Si le type repasse en "document", on nettoie la deadline en BDD
+                    $document->deadline = null;
+                }
+            }
+            // Si le type n'est pas renvoyé mais qu'on modifie directement la deadline d'un appelprojet existant
+            elseif (array_key_exists('deadline', $data) && $document->type === "appelprojet") {
+                $document->deadline = $data['deadline'];
+                if (is_null($document->deadline)) {
+                    $document->type = "document";
+                }
+            }
 
             $document->save();
 

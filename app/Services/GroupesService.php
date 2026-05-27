@@ -122,7 +122,7 @@ readonly class GroupesService implements GroupesServiceInterface
     {
         try {
             $this->groupeRepository->removeUser($id, $user_id);
-            Log::info("Utilisateur retiré du groupe", ["dept_id" => $id, "user_id" => $user_id]);
+            Log::info("Utilisateur retiré du groupe", ["grp_id" => $id, "user_id" => $user_id]);
         } catch (PersistenceException | GroupeNotFoundException | UserNotFoundException $e) {
             Log::error("Erreur lors du retrait de l'utilisateur du groupe", [
                 "erreur" => $e->getMessage(),

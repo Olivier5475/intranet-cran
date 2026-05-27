@@ -34,6 +34,11 @@ const iconConfig = computed(() => {
             colorClass: "text-sky-500 dark:text-sky-400",
         };
 
+    if (props.child.type === "appelprojet")
+        return {
+            icon: SolidIcons.MegaphoneIcon,
+        };
+
     if (isImageFile(mime))
         return { icon: SolidIcons.PhotoIcon, colorClass: "text-pink-500" };
     if (isVideoFile(mime))

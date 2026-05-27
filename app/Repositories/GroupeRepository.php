@@ -131,7 +131,7 @@ class GroupeRepository implements GroupeRepositoryInterface
             $groupe->users()->detach($user_id);
         } catch (Throwable $t) {
             Log::error("Erreur SQL lors du détachement de l'utilisateur", [
-                'dept_id' => $id,
+                'grp_id' => $id,
                 'user_id' => $user_id,
                 'message' => $t->getMessage()
             ]);

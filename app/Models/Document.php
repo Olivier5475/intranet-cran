@@ -24,6 +24,12 @@ class Document extends Model {
         'folder_id',
         'groupes',
         'color',
+        'type',
+        'deadline',
+    ];
+
+    protected $casts = [
+        'deadline' => 'datetime'
     ];
 
     /**
@@ -127,7 +133,7 @@ class Document extends Model {
             'folder_id' => (int) $this->folder_id,
             'is_archived' => (int) $this->is_archived,
             // On peut même indexer le nom des groupes pour chercher par service !
-            'Groupes' => $this->groupes->pluck('name')->toArray(),
+            'groupes' => $this->groupes->pluck('name')->toArray(),
         ];
     }
 }

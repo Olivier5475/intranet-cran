@@ -9,4 +9,5 @@ export interface Child {
     groupes?: number[]; // groupes associés
     created_at: string; // date de creation de la ressource
     is_archived: boolean; // true si l'élément est archivé, false sinon
+    deadline?: string
 }

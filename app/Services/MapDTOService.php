@@ -30,7 +30,7 @@ readonly class MapDTOService implements MapDTOServiceInterface
         return new FolderDTO(
             id: $folder->id,
             name: $folder->name,
-            groupes: $this->getDeptIds($folder), // On passe l'objet entier ici
+            groupes: $this->getGrpsIds($folder), // On passe l'objet entier ici
             color: $folder->color,
             children: $children,
             created_at: $folder->created_at,
@@ -77,7 +77,7 @@ readonly class MapDTOService implements MapDTOServiceInterface
             storage_path: $file->storage_path,
             mimetype: $file->mimetype,
             is_archived: $file->is_archived ?? false,
-            groupes: $this->getDeptIds($file), // On passe l'objet entier
+            groupes: $this->getGrpsIds($file), // On passe l'objet entier
             folder_id: $file->folder_id,
         );
     }
@@ -99,17 +99,19 @@ readonly class MapDTOService implements MapDTOServiceInterface
             id: $document->id,
             name: $document->name,
             content: $cleanHtml,
-            groupes: $this->getDeptIds($document), // On passe l'objet entier
+            groupes: $this->getGrpsIds($document), // On passe l'objet entier
             attachments: $attachments,
             folder_id: $document->folder_id,
             created_at: $document->created_at,
             updated_at: $document->updated_at,
             color: $document->color,
             is_archived: $document->is_archived ?? false,
+            deadline: $document->deadline ?? null,
+            type: $document->type ?? "document",
         );
     }
 
-    // --- SECTION : ACTEURS (USERS & DEPT) ---
+    // --- SECTION : ACTEURS (USERS & GRP) ---
 
     /**
      * @inheritDoc
@@ -131,13 +133,11 @@ readonly class MapDTOService implements MapDTOServiceInterface
             email: $user->email,
             nom: $user->nom,
             prenom: $user->prenom,
-            groupes: $this->getDeptIds($user), // On passe l'objet entier
+            groupes: $this->getGrpsIds($user), // On passe l'objet entier
             role: $user->role,
             id: $user->id
         );
     }
-
-    // ... (mapToVersionDTO, mapToGroupeDTO, mapToAttachmentDTO etc. restent identiques)
 
     /**
      * @inheritDoc
@@ -176,7 +176,7 @@ readonly class MapDTOService implements MapDTOServiceInterface
             name: $groupe->name,
             initials: $groupe->initials,
             color: $groupe->color,
-            users: $this->getDeptUsers($groupe),
+            users: $this->getGrpUsers($groupe),
         );
     }
 
@@ -185,7 +185,7 @@ readonly class MapDTOService implements MapDTOServiceInterface
      */
     public function mapToGroupeDTOsCollection(Collection $groupes): Collection
     {
-        return $groupes->map(fn($dept) => $this->mapToGroupeDTO($dept));
+        return $groupes->map(fn($grp) => $this->mapToGroupeDTO($grp));
     }
 
     /**
@@ -201,7 +201,7 @@ readonly class MapDTOService implements MapDTOServiceInterface
     /**
      * Extrait les IDs de groupes sans déclencher de nouvelle requête SQL.
      */
-    private function getDeptIds(mixed $model): array
+    private function getGrpsIds(mixed $model): array
     {
         // Si c'est un modèle Eloquent (File, Document, Folder, User)
         if ($model instanceof \Illuminate\Database\Eloquent\Model) {
@@ -216,7 +216,7 @@ readonly class MapDTOService implements MapDTOServiceInterface
         return [];
     }
 
-    private function getDeptUsers(Groupe $groupe): ?Collection {
+    private function getGrpUsers(Groupe $groupe): ?Collection {
         if($groupe->relationLoaded('users')) {
             return $this->mapToAuthDTOsCollection($groupe->users);
         }

@@ -2,6 +2,7 @@
 import { ref, computed } from 'vue';
 import { Link } from '@inertiajs/vue3';
 import { ArrowDownTrayIcon } from "@heroicons/vue/24/solid";
+import { ClipboardDocumentIcon, ClipboardDocumentCheckIcon } from "@heroicons/vue/24/outline";
 import { decodeEntities } from "@/Composables/useDecodeModule";
 import { useResource } from "@/Composables/useResource";
 import ResourceIcon from "@/Components/Features/Navigation/Resource/ResourceIcon.vue";
@@ -41,6 +42,24 @@ const handleDragStart = (e: DragEvent) => {
 const handleDragEnd = (e: DragEvent) => {
     if (e.target instanceof HTMLElement) e.target.classList.remove('opacity-40');
 };
+
+const isCopied = ref(false);
+
+const copyToClipboard = async () => {
+    try {
+        // Utilisation de l'API native du navigateur
+        await navigator.clipboard.writeText(`${window.location.origin}${links.value.href}`);
+
+        // Petit feedback visuel de 2 secondes
+        isCopied.value = true;
+        setTimeout(() => {
+            isCopied.value = false;
+        }, 2000);
+    } catch (err) {
+        console.error('Erreur lors de la copie : ', err);
+    }
+};
+
 </script>
 
 <template>
@@ -76,6 +95,14 @@ const handleDragEnd = (e: DragEvent) => {
         <ResourceBadges v-if="child.groupes" :groupe-ids="child.groupes" mode="row" class="col-span-2" />
 
         <div class="col-start-12 flex justify-center">
+            <span class="p-1 hover:bg-gray-100 rounded-full" title="Copier le lien">
+            <component
+                :is="isCopied ? ClipboardDocumentCheckIcon : ClipboardDocumentIcon"
+                @click="copyToClipboard"
+                class="w-5 h-5"
+                :class="isCopied ? 'text-green-500' : 'text-gray-400 hover:text-sky-500'"
+            />
+            </span>
             <a v-if="child.type == 'file'" :href="links.download" class="p-1 hover:bg-gray-100 rounded-full" title="Télécharger">
                 <ArrowDownTrayIcon class="w-5 h-5 text-gray-400"/>
             </a>

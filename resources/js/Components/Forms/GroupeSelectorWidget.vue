@@ -8,7 +8,7 @@ const props = defineProps<{
 }>();
 
 // Le v-model automatique lié au tableau form.groupes du parent
-const selectedDeps = defineModel<number[]>({ default: [] });
+const selectedGrp = defineModel<number[]>({ default: [] });
 
 const page = usePage();
 const user = page.props.auth.user;
@@ -17,20 +17,20 @@ const allGroupesIds = props.allGroupes.map((d) => d.id);
 
 // Empêcher de se désélectionner de son propre service s'il n'en reste qu'un
 const isCheckboxDisabled = (groupeId: number) => {
-    let mySelectedDeps;
+    let mySelectedGrp;
     if (user.role == "admin") {
         if (!allGroupesIds.includes(groupeId)) return false;
-        mySelectedDeps = selectedDeps.value.filter((id) =>
+        mySelectedGrp = selectedGrp.value.filter((id) =>
             allGroupesIds.includes(id),
         );
     } else {
         if (!userGroupeIds.includes(groupeId)) return false;
-        mySelectedDeps = selectedDeps.value.filter((id) =>
+        mySelectedGrp = selectedGrp.value.filter((id) =>
             userGroupeIds.includes(id),
         );
     }
     return (
-        selectedDeps.value.includes(groupeId) && mySelectedDeps.length <= 1
+        selectedGrp.value.includes(groupeId) && mySelectedGrp.length <= 1
     );
 };
 </script>
@@ -45,47 +45,47 @@ const isCheckboxDisabled = (groupeId: number) => {
 
         <div class="sm:grid-cols-2 lg:grid-cols-3 gap-3 grid grid-cols-1">
             <label
-                v-for="dep in allGroupes"
-                :key="dep.id"
+                v-for="grp in allGroupes"
+                :key="grp.id"
                 :class="[
                     'p-4 rounded-2xl group relative flex cursor-pointer items-center border-2 transition-all',
-                    selectedDeps.includes(dep.id)
+                    selectedGrp.includes(grp.id)
                         ? 'border-sky-500 bg-sky-500/5'
                         : 'border-gray-100 dark:border-zinc-800 hover:border-gray-200 dark:hover:border-zinc-700',
-                    isCheckboxDisabled(dep.id)
+                    isCheckboxDisabled(grp.id)
                         ? 'cursor-not-allowed opacity-40'
                         : '',
                 ]"
             >
                 <input
                     type="checkbox"
-                    :value="dep.id"
-                    v-model="selectedDeps"
-                    :disabled="isCheckboxDisabled(dep.id)"
+                    :value="grp.id"
+                    v-model="selectedGrp"
+                    :disabled="isCheckboxDisabled(grp.id)"
                     class="sr-only"
                 />
                 <span
                     :class="[
                         'w-5 h-5 rounded-lg mr-3 flex items-center justify-center border transition-colors',
-                        selectedDeps.includes(dep.id)
+                        selectedGrp.includes(grp.id)
                             ? 'bg-sky-500 border-sky-500'
                             : 'border-gray-300 dark:border-zinc-600',
                     ]"
                 >
                     <CheckIcon
-                        v-if="selectedDeps.includes(dep.id)"
+                        v-if="selectedGrp.includes(grp.id)"
                         class="w-3.5 h-3.5 text-white stroke-[3]"
                     />
                 </span>
                 <span
                     class="text-sm font-bold tracking-tight"
                     :class="
-                        selectedDeps.includes(dep.id)
+                        selectedGrp.includes(grp.id)
                             ? 'text-sky-700 dark:text-sky-400'
                             : 'text-gray-500 dark:text-zinc-400'
                     "
                 >
-                    {{ dep.name }}
+                    {{ grp.name }}
                 </span>
             </label>
         </div>

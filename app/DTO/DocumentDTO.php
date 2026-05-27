@@ -21,6 +21,7 @@ readonly class DocumentDTO {
         public string  $updated_at,
         public ?string $color,
         public ?bool   $is_archived = null,
+        public ?\Datetime $deadline = null,
 
         // Renvoie automatiquement le type en string,
         // pour savoir qu'il s'agit d'un document dans la vue

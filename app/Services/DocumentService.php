@@ -64,8 +64,8 @@ readonly class DocumentService implements DocumentsServiceInterface
             return true;
         }
 
-        $docDeptIds = $this->groupesService->groupesIDs($document->groupes);
-        return (bool) array_intersect($user->groupes, $docDeptIds);
+        $docGrpIds = $this->groupesService->groupesIDs($document->groupes);
+        return (bool) array_intersect($user->groupes, $docGrpIds);
     }
 
     /**

@@ -47,8 +47,8 @@ const submit = () => {
 
 onMounted(() => {
     if (!props.folder) {
-        const allAvailableDeps = props.groupes?.map((d) => d.id) ?? [];
-        form.groupes = allAvailableDeps.filter((id) =>
+        const allAvailableGrp = props.groupes?.map((d) => d.id) ?? [];
+        form.groupes = allAvailableGrp.filter((id) =>
             userGroupesIds.includes(id),
         );
     }

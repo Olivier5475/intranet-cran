@@ -56,6 +56,29 @@ export function useResource(child: Child|Document|FileEntry|Folder) {
 
     // Gestion de la couleur
     const itemColor = computed(() => {
+        if (child.type === 'appelprojet' && (child as Child|Document).deadline) {
+            const now = new Date();
+            const deadline = new Date((child as Child|Document).deadline ?? "");
+
+            // Calcul de la différence en millisecondes, puis conversion en jours
+            const diffInMs = deadline.getTime() - now.getTime();
+            const diffInDays = diffInMs / (1000 * 60 * 60 * 24);
+
+            if (diffInDays < 0) {
+                return '#ef4444'; // Dépassé -> Rouge (ou une autre couleur pour les archives)
+            }
+            if (diffInDays <= 2) {
+                return '#ef4444'; // Moins de 2 jours -> Rouge
+            }
+            if (diffInDays <= 7) {
+                return '#f97316'; // Moins d'une semaine -> Orange
+            }
+            if (diffInDays <= 14) {
+                return '#eab308'; // Moins de 2 semaines -> Jaune
+            }
+            return '#22c55e'; // Plus de 2 semaines -> Vert
+        }
+
         // Si ce n'ai pas un fichier
         if (child.type != "file") {
             // On retourne Color en disant
