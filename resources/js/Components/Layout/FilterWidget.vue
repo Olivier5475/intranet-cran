@@ -62,7 +62,7 @@ const onAfterLeave = () => {
 </script>
 
 <template>
-    <section class="bg-white shadow-xl rounded-2xl border-gray-100 dark:border-slate-800 dark:bg-slate-900 overflow-hidden border transition-all duration-300">
+    <section class="bg-white shadow-xl rounded-2xl border-gray-100 dark:border-slate-800 dark:bg-slate-900 overflow-hidden border transition-all duration-600">
         <div
             @click="toggle"
             class="h-14 font-bold text-gray-700 dark:text-zinc-300 p-4 bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-800 border-gray-100 dark:border-slate-800 flex cursor-pointer items-center justify-between border-b transition-colors"
@@ -71,7 +71,7 @@ const onAfterLeave = () => {
                 <AdjustmentsHorizontalIcon class="h-5 w-5 text-sky-500" />
                 <span class="text-sm tracking-wider uppercase">Filtres</span>
             </div>
-            <div :class="['transition-transform duration-300', isExpanded ? 'rotate-180' : '']">
+            <div :class="['transition-transform duration-600', isExpanded ? 'rotate-180' : '']">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                 </svg>
@@ -79,15 +79,15 @@ const onAfterLeave = () => {
         </div>
 
         <Transition
-            enter-active-class="transition-all duration-300 ease-out"
+            enter-active-class="transition-all duration-600 ease-out"
             enter-from-class="max-h-0 opacity-0 transform -translate-y-2"
             enter-to-class="max-h-[1500px] opacity-100 transform translate-y-0"
-            leave-active-class="transition-all duration-200 ease-in"
+            leave-active-class="transition-all duration-600 ease-in"
             leave-from-class="max-h-[1500px] opacity-100 transform translate-y-0"
             leave-to-class="max-h-0 opacity-0 transform -translate-y-2"
             @after-leave="onAfterLeave"
         >
-            <form v-if="isExpanded" class="p-5 dark:bg-sky-900/5 overflow-hidden flex flex-col gap-8 transition-all duration-300">
+            <form v-if="isExpanded" class="p-5 dark:bg-sky-900/5 overflow-hidden flex flex-col gap-8 transition-all duration-600">
 
                 <div class="space-y-3">
                     <label class="font-black text-gray-400 dark:text-zinc-500 mb-3 ml-1 block text-[10px] tracking-[0.2em] uppercase">Groupes</label>
