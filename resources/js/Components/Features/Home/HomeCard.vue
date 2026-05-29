@@ -80,7 +80,12 @@ const copyToClipboard = async () => {
         <div class="w-full h-full overflow-hidden rounded-2xl relative">
             <component v-if="!activeRename" :is="child.type !== 'file' ? Link : 'a'" :href="links.href" :target="child.type == 'file' ? '_blank' : ''" class="flex flex-col items-center">
                 <div class="w-32 h-32 -right-12 relative transition-transform duration-200 group-hover:scale-110">
-                    <ResourceIcon :child="child" :color="itemColor" class="h-full w-full" />
+                    <ResourceIcon
+                        :child="child"
+                        :color="itemColor"
+                        :solid="true"
+                        class="h-full w-full"
+                    />
                 </div>
                 <span class="text-xs font-black line-clamp-2 mb-2 text-center break-all">
                     {{ decodeEntities(child.name) }}

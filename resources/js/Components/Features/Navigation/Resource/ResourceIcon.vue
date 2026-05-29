@@ -14,60 +14,69 @@ import {
 
 // 3. Librairies tierces (Icônes)
 import * as SolidIcons from "@heroicons/vue/24/solid";
-import { DocumentTextIcon } from '@heroicons/vue/24/outline';
+import * as OutlineIcons from "@heroicons/vue/24/outline";
 
 const props = defineProps<{
     child: { id: number; type: string; mimetype?: string; name?: string };
     color?: string;
+    solid?: boolean
 }>();
-
 const iconConfig = computed(() => {
     const mime = props.child.mimetype || "";
     if (props.child.type === "folder")
         return {
-            icon: SolidIcons.FolderIcon,
+            icon: props.solid ? SolidIcons.FolderIcon : OutlineIcons.FolderIcon,
             colorClass: "text-amber-400 dark:text-amber-500",
         };
     if (props.child.type === "document")
         return {
-            icon: SolidIcons.DocumentIcon,
+            icon: props.solid ? SolidIcons.DocumentIcon : OutlineIcons.DocumentIcon,
             colorClass: "text-sky-500 dark:text-sky-400",
         };
 
     if (props.child.type === "appelprojet")
         return {
-            icon: SolidIcons.MegaphoneIcon,
+            icon: props.solid ? SolidIcons.MegaphoneIcon : OutlineIcons.MegaphoneIcon,
         };
 
     if (isImageFile(mime))
-        return { icon: SolidIcons.PhotoIcon, colorClass: "text-pink-500" };
+        return {
+            icon: props.solid ? SolidIcons.PhotoIcon : OutlineIcons.PhotoIcon,
+            colorClass: "text-pink-500"
+    };
     if (isVideoFile(mime))
-        return { icon: SolidIcons.FilmIcon, colorClass: "text-purple-500" };
+        return {
+            icon: props.solid ? SolidIcons.FilmIcon : OutlineIcons.FilmIcon,
+            colorClass: "text-purple-500"
+    };
     if (isGifFile(mime))
-        return { icon: SolidIcons.GifIcon, colorClass: "text-indigo-500" };
+        return {
+            icon: props.solid ? SolidIcons.GifIcon : OutlineIcons.GifIcon,
+            colorClass: "text-indigo-500"
+    };
     if (isPresentationFile(mime))
         return {
-            icon: SolidIcons.PresentationChartLineIcon,
+            icon: props.solid ? SolidIcons.PresentationChartLineIcon : OutlineIcons.PresentationChartLineIcon,
             colorClass: "text-orange-500",
         };
     if (isDocFile(mime))
         return {
-            icon: SolidIcons.DocumentTextIcon,
+            icon: props.solid ? SolidIcons.DocumentTextIcon : OutlineIcons.DocumentTextIcon,
             colorClass: "text-blue-600",
         };
     if (mime.includes("pdf"))
         return {
-            icon: SolidIcons.DocumentTextIcon,
+            icon: props.solid ? SolidIcons.DocumentTextIcon : OutlineIcons.DocumentTextIcon,
             colorClass: "text-red-600",
         };
     if (isTabFile(mime))
         return {
-            icon: SolidIcons.TableCellsIcon,
+            icon: props.solid ? SolidIcons.TableCellsIcon : OutlineIcons.TableCellsIcon,
             colorClass: "text-emerald-600",
         };
     if (isTextFile(mime))
         return {
-            icon: DocumentTextIcon,
+            icon: props.solid ? SolidIcons.DocumentTextIcon : OutlineIcons.DocumentTextIcon,
             colorClass: "text-black dark:text-white",
         };
     return { icon: SolidIcons.PaperClipIcon, colorClass: "text-slate-400" };

@@ -5,7 +5,13 @@ import editor from '@/routes/editor';
 import admin from '@/routes/admin';
 import navigate from '@/routes/navigate';
 
-import { isGifFile, isImageFile } from '@/Composables/useDocumentsTypeRegex';
+import {
+    isDocFile,
+    isGifFile,
+    isImageFile,
+    isPresentationFile, isTabFile, isTextFile,
+    isVideoFile
+} from '@/Composables/useDocumentsTypeRegex';
 import { useCanEdit } from '@/Composables/useCanEdit';
 
 import { Child } from '@/types/child';
@@ -56,37 +62,47 @@ export function useResource(child: Child|Document|FileEntry|Folder) {
 
     // Gestion de la couleur
     const itemColor = computed(() => {
-        if (child.type === 'appelprojet' && (child as Child|Document).deadline) {
-            const now = new Date();
-            const deadline = new Date((child as Child|Document).deadline ?? "");
+        // 1. Logique pour les Appels à Projet (Prioritaire)
+        if (child.type === 'appelprojet') {
+            const projectChild = child as { deadline?: string };
+            if (projectChild.deadline) {
+                const now = new Date();
+                const deadline = new Date(projectChild.deadline);
 
-            // Calcul de la différence en millisecondes, puis conversion en jours
-            const diffInMs = deadline.getTime() - now.getTime();
-            const diffInDays = diffInMs / (1000 * 60 * 60 * 24);
+                const diffInMs = deadline.getTime() - now.getTime();
+                const diffInDays = diffInMs / (1000 * 60 * 60 * 24);
 
-            if (diffInDays < 0) {
-                return '#ef4444'; // Dépassé -> Rouge (ou une autre couleur pour les archives)
+                if (diffInDays <= 2) {
+                    return '#ef4444'; // text-red-500
+                }
+                if (diffInDays <= 7) {
+                    return '#f97316'; // text-orange-500
+                }
+                if (diffInDays <= 14) {
+                    return '#eab308'; // text-yellow-500
+                }
+                return '#22c55e'; // text-green-500
             }
-            if (diffInDays <= 2) {
-                return '#ef4444'; // Moins de 2 jours -> Rouge
-            }
-            if (diffInDays <= 7) {
-                return '#f97316'; // Moins d'une semaine -> Orange
-            }
-            if (diffInDays <= 14) {
-                return '#eab308'; // Moins de 2 semaines -> Jaune
-            }
-            return '#22c55e'; // Plus de 2 semaines -> Vert
         }
 
-        // Si ce n'ai pas un fichier
-        if (child.type != "file") {
-            // On retourne Color en disant
-            // "c'est l'un de ces trois types-là donc tu peux récupérer 'color'".
-            return (child as Child|Document|Folder).color;
+        // 2. Logique pour les Fichiers (Détection par Mimetype)
+        if (child.type === "file") {
+            const mime = (child as FileEntry|Child).mimetype || "";
+
+            if (isImageFile(mime)) return '#ec4899';       // text-pink-500
+            if (isVideoFile(mime)) return '#a855f7';       // text-purple-500
+            if (isGifFile(mime)) return '#6366f1';         // text-indigo-500
+            if (isPresentationFile(mime)) return '#f97316';// text-orange-500
+            if (isDocFile(mime)) return '#2563eb';         // text-blue-600
+            if (mime.includes("pdf")) return '#dc2626';    // text-red-600
+            if (isTabFile(mime)) return '#059669';         // text-emerald-600
+            if (isTextFile(mime)) return '#000000';        // text-black
+
+            return '#94a3b8'; // text-slate-400 (par défaut pour PaperClipIcon)
         }
-        // Sinon 'itemColor' est null si c'est un fichier
-        return undefined
+
+        // 3. Logique pour les Dossiers et Documents (Couleur personnalisée de la BDD)
+        return (child as Child|Document|Folder).color;
     });
 
     // Gestion des permissions

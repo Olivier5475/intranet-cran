@@ -212,4 +212,82 @@ readonly class AuthService implements UserServiceInterface
         $emails = array_map('strtolower', array_column($tab_listeindividu, 'email'));
         return in_array(strtolower($email), $emails, true);
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function addFavorites(int $ressource_id, string $ressource_type): void
+    {
+        try {
+            $this->userRepository->addFavorites($ressource_id, $ressource_type);
+            Log::info("Ressource ajoutée aux favoris", [
+                'user_id' => $this->getCurrentUserId(),
+                'ressource_id' => $ressource_id,
+                'ressource_type' => $ressource_type
+            ]);
+        } catch (Throwable $e) {
+            Log::error("Erreur lors de l'ajout aux favoris dans AuthService", [
+                'message' => $e->getMessage()
+            ]);
+            throw $e;
+        }
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function removeFavorites(string $ressource_type, int $ressource_id): void
+    {
+
+        try {
+            $this->userRepository->removeFavorites($ressource_type,$ressource_id);
+            Log::info("Favori supprimé avec succès", [
+                'user_id' => $this->getCurrentUserId(),
+                'ressource_id' => $ressource_id,
+                'ressource_type' => $ressource_type,
+            ]);
+        } catch (Throwable $e) {
+            Log::error("Erreur lors de la suppression du favori dans AuthService", [
+                'ressource_id' => $ressource_id,
+                'ressource_type' => $ressource_type,
+                'message' => $e->getMessage()
+            ]);
+            throw $e;
+        }
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getFavorites(): Collection
+    {
+        try {
+            // 1. Récupération des favoris bruts (modèles UserFavori avec la relation 'ressource' préchargée)
+            $favoris = $this->userRepository->getFavorites();
+
+            // 2. Mapping dynamique vers le bon DTO selon l'instance de la ressource polymorphique
+            return $favoris->map(function ($favori) {
+                $ressource = $favori->ressource;
+
+                if (!$ressource) {
+                    return null;
+                }
+
+                // Détection du type de modèle et appel de la méthode de DTO correspondante
+                return match (true) {
+                    $ressource instanceof \App\Models\Folder   => $this->mapDTOService->mapToFolderDTO($ressource),
+                    $ressource instanceof \App\Models\File     => $this->mapDTOService->mapToFileDTO($ressource),
+                    $ressource instanceof \App\Models\Document => $this->mapDTOService->mapToDocumentDTO($ressource),
+                    default => null,
+                };
+            })->filter()->values(); // Nettoie les éventuels nulls et réindexe proprement la collection
+
+        } catch (Throwable $e) {
+            Log::error("Erreur lors de la récupération ou du mapping des favoris", [
+                'user_id' => $this->getCurrentUserId(),
+                'message' => $e->getMessage()
+            ]);
+            throw $e;
+        }
+    }
 }

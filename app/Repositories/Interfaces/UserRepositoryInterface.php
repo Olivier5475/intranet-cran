@@ -4,7 +4,10 @@ namespace App\Repositories\Interfaces;
 
 use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
-use App\Exception\{PersistenceException, UserNotFoundException};
+use App\Exception\{FavoriNotFoundException, PersistenceException, UserNotFoundException};
+use Symfony\Component\HttpFoundation\Exception\BadRequestException;
+use Symfony\Component\HttpFoundation\File\Exception\AccessDeniedException;
+use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 
 interface UserRepositoryInterface
 {
@@ -70,4 +73,36 @@ interface UserRepositoryInterface
      * @throws PersistenceException
      */
     public function delete(int $id): void;
+
+    /**
+     * Ajoute une ressource aux favoris de l'utilisateur connecté.
+     *
+     * @param int $ressource_id L'identifiant unique de la ressource à mettre en favori.
+     * @param string $ressource_type Le type de la ressource (ex: 'document', 'folder', 'file').
+     * @return void
+     * * @throws UserNotFoundException Si l'utilisateur n'est pas authentifié.
+     * @throws BadRequestException Si le type de ressource n'est pas reconnu.
+     * @throws ResourceNotFoundException Si la ressource ciblée n'existe pas en base de données.
+     */
+    public function addFavorites(int $ressource_id, string $ressource_type): void;
+
+    /**
+     * Supprime un favori spécifique appartenant à l'utilisateur connecté.
+     *
+     * @param string $ressource_type
+     * @param int $ressource_id
+     * @return void
+     * * @throws FavoriNotFoundException Si le favori n'existe pas ou a déjà été supprimé.
+     * @throws FavoriNotFoundException Si le favori n'existe pas ou a déjà été supprimé.
+     * @throws AccessDeniedException Si l'utilisateur tente de supprimer le favori d'un autre.
+     */
+    public function removeFavorites(string $ressource_type, int $ressource_id): void;
+
+    /**
+     * Récupère la liste de tous les favoris de l'utilisateur connecté.
+     * Les données retournées incluent les relations (Eager Loading) vers les ressources associées.
+     *
+     * @return Collection Une collection d'objets favoris.
+     */
+    public function getFavorites(): Collection;
 }

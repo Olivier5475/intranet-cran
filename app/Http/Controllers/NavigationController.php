@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Services\Interfaces\FoldersServiceInterface;
+use App\Services\Interfaces\UserServiceInterface;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Throwable;
@@ -12,6 +13,7 @@ class NavigationController extends Controller
 {
     public function __construct(
         private readonly FoldersServiceInterface $foldersService,
+        private readonly UserServiceInterface $userService,
     ) {}
 
     public function __invoke(int $folder_id, Request $request)
@@ -34,6 +36,7 @@ class NavigationController extends Controller
                 "children" => $navData['items'],
                 "currentSearch" => $searchQuery,
                 "isArchived" => $isArchived,
+                'favorites' => $this->userService->getFavorites(),
             ]);
 
         } catch (Throwable $t) {

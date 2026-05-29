@@ -30,6 +30,7 @@ const props = defineProps<{
     parents: Folder[];
     currentSearch?: string;
     isArchived: boolean;
+    favorites: Child[]
 }>();
 
 // INITIALISATION DES VARIABLES
@@ -126,6 +127,7 @@ useShortcuts({
             :key="child.name"
             :child="child"
             :folder_id="folder_id"
+            :favorites="favorites"
         />
         <CreateFolderCardWidget
             v-if="fastFolderCreation && canEdit"

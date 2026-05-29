@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use App\Services\Interfaces\GroupesServiceInterface;
 use App\Services\Interfaces\DocumentsServiceInterface;
 use App\Services\Interfaces\FoldersServiceInterface;
+use App\Services\Interfaces\UserServiceInterface;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
@@ -15,6 +16,7 @@ class HandleInertiaRequests extends Middleware {
         private readonly FoldersServiceInterface   $foldersService,
         private readonly GroupesServiceInterface   $groupesService,
         private readonly DocumentsServiceInterface $documentsService,
+        private readonly UserServiceInterface      $userService
     ) {}
 
     /**

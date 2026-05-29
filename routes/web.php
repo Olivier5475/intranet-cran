@@ -18,6 +18,11 @@ Route::prefix('/navigation')->group(function () {
     Route::get("/d/{document_id}", Controllers\DocumentViewController::class)->name('navigate.document');
 });
 
+Route::prefix('/favorites')->group(function () {
+    Route::post("/{resource_type}/{resource_id}", [Controllers\FavoritesController::class, "addFavorite"])->name('favorites.add');
+    Route::delete("/{resource_type}/{resource_id}", [Controllers\FavoritesController::class, "removeFavorite"])->name('favorites.delete');
+});
+
 Route::get('/logout', [Controllers\AuthController::class, 'logout'])->name('logout');
 
 Route::prefix("editor")

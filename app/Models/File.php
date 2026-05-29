@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Laravel\Scout\Searchable;
@@ -45,6 +46,12 @@ class File extends Model
 
     public function groupes(): BelongsToMany {
         return $this->belongsToMany(Groupe::class);
+    }
+
+    public function favoris(): MorphMany
+    {
+        // Laravel va automatiquement chercher 'ressource_type' et 'ressource_id'
+        return $this->morphMany(UserFavori::class, 'ressource');
     }
 
     public function archivePhysicalFile($version)

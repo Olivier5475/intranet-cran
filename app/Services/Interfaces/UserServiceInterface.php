@@ -3,11 +3,16 @@
 namespace App\Services\Interfaces;
 
 use App\DTO\AuthDTO;
+use App\DTO\DocumentDTO;
+use App\DTO\FileDTO;
+use App\DTO\FolderDTO;
+use App\Exception\FavoriNotFoundException;
 use App\Exception\PersistenceException;
 use App\Exception\UserNotFoundException;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Collection;
 use Illuminate\Validation\UnauthorizedException;
+use Symfony\Component\Finder\Exception\AccessDeniedException;
 use Throwable;
 
 interface UserServiceInterface
@@ -115,4 +120,37 @@ interface UserServiceInterface
      * @return bool True si l'email est présent dans la liste.
      */
     public function emailExistIn12Plus(string $email): bool;
+
+    /**
+     *  Fonction pour lancer l'ajout d'un favori à l'utilisateur courant
+     *
+     * @param int $ressource_id
+     * @param string $ressource_type
+     * @return void
+     * * @throws
+     */
+    public function addFavorites(int $ressource_id, string $ressource_type): void;
+
+    /**
+     *  Fonction pour lancer la suppression d'un favori
+     *
+     * @param string $ressource_type
+     * @param int $ressource_id
+     * @return void
+     * * @throws FavoriNotFoundException|AccessDeniedException
+     * @throws FavoriNotFoundException
+     * @throws AccessDeniedException
+     */
+    public function removeFavorites(string $ressource_type, int $ressource_id): void;
+
+    /**
+     * Récupère les favoris de l'utilisateur connecté et les transforme en DTOs.
+     * * Cette méthode récupère les modèles polymorphiques préchargés depuis le repository,
+     * puis utilise le MapDTOService pour retourner des objets propres au front-end
+     * (Dossiers, Fichiers, ou Documents). Les ressources orphelines sont ignorées.
+     *
+     * @return Collection<int, FolderDTO|FileDTO|DocumentDTO>
+     * @throws Throwable En cas d'erreur lors de la récupération en base ou du mapping des DTOs.
+     */
+    public function getFavorites(): Collection;
 }

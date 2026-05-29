@@ -2,11 +2,15 @@
 
 namespace App\Repositories;
 
-use App\Exception\{PersistenceException, UserNotFoundException};
+use App\Models\UserFavori;
+use App\Exception\{PersistenceException, UserNotFoundException, FavoriNotFoundException};
 use App\Models\User;
 use App\Repositories\Interfaces\UserRepositoryInterface;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Log;
+use Symfony\Component\Finder\Exception\AccessDeniedException;
+use Symfony\Component\HttpFoundation\Exception\BadRequestException;
+use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Throwable;
 
 class UserRepository implements UserRepositoryInterface
@@ -140,5 +144,61 @@ class UserRepository implements UserRepositoryInterface
             ]);
             throw new PersistenceException("Erreur technique lors de la suppression.");
         }
+    }
+
+    public function addFavorites(int $ressource_id, string $ressource_type): void
+    {
+        // 1. Vérification propre de l'utilisateur
+        $userId = auth()->id();
+        if (!$userId) {
+            throw new UserNotFoundException("Utilisateur introuvable.");
+        }
+
+        // 2. Déduction du modèle
+        $modelClass = match ($ressource_type) {
+            'document' => \App\Models\Document::class,
+            'folder'   => \App\Models\Folder::class,
+            'file'     => \App\Models\File::class,
+            default    => throw new BadRequestException("Type de ressource invalide.", 400),
+        };
+
+        // 3. Vérification de l'existence de la ressource
+        if (!$modelClass::where('id', $ressource_id)->exists()) {
+            throw new ResourceNotFoundException("Cette ressource n'existe plus.", 404);
+        }
+
+        // 4. firstOrCreate pour éviter le crash SQL si le favori existe déjà
+        UserFavori::firstOrCreate([
+            'user_id'        => $userId,
+            'ressource_id'   => $ressource_id,
+            'ressource_type' => $modelClass,
+        ]);
+    }
+
+    public function removeFavorites(string $ressource_type, int $ressource_id): void
+    {
+        $modelClass = match ($ressource_type) {
+            'document' => \App\Models\Document::class,
+            'folder'   => \App\Models\Folder::class,
+            'file'     => \App\Models\File::class,
+            default    => throw new BadRequestException("Type de ressource invalide.", 400),
+        };
+
+        $favorite = UserFavori::where("ressource_id", $ressource_id)
+            ->where("ressource_type", $modelClass)
+            ->where("user_id", auth()->id())
+            ->first();
+        if (!$favorite) {
+            throw new FavoriNotFoundException("Ce favori n'existe pas ou a déjà été supprimé.", 404);
+        }
+        $favorite->delete();
+    }
+
+    public function getFavorites(): Collection
+    {
+        return UserFavori::where('user_id', auth()->id())
+            ->with('ressource') // Magie : charge les Documents, Folders ou Files associés d'un coup !
+            ->latest() // Optionnel : trie par les ajouts les plus récents en premier
+            ->get();
     }
 }
