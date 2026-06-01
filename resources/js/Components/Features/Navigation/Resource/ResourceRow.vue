@@ -74,7 +74,12 @@ const copyToClipboard = async () => {
         <component v-if="!activeRename" :is="child.type !== 'file' ? Link : 'a'" :href="links.href" :target="child.type == 'file' ? '_blank' : ''"
                    class="space-x-3 col-span-6 flex items-center overflow-hidden" @mouseenter="handleMouseEnter" @mouseleave="showImage = false">
             <div class="w-9 h-9 flex-shrink-0">
-                <ResourceIcon :child="child" :color="itemColor" class="h-full w-full transform transition-transform group-hover:scale-110" />
+                <ResourceIcon
+                    :child="child"
+                    :color="itemColor"
+                    :solid="true"
+                    class="h-full w-full transform transition-transform group-hover:scale-110"
+                />
             </div>
             <p class="text-sm font-medium text-gray-700 dark:text-zinc-200 truncate">{{ decodeEntities(child.name) }}</p>
         </component>

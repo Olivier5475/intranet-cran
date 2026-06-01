@@ -108,7 +108,7 @@ const isFavorite = computed(() => {
             <ResourceRenameForm v-model="child.name" :route-url="updateRoute" @success="activeRename = false" />
         </div>
 
-        <div class="flex flex-col items-center space-y-2 z-30 ml-auto">
+        <div class="flex flex-col items-center space-y-2 z-30">
 
             <Link
                 :href="isFavorite ? favorite_route.delete.url([child.type, child.id]) : favorite_route.add.url([child.type, child.id])"
@@ -152,7 +152,6 @@ const isFavorite = computed(() => {
             >
                 <ArrowDownTrayIcon class="w-4 h-4 text-gray-400 hover:text-sky-500"/>
             </a>
-
         </div>
     </div>
 </template>
