@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref, computed, unref } from "vue";
 import { Link } from '@inertiajs/vue3';
-import { ArrowDownTrayIcon } from '@heroicons/vue/24/solid';
-import { ClipboardDocumentIcon, ClipboardDocumentCheckIcon } from "@heroicons/vue/24/outline";
+import { ArrowDownTrayIcon, StarIcon as SolidStar } from '@heroicons/vue/24/solid';
+import { ClipboardDocumentIcon, ClipboardDocumentCheckIcon, StarIcon as OutlineStar } from "@heroicons/vue/24/outline";
 import { decodeEntities } from "@/Composables/useDecodeModule";
 import { useResource } from "@/Composables/useResource";
 import ResourceIcon from "@/Components/Features/Navigation/Resource/ResourceIcon.vue";
@@ -12,14 +12,19 @@ import { Child } from "@/types/child";
 import folder_route from '@/routes/editor/folder';
 import document_route from '@/routes/editor/document';
 import file_route from '@/routes/editor/file';
+import favorite_route from '@/routes/favorites';
 import ResourceBadges from '@/Components/Features/Navigation/Resource/ResourceBadges.vue';
 import HomeEditorActionsWidget from '@/Components/Features/Home/HomeEditorActionsWidget.vue';
 
-const props = defineProps<{ child: Child; folder_id: number; }>();
+const props = defineProps<{
+    child: Child;
+    folder_id: number;
+    favorites: Child[]; // Ajout de la prop favorites
+}>();
+
 const { links, itemColor, canEdit } = useResource(props.child);
 
 // --- COULEUR DYNAMIQUE SÉCURISÉE ---
-// Si itemColor n'existe pas (ex: un fichier simple sans couleur), on met un gris par défaut (slate-600)
 const baseColor = computed(() => unref(itemColor) || '#475569');
 
 const showImage = ref(false);
@@ -63,13 +68,22 @@ const copyToClipboard = async () => {
         console.error('Erreur lors de la copie : ', err);
     }
 };
+
+// --- LOGIQUE DES FAVORIS ---
+const isFavorite = computed(() => {
+    if (!Array.isArray(props.favorites)) {
+        return false;
+    }
+    return props.favorites.some((f: any) => f.id === props.child.id && f.type === props.child.type);
+});
 </script>
 
 <template>
     <FilePreviewWidget :was-shown="wasShown" :show-image="showImage" :child="child" />
 
     <div
-        class="resource-card group hover:border-sky-200 rounded-2xl relative transition-all duration-200 border border-transparent cursor-grab active:cursor-grabbing"
+        class="resource-card group hover:border-sky-200 rounded-2xl relative transition-all
+        duration-200 border border-transparent cursor-grab active:cursor-grabbing max-h-[10.2rem]"
         draggable="true"
         @dragstart="handleDragStart"
         @dragend="handleDragEnd"
@@ -102,24 +116,22 @@ const copyToClipboard = async () => {
             </div>
         </div>
 
-        <div class="absolute left-1 top-8 flex flex-col items-start space-y-1 z-30">
-            <div class="flex items-center space-x-1">
-                <a v-if="child.type == 'file'" :href="links.download" class="p-1 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-full transition-colors" title="Télécharger">
-                    <ArrowDownTrayIcon class="w-4 h-4 text-gray-400 hover:text-sky-500"/>
-                </a>
+        <div class="absolute left-1 top-8 flex flex-col items-center z-30">
 
-                <button
-                    @click.stop="copyToClipboard"
-                    class="p-1 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-full transition-colors"
-                    :title="isCopied ? 'Lien copié !' : 'Copier le lien'"
-                >
-                    <component
-                        :is="isCopied ? ClipboardDocumentCheckIcon : ClipboardDocumentIcon"
-                        class="w-4 h-4"
-                        :class="isCopied ? 'text-green-500' : 'text-gray-400 hover:text-sky-500'"
-                    />
-                </button>
-            </div>
+            <Link
+                :href="isFavorite ? favorite_route.delete.url([child.type, child.id]) : favorite_route.add.url([child.type, child.id])"
+                :method="isFavorite ? 'delete' : 'post'"
+                as="button"
+                type="button"
+                preserve-scroll
+                :only="['favorites']"
+                class="p-1 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-full transition-colors"
+            >
+                <component
+                    :is="isFavorite ? SolidStar : OutlineStar"
+                    class="w-4 h-4 text-yellow-400"
+                />
+            </Link>
 
             <HomeEditorActionsWidget
                 v-if="canEdit"
@@ -127,16 +139,30 @@ const copyToClipboard = async () => {
                 :is_archived="child.is_archived"
                 @active-rename="activeRename = $event"
             />
+
+            <button
+                @click.stop="copyToClipboard"
+                class="p-1 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-full transition-colors"
+                :title="isCopied ? 'Lien copié !' : 'Copier le lien'"
+            >
+                <component
+                    :is="isCopied ? ClipboardDocumentCheckIcon : ClipboardDocumentIcon"
+                    class="w-4 h-4"
+                    :class="isCopied ? 'text-green-500' : 'text-gray-400 hover:text-sky-500'"
+                />
+            </button>
+
+            <a v-if="child.type == 'file'" :href="links.download" class="p-1 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-full transition-colors" title="Télécharger">
+                <ArrowDownTrayIcon class="w-4 h-4 text-gray-400 hover:text-sky-500"/>
+            </a>
+
         </div>
     </div>
 </template>
 
 <style scoped>
 .resource-card {
-    /* Fond très sombre : on mixe 30% de la couleur d'origine avec 70% de noir */
     background-color: color-mix(in srgb, v-bind(baseColor) 50%, black);
-
-    /* Texte plus clair : on mixe 60% de la couleur d'origine avec 40% de blanc */
     color: color-mix(in srgb, v-bind(baseColor) 60%, white);
 }
 </style>

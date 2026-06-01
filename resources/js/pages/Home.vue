@@ -3,7 +3,7 @@ import SearchBarWidget from '@/Components/Features/SearchBarWidget.vue';
 import { Child } from '@/types/child';
 import { Folder } from '@/types/folder';
 // import CreateFolderCardWidget from '@/Components/Features/Navigation/Creation/CreateFolderCardWidget.vue';
-import { computed, DeepReadonly, inject, ref, Ref, toRef } from 'vue';
+import { computed, DeepReadonly, inject, ref, Ref } from 'vue';
 import { useFilteredChildren } from '@/Composables/useFiltres';
 import { FilterState } from '@/types/filtres';
 import HomeCard from '@/Components/Features/Home/HomeCard.vue';
@@ -12,16 +12,31 @@ import HomeCard from '@/Components/Features/Home/HomeCard.vue';
 const props = defineProps<{
     // children?: Array<Child>;
     racineChildren: Array<Child>;
+    favorites: Array<Child>;
     parents: Folder[];
     currentSearch?: string;
     isArchived: boolean;
 }>();
 
+const combinedChildren = computed(() => {
+    const merged = [...props.favorites, ...props.racineChildren];
+
+    const uniqueItems = new Map();
+    merged.forEach(item => {
+        // On utilise le type et l'id comme clé unique pour filtrer les doublons
+        uniqueItems.set(`${item.type}-${item.id}`, item);
+    });
+
+    return Array.from(uniqueItems.values());
+});
+
 const filters = inject<DeepReadonly<Ref<FilterState>>>("activeFilters");
+
+// 2. On passe notre computed directement au composable
 const filteredChildren = useFilteredChildren(
-    toRef(props, "racineChildren"),
+    combinedChildren,
     filters as Ref<FilterState | null>,
-);
+)
 
 // Récupération réactive de l'état des barres latérales du Layout principal
 const sidebarActive = inject<Ref<boolean>>('sidebarActive', ref(true));
@@ -61,6 +76,7 @@ const gridColsClass = computed(() => {
             :key="child.name"
             :child="child"
             :folder_id="0"
+            :favorites="favorites"
         />
 <!--        <CreateFolderCardWidget-->
 <!--            v-if="fastFolderCreation && canEdit"-->

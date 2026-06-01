@@ -74,6 +74,7 @@ class HandleInertiaRequests extends Middleware {
             'racineChildren' => fn() => $this->foldersService->getRacineChildren(),
             'racineDocument' => fn() => $this->documentsService->readRacineDoc(),
             'groupes'   => fn() => $this->groupesService->readAll(),
+            'favorites' => $this->userService->getFavorites(),
         ];
     }
 }

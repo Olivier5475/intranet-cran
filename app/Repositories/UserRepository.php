@@ -197,7 +197,7 @@ class UserRepository implements UserRepositoryInterface
     public function getFavorites(): Collection
     {
         return UserFavori::where('user_id', auth()->id())
-            ->with('ressource') // Magie : charge les Documents, Folders ou Files associés d'un coup !
+            ->with('ressource.groupes:id') // Magie : charge les Documents, Folders ou Files associés d'un coup !
             ->latest() // Optionnel : trie par les ajouts les plus récents en premier
             ->get();
     }

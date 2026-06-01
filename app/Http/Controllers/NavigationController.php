@@ -36,7 +36,6 @@ class NavigationController extends Controller
                 "children" => $navData['items'],
                 "currentSearch" => $searchQuery,
                 "isArchived" => $isArchived,
-                'favorites' => $this->userService->getFavorites(),
             ]);
 
         } catch (Throwable $t) {

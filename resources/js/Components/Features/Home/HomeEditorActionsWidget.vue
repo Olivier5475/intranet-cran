@@ -48,7 +48,7 @@ const user = usePage().props.auth.user
             class="p-1 hover:bg-gray-100 dark:hover:bg-zinc-700
                 rounded-full transition-all group-hover:opacity-100"
         >
-            <PencilIcon class="w-5 h-5 text-gray-400" />
+            <PencilIcon class="w-4 h-4 text-gray-400" />
         </button>
 
         <div
