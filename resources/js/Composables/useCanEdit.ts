@@ -15,6 +15,6 @@ export const useCanEdit = (groupes: number[]) => {
     return  ref(
         user.role === 'admin' || // Si l'utilisateur est un admin, il peut créer.
         // Si c'est un editeur et qu'il a des roles en commun avec la page, il peut créer.
-        (user.role === 'editor' && (groupes.length === 0 || compareParentAndUser.length > 0)),
+        (user.role === 'editeur' && (groupes.length === 0 || compareParentAndUser.length > 0)),
     );
 }
