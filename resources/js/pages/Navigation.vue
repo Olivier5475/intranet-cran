@@ -58,7 +58,7 @@ const filteredChildren = useFilteredChildren(
 // Calcul dynamique strict du nombre de colonnes de cartes
 const gridColsClass = computed(() => {
     if (sidebarActive.value && filterActive.value) {
-        return 'lg:grid-cols-6'; // 6 colonnes si tout est déplié
+        return 'lg:grid-cols-5'; // 6 colonnes si tout est déplié
     }
     if (!sidebarActive.value && !filterActive.value) {
         return 'lg:grid-cols-8'; // 8 colonnes si tout est fermé
@@ -119,7 +119,7 @@ useShortcuts({
 
     <div
         v-show="view_mod == 'icon'"
-        class="mt-6 gap-4 grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 transition-all duration-300"
+        class="mt-6 gap-3 grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 transition-all duration-300"
         :class="gridColsClass"
     >
         <ResourceCard

@@ -29,10 +29,6 @@ provide('activeFilters', readonly(activeFilters));
 defineProps<{
     racineChildren?: Folder[];
     groupes: Groupe[];
-    racineDocument: {
-        id: number;
-        name: string;
-    } | null;
 }>();
 
 const sidebarActive = ref(true);
@@ -62,7 +58,6 @@ provide('filterActive', readonly(filterActive));
                     <SidebarWidget
                         name="Navigation"
                         :children="racineChildren"
-                        :racine-document="racineDocument"
                         v-model:isActive="sidebarActive"
                     />
                 </aside>

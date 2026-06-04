@@ -4,7 +4,7 @@ namespace App\Repositories\Interfaces;
 
 use App\Models\{Document, Version};
 use Illuminate\Database\Eloquent\Collection;
-use App\Exception\{AlreadyExistsException, DocumentNotFoundException, PersistenceException};
+use App\Exception\{AlreadyExistsException, DocumentNotFoundException, PersistenceException, VersionNotFoundException};
 
 interface DocumentRepositoryInterface
 {
@@ -86,4 +86,11 @@ interface DocumentRepositoryInterface
      * @return Version
      */
     public function findVersionWithParent(int $versionId): Version;
+
+    /**
+     * @param int $versionId
+     * @return Version
+     * @throws VersionNotFoundException
+     */
+    public function findVersionFromId(int $versionId) : Version;
 }

@@ -13,7 +13,6 @@ const user = page.props.auth.user;
 defineProps<{
     name: string;
     children?: Array<Folder>;
-    racineDocument: { id: number; name: string; } | null;
 }>();
 
 // Liaison bi-directionnelle de l'état actif avec le MainLayout
@@ -46,7 +45,6 @@ const isActive = defineModel<boolean>('isActive', { default: true });
             <div v-if="isActive" class="dark:bg-sky-900/5 p-3 overflow-hidden">
                 <ul class="lg:min-h-[65svh] max-h-[calc(100vh-2rem)] overflow-y-auto no-scrollbar space-y-1">
                     <Link
-                        v-if="racineDocument"
                         :href="home.url()"
                         class="flex items-center px-3 py-2.5 rounded-xl transition-all duration-200 group border border-transparent"
                         :class="page.url === '/'
@@ -58,14 +56,6 @@ const isActive = defineModel<boolean>('isActive', { default: true });
                             :class="page.url === '/' ? 'text-sky-500' : 'text-gray-400 dark:text-zinc-500'"
                         />
                         <span class="text-sm font-semibold uppercase tracking-tight"> Accueil </span>
-                    </Link>
-
-                    <Link
-                        v-else
-                        :href="editor.document.create.url(0)"
-                        class="block p-4 text-center border-2 border-dashed border-gray-200 dark:border-slate-800 rounded-xl text-sm text-gray-400 hover:border-sky-500 hover:text-sky-500 transition-all"
-                    >
-                        + Créer la page d'accueil
                     </Link>
 
                     <li class="py-2">

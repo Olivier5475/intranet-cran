@@ -2,8 +2,10 @@
 
 namespace App\Services;
 
+use App\DTO\DocumentDTO;
 use App\DTO\VersionDTO;
 use App\Exception\FileNotFoundException;
+use App\Exception\VersionNotFoundException;
 use App\Models\{Document, File, Version};
 use App\Repositories\Interfaces\{AttachmentRepositoryInterface, DocumentRepositoryInterface, FilesRepositoryInterface};
 use App\Services\Interfaces\{MapDTOServiceInterface, VersionsServiceInterface};
@@ -135,11 +137,22 @@ readonly class VersionsService implements VersionsServiceInterface
             $this->attachmentsRepository->delete($idToDelete);
         }
 
-        // Restauration des attachements qui existaient alors mais ont été supprimés depuis
+        // Restauration des attachements qui existaient alors, mais ont été supprimés depuis
         $idsToRestore = array_diff($historyIds, $currentIds);
         foreach ($history->whereIn('id', $idsToRestore) as $attachmentData) {
             $attachmentData["document_id"] = $documentId;
             $this->attachmentsRepository->create($attachmentData);
         }
+    }
+
+    public function readDocumentVersionFromId(int $versionId): DocumentDTO
+    {
+        try {
+            $document = $this->documentsRepository->findVersionFromId($versionId);
+        } catch (VersionNotFoundException $e) {
+            Log::error($e->getMessage());
+            throw $e;
+        }
+        return $this->mapDTOService->mapVersionToDocumentDTO($document);
     }
 }

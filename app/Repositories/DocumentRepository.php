@@ -2,7 +2,7 @@
 
 namespace App\Repositories;
 
-use App\Exception\{AlreadyExistsException, DocumentNotFoundException, PersistenceException};
+use App\Exception\{AlreadyExistsException, DocumentNotFoundException, PersistenceException, VersionNotFoundException};
 use App\Models\{Document, File, Version};
 use App\Repositories\Interfaces\DocumentRepositoryInterface;
 use Illuminate\Database\Eloquent\Collection;
@@ -245,5 +245,14 @@ class DocumentRepository implements DocumentRepositoryInterface
             ->when($excludeId, fn($q) => $q->where('id', '!=', $excludeId));
 
         return $fileQuery->exists() || $docQuery->exists();
+    }
+
+    public function findVersionFromId(int $versionId): Version
+    {
+        try {
+            return Version::where('id', $versionId)->where("versionable_type", Document::class)->firstOrFail();
+        } catch (\Exception $e) {
+            throw new VersionNotFoundException("Version $versionId n'existe pas.", 0, $e);
+        }
     }
 }

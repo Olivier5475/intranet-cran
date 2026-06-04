@@ -101,4 +101,10 @@ interface MapDTOServiceInterface
      * @throws FileNotFoundException Si le fichier n'est plus présent sur le disque.
      */
     public function mapToAttachmentDTO(Attachment $attachment): AttachmentDTO;
+
+    /**
+     * @param Version $version
+     * @return DocumentDTO
+     */
+    public function mapVersionToDocumentDTO(Version $version) : DocumentDTO;
 }

@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { router } from '@inertiajs/vue3';
+import { Link, router } from '@inertiajs/vue3';
 import editor from '@/routes/editor';
 import download from '@/routes/download';
-
+import document_route from '@/routes/navigate/document'
 interface Attachment {
     id: string;
     name: string;
@@ -65,7 +65,7 @@ const restore = (versionId: number) => {
                 <tbody>
                 <tr v-for="version in versions" :key="version.id" class="border-b transition">
                     <td class="p-4 font-medium">
-                        {{ version.payload.name }}
+                        <Link :href="document_route.version.url(version.id)">{{ version.payload.name }}</Link>
                     </td>
                     <td class="p-4 text-sm uppercase">
                         DOC

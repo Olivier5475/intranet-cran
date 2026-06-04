@@ -222,4 +222,27 @@ readonly class MapDTOService implements MapDTOServiceInterface
         }
         return null;
     }
+
+    public function mapVersionToDocumentDTO(Version $version) : DocumentDTO
+    {
+        $document = $version->payload;
+        $html = (new Parsedown())->text($document['content'] ?? '');
+        $cleanHtml = Purifier::clean($html);
+
+
+        return new DocumentDTO(
+            id: $document["id"],
+            name: $document["name"],
+            content: $cleanHtml,
+            groupes: $document["_relations"]["groupes"] ?? [],
+            attachments: $document["_relations"]["attachments"] ?? [],
+            folder_id: $document["folder_id"],
+            created_at: $document["created_at"] ?? null,
+            updated_at: $document["updated_at"] ?? null,
+            color: $document["color"],
+            is_archived: $document["is_archived"] ?? false,
+            deadline: $document["deadline"] ?? null,
+            type: $document["type"] ?? "document",
+        );
+    }
 }

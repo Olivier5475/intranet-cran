@@ -7,7 +7,7 @@ import { decodeEntities } from '@/Composables/useDecodeModule';
 import { useResource } from '@/Composables/useResource';
 
 // 3. Icons
-import { CalendarDaysIcon } from '@heroicons/vue/24/outline';
+import { CalendarDaysIcon, ArrowUturnLeftIcon, ArrowPathIcon } from '@heroicons/vue/24/outline';
 
 // 4. Types
 import { Document } from '@/types/document';
@@ -15,9 +15,12 @@ import DisplayContentWidget from '@/Components/Features/Document/DisplayContentW
 import DisplayAttachments from '@/Components/Features/Document/DisplayAttachments.vue';
 import EditorActionsWidget from '@/Components/Features/EditorActionsWidget.vue';
 import PageDragDropWidget from '@/Components/Features/PageDragDropWidget.vue';
+import { Link, router } from '@inertiajs/vue3';
+import editor from '@/routes/editor';
 
 const props = defineProps<{
     document: Document;
+    versionId: number
 }>();
 
 const { links, canEdit } = useResource(props.document);
@@ -64,7 +67,7 @@ const deadlineStyle = computed(() => {
     };
 });
 
-// Formatage rapide de la date pour l'affichage (ex: 31 mai 2026 à 23:59)
+// Formatage rapide de la date pour l'affichage (exemple : 31 mai 2026 à 23:59)
 const formattedDeadline = computed(() => {
     if (!props.document.deadline) return '';
     return new Date(props.document.deadline).toLocaleString('fr-FR', {
@@ -75,6 +78,19 @@ const formattedDeadline = computed(() => {
         minute: '2-digit'
     });
 });
+
+const restore = () => {
+    if (confirm('Êtes-vous sûr de vouloir restaurer cette version ? La version actuelle sera archivée.')) {
+        router.post(
+            editor.model.post.restore.url(["documents", props.versionId]),
+            {},
+            {
+                preserveState: false,
+                onSuccess: () => alert('Fichier restauré avec succès !'),
+            },
+        );
+    }
+};
 </script>
 
 <template>
@@ -98,7 +114,33 @@ const formattedDeadline = computed(() => {
             </div>
 
             <div
-                class="right-4 p-3 bg-white dark:bg-slate-700 shadow-sm hover:shadow-md rounded-xl text-sky-600 dark:text-sky-400 border-slate-100 dark:border-slate-600 absolute top-1/2 -translate-y-1/2 border transition-all hover:scale-110"
+                v-if="versionId"
+                class="absolute top-1/2 -translate-y-1/2 left-4 flex gap-4"
+            >
+                <Link
+                    title="Retour à la liste des version"
+                    :href="links.history"
+                    class="block p-3 bg-white dark:bg-slate-700 shadow-sm hover:shadow-md
+                rounded-xl text-sky-600 dark:text-sky-400 border-slate-100 dark:border-slate-600
+                border transition-all hover:scale-110"
+                >
+                    <ArrowUturnLeftIcon class="w-5 h-5" />
+                </Link>
+                <button
+                    title="Restauré cette version"
+                    @click="restore"
+                    class="p-3 bg-white dark:bg-slate-700 shadow-sm hover:shadow-md
+                rounded-xl text-sky-600 dark:text-sky-400 border-slate-100 dark:border-slate-600
+                border transition-all hover:scale-110"
+                >
+                    <ArrowPathIcon class="w-5 h-5" />
+                </button>
+            </div>
+            <div
+                v-else
+                class="right-4 p-3 bg-white dark:bg-slate-700 shadow-sm hover:shadow-md
+                rounded-xl text-sky-600 dark:text-sky-400 border-slate-100 dark:border-slate-600
+                absolute top-1/2 -translate-y-1/2 border transition-all hover:scale-110"
             >
                 <EditorActionsWidget
                     :links="links"

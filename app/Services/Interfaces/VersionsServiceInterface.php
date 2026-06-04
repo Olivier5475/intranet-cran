@@ -2,8 +2,10 @@
 
 namespace App\Services\Interfaces;
 
+use App\DTO\DocumentDTO;
 use App\DTO\VersionDTO;
 use App\Exception\FileNotFoundException;
+use App\Exception\VersionNotFoundException;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 
 interface VersionsServiceInterface
@@ -31,4 +33,11 @@ interface VersionsServiceInterface
      * @throws \Throwable En cas d'échec de la transaction de restauration.
      */
     public function restoreFromVersionId(int $versionId, string $modelString): void;
+
+    /**
+     * @param int $versionId
+     * @return DocumentDTO
+     * @throws VersionNotFoundException
+     */
+    public function readDocumentVersionFromId(int $versionId): DocumentDTO;
 }

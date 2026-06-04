@@ -17,8 +17,8 @@ readonly class DocumentDTO {
         public ?int    $folder_id,
 
         // INFORMATION
-        public string  $created_at,
-        public string  $updated_at,
+        public ?string  $created_at,
+        public ?string  $updated_at,
         public ?string $color,
         public ?bool   $is_archived = null,
         public ?\Datetime $deadline = null,

@@ -15,9 +15,10 @@ Route::get("/preview/file/{id}", [Controllers\DownloadController::class, "previe
 Route::prefix('/navigation')->group(function () {
     Route::get('/f/{folder_id}', Controllers\NavigationController::class)->name('navigate.folder');
     Route::get('/f/{folder_id}/archived', Controllers\NavigationController::class)->name('navigate.archived');
-    Route::get("/d/{document_id}", Controllers\DocumentViewController::class)->name('navigate.document');
+    Route::get("/d/{document_id}", [Controllers\DocumentViewController::class, 'index'])->name('navigate.document');
 });
 
+Route::get("/version/document/{version_id}", [Controllers\DocumentViewController::class, "version"])->name('navigate.document.version');
 Route::prefix('/favorites')->group(function () {
     Route::post("/{resource_type}/{resource_id}", [Controllers\FavoritesController::class, "addFavorite"])->name('favorites.add');
     Route::delete("/{resource_type}/{resource_id}", [Controllers\FavoritesController::class, "removeFavorite"])->name('favorites.delete');
