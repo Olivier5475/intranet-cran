@@ -99,7 +99,6 @@ readonly class FoldersService implements FoldersServiceInterface
         if (count($folder->groupes) === 0) {
             return true;
         }
-
         return (bool) array_intersect($user->groupes, $folder->groupes);
     }
 

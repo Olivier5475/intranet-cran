@@ -41,14 +41,14 @@ const submit = () => {
                 placeholder="Nom du dossier..."
                 autofocus
                 class="text-xs font-semibold border-purple-500 focus:border-purple-400
-                dark:text-zinc-200 w-full border-b bg-transparent text-center focus:ring-0"
+                dark:text-zinc-200 w-full border-b bg-transparent text-center focus:ring-0 rounded"
             />
             <button
                 type="submit"
-                class="mt-2 p-1.5 bg-purple-600 hover:bg-purple-700 text-white shadow-lg
-                rounded-full transition-transform active:scale-90"
+                class="w-full p-1.5 bg-purple-600 hover:bg-purple-700 text-white shadow-lg
+                rounded transition-transform active:scale-90"
             >
-                <ArrowTurnDownRightIcon class="w-4 h-4" />
+                <ArrowTurnDownRightIcon class="w-4 h-4 mx-auto" />
             </button>
         </form>
     </div>

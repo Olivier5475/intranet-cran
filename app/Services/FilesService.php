@@ -6,7 +6,6 @@ use App\DTO\FileDTO;
 use App\Exception\{DiskWriteException, PersistenceException};
 use App\Repositories\Interfaces\FilesRepositoryInterface;
 use App\Services\Interfaces\{
-    GroupesServiceInterface,
     FoldersServiceInterface,
     MapDTOServiceInterface,
     UserServiceInterface,
@@ -26,7 +25,6 @@ readonly class FilesService implements FilesServiceInterface
         private FilesRepositoryInterface $filesRepository,
         private FoldersServiceInterface  $foldersService,
         private UserServiceInterface     $userService,
-        private GroupesServiceInterface  $groupesService,
         private MapDTOServiceInterface   $mapDTOService,
     ){}
 
@@ -52,7 +50,7 @@ readonly class FilesService implements FilesServiceInterface
             return true;
         }
 
-        $fileGrpIds = $this->groupesService->groupesIDs($file->groupes);
+        $fileGrpIds = $this->mapDTOService->getGrpsIds($file);
         return (bool) array_intersect($user->groupes, $fileGrpIds);
     }
 

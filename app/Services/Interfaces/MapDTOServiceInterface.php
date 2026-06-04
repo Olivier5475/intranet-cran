@@ -107,4 +107,10 @@ interface MapDTOServiceInterface
      * @return DocumentDTO
      */
     public function mapVersionToDocumentDTO(Version $version) : DocumentDTO;
+
+    /**
+     * Extrait les IDs de groupes sans déclencher de nouvelles requêtes SQL.
+     */
+    public function getGrpsIds(mixed $model): array;
+
 }

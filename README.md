@@ -112,3 +112,4 @@ Le projet utilise l'architecture suivante pour la partie Vue :
 - **Mettre à jour l'index de recherche :** `php artisan scout:import "App\Models\Document"`
 - **Lancer les files d'attente :** `php artisan queue:work`
 - **Compiler pour la production :** `npm run build`
+- **Générer les fichiers de routes pour VueJS :** `php artisan wayfinder:generate`

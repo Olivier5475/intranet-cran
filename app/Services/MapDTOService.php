@@ -198,10 +198,7 @@ readonly class MapDTOService implements MapDTOServiceInterface
 
     // --- HELPERS PRIVÉS OPTIMISÉS ---
 
-    /**
-     * Extrait les IDs de groupes sans déclencher de nouvelle requête SQL.
-     */
-    private function getGrpsIds(mixed $model): array
+    public function getGrpsIds(mixed $model): array
     {
         // Si c'est un modèle Eloquent (File, Document, Folder, User)
         if ($model instanceof \Illuminate\Database\Eloquent\Model) {

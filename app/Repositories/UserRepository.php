@@ -30,7 +30,7 @@ class UserRepository implements UserRepositoryInterface
      */
     public function getUserById(int $id): User
     {
-        $user = User::find($id);
+        $user = User::where("id", $id)->with("groupes:id")->firstOrFail();
         if (!$user) {
             throw new UserNotFoundException("Utilisateur ID $id introuvable.");
         }
