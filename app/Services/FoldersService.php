@@ -174,7 +174,7 @@ readonly class FoldersService implements FoldersServiceInterface
             DB::commit();
         } catch (Throwable $e) {
             DB::rollBack();
-            Log::error("Erreur lors de la suppression du dossier", ['id' => $id, 'error' => $e->getMessage()]);
+            Log::error("Erreur lors de la suppression du dossier", ['id' => $folder_id, 'error' => $e->getMessage()]);
             throw $e;
         }
     }
