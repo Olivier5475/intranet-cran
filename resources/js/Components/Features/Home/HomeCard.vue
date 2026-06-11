@@ -14,7 +14,7 @@ import document_route from '@/routes/editor/document';
 import file_route from '@/routes/editor/file';
 import favorite_route from '@/routes/favorites';
 import ResourceBadges from '@/Components/Features/Navigation/Resource/ResourceBadges.vue';
-import HomeEditorActionsWidget from '@/Components/Features/Home/HomeEditorActionsWidget.vue';
+import EditorActionsWidget from '@/Components/Features/EditorActionsWidget.vue';
 
 const props = defineProps<{
     child: Child;
@@ -133,10 +133,11 @@ const isFavorite = computed(() => {
                 />
             </Link>
 
-            <HomeEditorActionsWidget
+            <EditorActionsWidget
                 v-if="canEdit"
                 :links="links"
                 :is_archived="child.is_archived"
+                variant="home"
                 @active-rename="activeRename = $event"
             />
 

@@ -9,23 +9,22 @@ import { PencilIcon } from '@heroicons/vue/24/solid';
 // 3. Composants
 import DeleteModal from '@/Components/UI/DeleteModal.vue';
 
-defineProps<{
-    links: any,
-    is_archived: boolean
-}>();
+// On utilise withDefaults pour que 'default' soit la valeur de base
+withDefaults(defineProps<{
+    links: any;
+    is_archived: boolean;
+    variant?: 'default' | 'home'; // Gère les différences de style
+}>(), {
+    variant: 'default'
+});
 
 const activeRename = ref(false);
 
 const emit = defineEmits(['activeRename']);
 
-// Menu = Menu dropdown d'action d'un dossier (avec bouton modifier et supprimer)
-// pour savoir si le menu est étendu. sert pour quand on passe dessus
 const isMenuExpend = ref(false);
-
-// pour garder le menu ouvert même quand la souris n'est pas dessus
 const toggleMenu = ref(false);
 
-// savoir si le Modal de validation de suppression est ouvert
 const isActiveArchiveValidation = ref(false);
 const isActiveDeleteValidation = ref(false);
 
@@ -38,9 +37,9 @@ const user = usePage().props.auth.user
 </script>
 
 <template>
-    <!--            ACTION EDITEUR            -->
     <div
-        class="relative flex justify-end"
+        class="relative flex"
+        :class="{ 'justify-end': variant === 'default' }"
         @mouseenter="isMenuExpend = true"
         @mouseleave="isMenuExpend = false"
     >
@@ -49,12 +48,16 @@ const user = usePage().props.auth.user
             class="p-1 hover:bg-gray-100 dark:hover:bg-zinc-700
                 rounded-full transition-all group-hover:opacity-100"
         >
-            <PencilIcon class="w-5 h-5 text-gray-400" />
+            <PencilIcon
+                class="text-gray-400"
+                :class="variant === 'default' ? 'w-5 h-5' : 'w-4 h-4'"
+            />
         </button>
 
         <div
             v-if="toggleMenu || isMenuExpend"
-            class="top-6 -right-7 w-32 bg-white dark:bg-zinc-900 shadow-xl rounded-xl border-gray-100 dark:border-zinc-700 absolute z-50 border"
+            class="w-32 bg-white dark:bg-zinc-900 shadow-xl rounded-xl border-gray-100 dark:border-zinc-700 absolute z-50 border"
+            :class="variant === 'default' ? 'top-6 -right-7' : 'top-8 left-0'"
         >
             <Link
                 v-if="links.history"
@@ -100,7 +103,6 @@ const user = usePage().props.auth.user
             </button>
         </div>
     </div>
-
 
     <DeleteModal
         :show="isActiveArchiveValidation"
