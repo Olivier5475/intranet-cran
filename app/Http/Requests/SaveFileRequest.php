@@ -44,7 +44,7 @@ class SaveFileRequest extends FormRequest
                 'max:255'
             ],
             'files' => [$isUpdate ? 'nullable' : 'required', 'array'],
-            'files.*' => ['file', 'max:102400'],
+            'files.*' => ['file', 'max:307200'],
             'groupes' => ['sometimes', 'array'],
             'parent_id' => [$isUpdate ? 'nullable' : 'required', 'integer'],
         ];
