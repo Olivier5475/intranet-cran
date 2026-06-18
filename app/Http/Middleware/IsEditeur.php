@@ -14,7 +14,7 @@ class IsEditeur
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
     public function handle(Request $request, Closure $next): Response {
-        if (!auth()->check() || !(auth()->user()->role == "admin" || auth()->user()->role == "editeur") ) {
+        if (!auth()->check() || !(auth()->user()->role == "superadmin" || auth()->user()->role == "admin" || auth()->user()->role == "editeur") ) {
             abort(403, "Accès refusé : vous n'êtes pas administrateur.");
         }
         return $next($request);

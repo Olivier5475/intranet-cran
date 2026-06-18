@@ -88,7 +88,11 @@ Route::prefix("admin")
         Route::delete("/folders/{folder_id}", [Controllers\Admin\FolderController::class, "delete"])->name("admin.folder.delete");
         Route::delete("/documents/{document_id}", [Controllers\Admin\DocumentController::class, "delete"])->name("admin.document.delete");
         Route::delete("/files/{document_id}", [Controllers\Admin\FileController::class, "delete"])->name("admin.file.delete");
+    });
 
+Route::prefix("admin")
+    ->middleware(Middleware\IsSuperAdmin::class)
+    ->group(function () {
         Route::prefix("users")->group(function () {
             // GET
             Route::get("/", [Controllers\Admin\UsersController::class, "index"])->name("admin.user");
@@ -118,5 +122,5 @@ Route::prefix("admin")
             Route::delete("/{id}", [Controllers\Admin\GroupeController::class, "delete"])->name("admin.groupes.delete");
             Route::delete("/{id}/user/{user_id}", [Controllers\Admin\GroupeController::class, "removeUser"])->name("admin.groupes.users.remove");
         });
-});
+    });
 

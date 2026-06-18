@@ -106,10 +106,10 @@ class UserRepository implements UserRepositoryInterface
         }
 
         try {
-            if (isset($data['nom'])) $user->nom = $data['nom'];
+            if (isset($data['nom']))    $user->nom    = $data['nom'];
             if (isset($data['prenom'])) $user->prenom = $data['prenom'];
-            if (isset($data['email'])) $user->email = $data['email'];
-            if (isset($data['role'])) $user->role = $data['role'];
+            if (isset($data['email']))  $user->email  = $data['email'];
+            if (isset($data['role']))   $user->role   = $data['role'];
 
             $user->save();
 
