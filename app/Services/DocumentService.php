@@ -22,7 +22,6 @@ readonly class DocumentService implements DocumentsServiceInterface
         private DocumentRepositoryInterface $documentRepository,
         private AttachmentServiceInterface  $attachmentService,
         private UserServiceInterface        $userService,
-        private GroupesServiceInterface     $groupesService,
         private MapDTOServiceInterface      $mapDTOService,
     ){}
 

@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use App\Services\Interfaces\DocumentsServiceInterface;
 use App\Services\Interfaces\FoldersServiceInterface;
+use Carbon\Carbon;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -68,6 +69,13 @@ class SaveDocumentRequest extends FormRequest
         if (isset($data['parent_id'])) {
             $data['folder_id'] = $data['parent_id'];
             unset($data['parent_id']);
+        }
+
+        // --- CORRECTION DU FUSEAU HORAIRE ---
+        if (!empty($data['deadline'])) {
+            // On précise que l'heure envoyée par le formulaire est l'heure locale Française,
+            // puis on la bascule en UTC pour un stockage propre en BDD.
+            $data['deadline'] = Carbon::parse($data['deadline'], 'Europe/Paris')->setTimezone('UTC');
         }
 
         // On s'assure que les nouveaux fichiers sont bien récupérés
