@@ -13,6 +13,7 @@ export const useCanEdit = (groupes: number[]) => {
     // On récupère les groupes en commun
     const compareParentAndUser = groupes.filter((value) => userGrps.includes(value));
     return  ref(
+        user.role === 'superadmin' ||  // Si l'utilisateur est un super admin, il peut créer.
         user.role === 'admin' || // Si l'utilisateur est un admin, il peut créer.
         // Si c'est un editeur et qu'il a des roles en commun avec la page, il peut créer.
         (user.role === 'editeur' && (groupes.length === 0 || compareParentAndUser.length > 0)),

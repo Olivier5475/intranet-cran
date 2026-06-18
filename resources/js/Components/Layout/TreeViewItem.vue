@@ -41,7 +41,11 @@ const user = page.props.auth.user;
 const parentGrps = props.child.groupes as number[];
 const userGrps = user.groupes as number[];
 const compareGrps = parentGrps.filter((v) => userGrps.includes(v));
-const canEdit = ref(user.role === "admin" || (user.role === "editeur" && (parentGrps.length === 0 || compareGrps.length > 0)));
+const canEdit = ref(
+    user.role === "superadmin" ||
+    user.role === "admin" ||
+    (user.role === "editeur" && (parentGrps.length === 0 || compareGrps.length > 0))
+);
 
 // --- LOGIQUE DE DROP ---
 const handleDragEnter = (e: DragEvent) => {

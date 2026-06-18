@@ -23,7 +23,7 @@ const isActive = (url: string) => page.url.startsWith(url);
     <nav class="bg-slate-800/90 dark:bg-slate-900/95 border-b border-slate-600 dark:border-zinc-800 h-16 flex items-center justify-between px-8 shadow-lg">
 
         <div class="flex items-center space-x-2">
-            <template v-if="page.props.auth.user.role === 'admin'">
+            <template v-if="page.props.auth.user.role === 'superadmin'">
                 <Link
                     :href="admin_routes.groupes.url()"
                     class="group flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-200"
@@ -39,7 +39,7 @@ const isActive = (url: string) => page.url.startsWith(url);
                     :class="isActive(admin_routes.user.url()) ? 'bg-red-500/10 text-red-400' : 'text-slate-300 hover:bg-slate-700'"
                 >
                     <UserGroupIcon class="w-6 h-6 transition-transform group-hover:scale-110" />
-                    <span class="text-lg font-medium">Admin</span>
+                    <span class="text-lg font-medium">Utilisateurs</span>
                 </Link>
 
                 <div class="h-8 w-[1px] bg-slate-600 mx-4"></div>

@@ -15,6 +15,7 @@ import FlashMessage from '@/Components/UI/FlashMessage.vue';
 import LogoWidget from '@/Components/Layout/LogoWidget.vue';
 import MainNav from '@/Components/Layout/MainNav.vue';
 import SidebarWidget from '@/Components/Layout/SidebarWidget.vue';
+import { usePage } from '@inertiajs/vue3';
 
 timeout.setup();
 const activeFilters = ref({});

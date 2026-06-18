@@ -54,8 +54,9 @@ const submit = () => {
                 class="px-4 py-3 rounded-xl border-zinc-200 dark:border-zinc-700 dark:bg-zinc-800 focus:ring-sky-500/20 focus:border-sky-500 text-sm w-full transition-all"
             >
                 <option value="user">User</option>
-                <option value="admin">Admin</option>
                 <option value="editeur">Éditeur</option>
+                <option value="admin">Admin</option>
+                <option value="superadmin">Super Admin</option>
             </select>
         </div>
 
