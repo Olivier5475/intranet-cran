@@ -3,7 +3,7 @@ import { ref, computed } from 'vue';
 import { Link } from '@inertiajs/vue3';
 import { ArrowDownTrayIcon } from "@heroicons/vue/24/solid";
 import { ClipboardDocumentIcon, ClipboardDocumentCheckIcon } from "@heroicons/vue/24/outline";
-import { decodeEntities } from "@/Composables/useDecodeModule";
+import { decodeEntities, formatForDisplay } from '@/Composables/useDecodeModule';
 import { useResource } from "@/Composables/useResource";
 import ResourceIcon from "@/Components/Features/Navigation/Resource/ResourceIcon.vue";
 import EditorActionsWidget from '@/Components/Features/EditorActionsWidget.vue';
@@ -15,7 +15,11 @@ import document_route from '@/routes/editor/document';
 import file_route from '@/routes/editor/file';
 import ResourceBadges from '@/Components/Features/Navigation/Resource/ResourceBadges.vue';
 
-const props = defineProps<{ child: Child; folder_id: number; }>();
+const props = defineProps<{
+    child: Child;
+    folder_id: number;
+    date_mode: 'create' | 'update' | 'deadline'
+}>();
 const { links, itemColor, canEdit } = useResource(props.child);
 
 const showImage = ref(false);
@@ -64,7 +68,6 @@ const copyToClipboard = async () => {
 
 <template>
     <FilePreviewWidget :was-shown="wasShown" :show-image="showImage" :child="child" />
-
     <div
         class="group py-3 px-4 border-gray-100 dark:border-zinc-800 hover:bg-sky-50/50 dark:hover:bg-slate-900/10 grid grid-cols-12 items-center border-t transition-colors duration-150 cursor-grab active:cursor-grabbing"
         draggable="true"
@@ -95,7 +98,27 @@ const copyToClipboard = async () => {
             </span>
         </div>
 
-        <p class="text-xs text-gray-400 col-span-2 text-center">{{ child.created_at }}</p>
+        <p v-if="date_mode == 'create'" class="text-xs text-gray-400 col-span-2 text-center">{{ child.created_at }}</p>
+
+        <!--        AFFICHAGE DATE DERNIÈRE MODIFICATION          -->
+        <p v-else-if="date_mode == 'update'" class="text-xs text-gray-400 col-span-2 text-center">
+            <span v-if="child.updated_at">
+                {{ child.updated_at }}
+            </span>
+            <span v-else>
+                -
+            </span>
+        </p>
+
+        <!--        AFFICHAGE DEADLINE          -->
+        <p v-else-if="date_mode == 'deadline'" class="text-xs text-gray-400 col-span-2 text-center">
+            <span v-if="child.deadline">
+                {{ formatForDisplay(child.deadline) }}
+            </span>
+            <span v-else>
+                -
+            </span>
+        </p>
 
         <ResourceBadges v-if="child.groupes" :groupe-ids="child.groupes" mode="row" class="col-span-2" />
 

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { DeepReadonly, inject, ref, Ref, toRef, watch, computed } from 'vue';
+import { DeepReadonly, inject, ref, Ref, toRef, watch, computed, useModel } from 'vue';
 import { Link } from "@inertiajs/vue3";
 
 import {
@@ -77,6 +77,8 @@ useShortcuts({
     isEnabled: canEdit.value,
     action: () => (fastFolderCreation.value = !fastFolderCreation.value),
 });
+
+const date_mode = ref("create");
 </script>
 
 <template>
@@ -146,7 +148,15 @@ useShortcuts({
         >
             <p class="col-span-6">Nom</p>
             <p class="col-span-1 text-center">Type</p>
-            <p class="col-span-2 text-center">Date de création</p>
+            <select
+                class="col-span-2 text-center p-0 pr-4 bg-transparent border-transparent
+                text-xs font-semibold uppercase"
+                v-model="date_mode"
+            >
+                <option value="create">Date de création</option>
+                <option value="update">Dernière modification</option>
+                <option value="deadline">Deadline</option>
+            </select>
             <p class="col-span-2 text-center">Groupes</p>
             <p class="col-span-1 text-right">Actions</p>
         </div>
@@ -156,6 +166,7 @@ useShortcuts({
             :key="child.name"
             :child="child"
             :folder_id="folder_id"
+            :date_mode="date_mode"
         />
         <div v-if="fastFolderCreation && canEdit">
             <CreateFolderRowWidget

@@ -9,7 +9,6 @@ export const formatForDatetimeLocal = (dateString?: string | null) => {
 
     const date = new Date(dateString);
 
-    // On doit extraire l'année, le mois, le jour, l'heure et la minute locaux pour reconstruire la chaîne
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
@@ -17,4 +16,9 @@ export const formatForDatetimeLocal = (dateString?: string | null) => {
     const minutes = String(date.getMinutes()).padStart(2, '0');
 
     return `${year}-${month}-${day}T${hours}:${minutes}`;
+};
+
+export const formatForDisplay = (dateString?: string | null) => {
+    const localDateTime = formatForDatetimeLocal(dateString);
+    return localDateTime ? localDateTime.replace('T', ' ') : null;
 };
