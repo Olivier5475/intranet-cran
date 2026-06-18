@@ -78,6 +78,22 @@ const handleDrop = (e: DragEvent) => {
         onSuccess: () => { isExpanded.value = true; }
     });
 };
+
+// État pour savoir si on affiche tout
+const showAll = ref(false);
+
+// Calcul dynamique des enfants à afficher
+const visibleChildren = computed(() => {
+    if (!props.child.children) return []; // Sécurité
+
+    // Si showAll est vrai, on renvoie tout. Sinon, on coupe après le 5ème.
+    return showAll.value ? props.child.children : props.child.children.slice(0, 5);
+});
+
+// Vérifie s'il y a plus de 5 éléments pour savoir s'il faut afficher le bouton
+const hasMoreItems = computed(() => {
+    return props.child.children && props.child.children.length > 5;
+});
 </script>
 
 <template>
@@ -131,7 +147,17 @@ const handleDrop = (e: DragEvent) => {
             leave-to-class="max-h-0 opacity-0 overflow-hidden"
         >
             <ul v-if="isExpanded" class="pl-4 ml-3 border-gray-200 dark:border-zinc-700 mt-1 space-y-1 border-l">
-                <TreeViewItem v-for="subChild in child.children" :key="subChild.id" :child="subChild" />
+                <TreeViewItem v-for="subChild in visibleChildren" :key="subChild.id" :child="subChild" />
+
+                <li v-if="hasMoreItems && !showAll">
+                    <button
+                        @click="showAll = true"
+                        class="text-xs text-sky-500 hover:text-sky-600 py-1 flex items-center transition-colors font-medium cursor-pointer"
+                    >
+                        <span class="mr-2">↳</span> Afficher plus ({{ child.children.length - 5 }})
+                    </button>
+                </li>
+
                 <li>
                     <Link v-if="canEdit" class="text-xs text-gray-400 hover:text-yellow-600 py-1 flex items-center transition-colors" :href="folder_route.create.url(child.id)">
                         <span class="mr-2 text-lg">+</span> Nouveau dossier
