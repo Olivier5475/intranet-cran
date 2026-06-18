@@ -52,7 +52,7 @@ class SaveDocumentRequest extends FormRequest
             'new_attachments.*' => ['file', 'max:51200'],
             'groupes' => ['sometimes', 'array'],
             'parent_id' => ['integer', 'nullable'],
-            'type' => ['required', 'string'],
+            'type' => ['sometimes', 'string'],
             'deadline' => ['nullable', 'date'],
         ];
     }

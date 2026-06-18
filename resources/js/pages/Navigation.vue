@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { DeepReadonly, inject, ref, Ref, toRef, watch, computed, useModel } from 'vue';
+import { DeepReadonly, inject, ref, Ref, toRef, watch, computed } from 'vue';
 import { Link } from "@inertiajs/vue3";
 
 import {
