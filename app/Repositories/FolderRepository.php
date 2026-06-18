@@ -135,7 +135,13 @@ class FolderRepository implements FolderRepositoryInterface
 
         try {
             if (isset($data['name'])) $folder->name = e($data['name']);
-            if (isset($data['parent_id'])) $folder->parent_id = $data['parent_id'];
+            if (isset($data['parent_id'])) {
+                if($data['parent_id'] == 0) {
+                    $folder->parent_id = null;
+                } else {
+                    $folder->parent_id = $data['parent_id'];
+                }
+            }
             if (isset($data['color'])) $folder->color = $data['color'];
 
             $folder->save();

@@ -1,11 +1,13 @@
 <script setup lang="ts">
-import { Link, usePage } from '@inertiajs/vue3';
+import { Link, useForm, usePage } from '@inertiajs/vue3';
 import { ChevronDownIcon, ChevronRightIcon, HomeIcon, PlusIcon } from '@heroicons/vue/24/solid';
-import editor from '@/routes/editor';
 import folder_route from '@/routes/editor/folder';
 import { home } from '@/routes';
 import TreeViewItem from '@/Components/Layout/TreeViewItem.vue';
 import { Folder } from '@/types/folder';
+import { ref } from 'vue';
+import document_route from '@/routes/editor/document';
+import file_route from '@/routes/editor/file';
 
 const page = usePage();
 const user = page.props.auth.user;
@@ -15,8 +17,44 @@ defineProps<{
     children?: Array<Folder>;
 }>();
 
-// Liaison bi-directionnelle de l'état actif avec le MainLayout
+// Liaison bidirectionnelle de l'état actif avec le MainLayout
 const isActive = defineModel<boolean>('isActive', { default: true });
+
+const isDragOver = ref(false);
+
+// --- LOGIQUE DE DROP ---
+const handleDragEnter = (e: DragEvent) => {
+    e.preventDefault();
+    if (e.dataTransfer?.types.includes('resource_id')) isDragOver.value = true;
+};
+
+const handleDragLeave = () => { isDragOver.value = false; };
+
+const handleDragOver = (e: DragEvent) => {
+    e.preventDefault();
+    if (e.dataTransfer) e.dataTransfer.dropEffect = 'move';
+};
+
+const handleDrop = (e: DragEvent) => {
+    e.preventDefault();
+    isDragOver.value = false;
+
+    const resourceId = e.dataTransfer?.getData('resource_id');
+    const resourceType = e.dataTransfer?.getData('resource_type');
+
+    if (!resourceId || !resourceType) return;
+    if (resourceType === 'folder' && resourceId === "null") return;
+
+    const form = useForm({ parent_id: 0 }); // On envoie le nouvel ID parent
+
+    let url = "";
+    if (resourceType == "folder") url = folder_route.post.update.url(resourceId);
+    else return;
+
+    form.post(url, {
+        preserveScroll: true
+    });
+};
 </script>
 
 <template>
@@ -50,6 +88,11 @@ const isActive = defineModel<boolean>('isActive', { default: true });
                         :class="page.url === '/'
                                 ? 'bg-sky-50 dark:bg-sky-900/40 text-sky-600 dark:text-sky-400 font-bold border-sky-100 dark:border-sky-900/30 shadow-sm'
                                 : 'text-gray-600 dark:text-zinc-400 hover:bg-white dark:hover:bg-slate-800 hover:text-sky-600 dark:hover:text-sky-300 hover:shadow-sm hover:border-gray-100 dark:hover:border-slate-700'"
+
+                        @dragover="handleDragOver"
+                        @dragenter="handleDragEnter"
+                        @dragleave="handleDragLeave"
+                        @drop="handleDrop"
                     >
                         <HomeIcon
                             class="h-5 w-5 mr-3 transition-transform duration-200 group-hover:scale-110"
