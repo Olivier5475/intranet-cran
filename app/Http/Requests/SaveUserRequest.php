@@ -9,7 +9,7 @@ class SaveUserRequest extends FormRequest
     public function authorize(): bool
     {
         // Seul un admin accède à ce contrôleur
-        return auth()->user()->role === 'admin';
+        return auth()->user()->role === 'superadmin';
     }
 
     public function rules(): array

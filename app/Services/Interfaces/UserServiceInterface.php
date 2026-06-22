@@ -33,13 +33,6 @@ interface UserServiceInterface
     public function getCurrentUserId(): int;
 
     /**
-     * Vérifie si l'utilisateur possède le rôle administrateur.
-     *
-     * @return bool
-     */
-    public function isAdmin(): bool;
-
-    /**
      * Récupère le rôle de l'utilisateur actuel.
      *
      * @return string Le rôle (ex: 'admin', 'user') ou 'guest' par défaut.

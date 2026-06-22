@@ -50,7 +50,8 @@ class UsersController extends Controller {
         try {
             $this->usersService->update($id, $request->validated());
 
-            return redirect()->back()->with("success", "Utilisateur mis à jour avec succès.");        } catch (Throwable $t) {
+            return redirect()->back()->with("success", "Utilisateur mis à jour avec succès.");
+        } catch (Throwable $t) {
             return $this->handleException($t, "mise à jour", $id);
         }
     }

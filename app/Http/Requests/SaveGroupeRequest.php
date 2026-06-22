@@ -9,7 +9,7 @@ class SaveGroupeRequest extends FormRequest
     public function authorize(): bool
     {
         // Seul un admin peut gérer les groupes
-        return auth()->user()->role === 'admin';
+        return auth()->user()->role === 'superadmin';
     }
 
     public function rules(): array

@@ -63,14 +63,6 @@ readonly class AuthService implements UserServiceInterface
         }
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function isAdmin(): bool
-    {
-        return $this->getRole() === "admin";
-    }
-
     // --- LECTURE & RECHERCHE ---
 
     /**
