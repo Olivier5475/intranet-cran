@@ -57,7 +57,9 @@ const deleteUser = (user_id: number) => {
                                 ? 'bg-red-100 text-red-600'
                                 : user.role === 'editeur'
                                   ? 'bg-yellow-100 text-yellow-600'
-                                  : 'bg-emerald-100 text-emerald-600'
+                                  : user.role === 'superadmin'
+                                    ? 'bg-blue-300 text-blue-800'
+                                    : 'bg-emerald-100 text-emerald-600'
                         "
                     >
                         {{ user.role }}
