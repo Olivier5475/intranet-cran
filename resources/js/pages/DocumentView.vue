@@ -1,25 +1,26 @@
 <script setup lang="ts">
-// 1. Vue & Core
 import { computed } from 'vue';
+import { Link, router } from '@inertiajs/vue3';
 
-// 2. Composables & Utilitaires (Logique)
 import { decodeEntities } from '@/Composables/useDecodeModule';
 import { useResource } from '@/Composables/useResource';
 
-// 3. Icons
 import { CalendarDaysIcon, ArrowUturnLeftIcon, ArrowPathIcon } from '@heroicons/vue/24/outline';
 
-// 4. Types
 import { Document } from '@/types/document';
+import { Folder } from '@/types/folder';
+
 import DisplayContentWidget from '@/Components/Features/Document/DisplayContentWidget.vue';
 import DisplayAttachments from '@/Components/Features/Document/DisplayAttachments.vue';
 import EditorActionsWidget from '@/Components/Features/EditorActionsWidget.vue';
 import PageDragDropWidget from '@/Components/Features/PageDragDropWidget.vue';
-import { Link, router } from '@inertiajs/vue3';
+import RepertoryWidget from '@/Components/Features/Navigation/RepertoryWidget.vue';
+
 import editor from '@/routes/editor';
 
 const props = defineProps<{
     document: Document;
+    parents: Folder[];
     versionId: number
 }>();
 
@@ -96,6 +97,9 @@ const restore = () => {
 <template>
     <PageDragDropWidget :can-edit="canEdit" :document="document" />
     <div class="max-w-5xl mb-10 mx-auto overflow-hidden">
+        <div class="bg-white dark:bg-slate-900 p-2 rounded-xl shadow-sm border-gray-100 dark:border-zinc-800 flex items-center justify-between border">
+            <RepertoryWidget :parents="parents" />
+        </div>
         <header class="group bg-slate-50 dark:bg-slate-800/50 p-6 rounded-t-2xl border-slate-200 dark:border-slate-700 relative border-b flex flex-col items-center justify-center">
 
             <h1 class="text-3xl font-black text-slate-800 dark:text-white tracking-tight text-center first-letter:uppercase max-w-[80%]">

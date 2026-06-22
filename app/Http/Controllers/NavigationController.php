@@ -13,7 +13,6 @@ class NavigationController extends Controller
 {
     public function __construct(
         private readonly FoldersServiceInterface $foldersService,
-        private readonly UserServiceInterface $userService,
     ) {}
 
     public function __invoke(int $folder_id, Request $request)

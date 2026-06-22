@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Exception\DocumentNotFoundException;
 use App\Exception\VersionNotFoundException;
 use App\Services\Interfaces\DocumentsServiceInterface;
+use App\Services\Interfaces\FoldersServiceInterface;
 use App\Services\Interfaces\VersionsServiceInterface;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Support\Facades\Log;
@@ -13,12 +14,16 @@ use Inertia\Inertia;
 
 class DocumentViewController extends Controller {
 
-    public function index(DocumentsServiceInterface $documentsService, $document_id) {
+    public function index(
+        DocumentsServiceInterface $documentsService,
+        FoldersServiceInterface $foldersService,
+        $document_id) {
         try {
             $document = $documentsService->read($document_id);
-
+            $breadcrumbs = $foldersService->getBreadcrumbs($document->folder_id);
             return Inertia::render('DocumentView', [
-                "document" => $document
+                "document" => $document,
+                "parents" => $breadcrumbs,
             ]);
 
         } catch (DocumentNotFoundException|FileNotFoundException $e) {
