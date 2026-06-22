@@ -84,7 +84,7 @@ const copyToClipboard = async () => {
                     class="h-full w-full transform transition-transform group-hover:scale-110"
                 />
             </div>
-            <p class="text-sm font-medium text-gray-700 dark:text-zinc-200 truncate">{{ decodeEntities(child.name) }}</p>
+            <p class="text-sm font-medium text-gray-700 dark:text-zinc-200 break-words">{{ decodeEntities(child.name) }}</p>
         </component>
 
         <div v-else class="space-x-3 col-span-6 flex items-center">
