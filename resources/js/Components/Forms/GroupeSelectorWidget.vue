@@ -18,7 +18,7 @@ const allGroupesIds = props.allGroupes.map((d) => d.id);
 // Empêcher de se désélectionner de son propre service s'il n'en reste qu'un
 const isCheckboxDisabled = (groupeId: number) => {
     let mySelectedGrp;
-    if (user.role == "admin") {
+    if (user.role == "admin" || user.role == "superadmin") {
         if (!allGroupesIds.includes(groupeId)) return false;
         mySelectedGrp = selectedGrp.value.filter((id) =>
             allGroupesIds.includes(id),
