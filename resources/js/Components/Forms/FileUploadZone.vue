@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { CloudArrowUpIcon, DocumentIcon, CheckIcon } from "@heroicons/vue/24/solid";
-import { useDragAndDrop } from "@/Composables/useDragAndDrop"; // Ajuste le chemin
+import { CloudArrowUpIcon, DocumentIcon, CheckIcon, XMarkIcon } from "@heroicons/vue/24/solid";
+import { useDragAndDrop } from "@/Composables/useDragAndDrop";
 
 const props = defineProps<{
     modelValue: File[];
@@ -11,19 +11,33 @@ const props = defineProps<{
 
 const emit = defineEmits(["update:modelValue"]);
 
-// Logique commune pour traiter les fichiers (Input ou Drop)
+// Logique pour traiter les fichiers (Input ou Drop)
 const updateFiles = (fileList: FileList | File[]) => {
-    const files = Array.from(fileList);
+    const newFiles = Array.from(fileList);
+
     if (props.multiple) {
-        emit("update:modelValue", files);
+        // On cumule les anciens fichiers avec les nouveaux
+        emit("update:modelValue", [...props.modelValue, ...newFiles]);
     } else {
-        emit("update:modelValue", files.slice(0, 1));
+        // Mode simple : on écrase par le nouveau fichier
+        emit("update:modelValue", newFiles.slice(0, 1));
     }
+};
+
+// Fonction pour retirer un fichier spécifique via la croix
+const removeFile = (index: number) => {
+    const updatedFiles = [...props.modelValue];
+    updatedFiles.splice(index, 1);
+    emit("update:modelValue", updatedFiles);
 };
 
 const handleFileInput = (event: Event) => {
     const target = event.target as HTMLInputElement;
-    if (target.files) updateFiles(target.files);
+    if (target.files) {
+        updateFiles(target.files);
+        // On vide l'input pour pouvoir sélectionner à nouveau le même fichier si on vient de le supprimer
+        target.value = '';
+    }
 };
 
 // Intégration du Drag & Drop
@@ -72,8 +86,22 @@ const { isDragging } = useDragAndDrop({
         </label>
 
         <div v-if="modelValue.length" class="mt-3 flex flex-wrap gap-2 justify-center">
-            <div v-for="file in modelValue" :key="file.name" class="gap-2 px-3 py-1 bg-emerald-500/10 text-emerald-600 text-xs font-bold border-emerald-500/20 flex items-center rounded-full border">
-                <DocumentIcon class="w-3 h-3" /> {{ file.name }}
+            <div
+                v-for="(file, index) in modelValue"
+                :key="index + '-' + file.name"
+                class="gap-1 px-3 py-1 bg-emerald-500/10 text-emerald-600 text-xs font-bold border-emerald-500/20 flex items-center rounded-full border group/file"
+            >
+                <DocumentIcon class="w-3 h-3 flex-shrink-0" />
+                <span class="truncate max-w-[150px]">{{ file.name }}</span>
+
+                <button
+                    type="button"
+                    @click.prevent="removeFile(index)"
+                    class="ml-1 p-0.5 rounded-full hover:bg-emerald-500/20 text-emerald-600 hover:text-red-500 transition-colors"
+                    title="Retirer ce fichier"
+                >
+                    <XMarkIcon class="w-4 h-4" />
+                </button>
             </div>
         </div>
 
