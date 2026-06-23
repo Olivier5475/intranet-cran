@@ -59,7 +59,7 @@ readonly class DocumentService implements DocumentsServiceInterface
         $document = $this->documentRepository->read($document_id);
 
         // Accès complet pour admin ou document hors dossier (racine)
-        if ($user->role === "admin" || empty($document->folder_id) || count($document->groupes) === 0) {
+        if ($user->role === "superadmin" || $user->role === "admin" || empty($document->folder_id) || count($document->groupes) === 0) {
             return true;
         }
 

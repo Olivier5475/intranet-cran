@@ -46,7 +46,7 @@ readonly class FilesService implements FilesServiceInterface
         $user = $this->userService->readById($this->userService->getCurrentUserId());
         $file = $this->filesRepository->read($file_id);
 
-        if ($user->role === "admin" || empty($file->folder_id) || count($file->groupes) === 0) {
+        if ($user->role === "superadmin" || $user->role === "admin" || empty($file->folder_id) || count($file->groupes) === 0) {
             return true;
         }
 

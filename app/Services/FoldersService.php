@@ -90,7 +90,7 @@ readonly class FoldersService implements FoldersServiceInterface
     {
         $user = $this->userService->readById($this->userService->getCurrentUserId());
 
-        if ($user->role === "admin" || empty($folder_id)) {
+        if ($user->role === "superadmin" || $user->role === "admin" || empty($folder_id)) {
             return true;
         }
 
