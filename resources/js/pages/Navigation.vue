@@ -46,11 +46,13 @@ const filters = inject<DeepReadonly<Ref<FilterState>>>("activeFilters");
 
 const canEdit = useCanEdit(lastParent?.groupes as number[]);
 const fastFolderCreation = ref(false);
+const date_mode = ref("create");
 
 // RÉCUPÉRATION DES ELEMENTS FILTRER
 const filteredChildren = useFilteredChildren(
     toRef(props, "children"),
     filters as Ref<FilterState | null>,
+    date_mode
 );
 
 
@@ -66,7 +68,6 @@ useShortcuts({
     action: () => (fastFolderCreation.value = !fastFolderCreation.value),
 });
 
-const date_mode = ref("create");
 </script>
 
 <template>

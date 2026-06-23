@@ -27,7 +27,8 @@ const getExtension = (name: string): string => {
 
 export function useFilteredChildren(
     children: Ref<Child[]>,
-    filters: Ref<FilterState | null>
+    filters: Ref<FilterState | null>,
+    date_mode: Ref<string>
 ) {
     return computed(() => {
         const currentFilters = filters.value;
@@ -69,17 +70,58 @@ export function useFilteredChildren(
         // --- e) TRI (LOGIQUE MISE À JOUR) ---
         if (sortBy) {
             if (sortBy === 'newest') {
-                items.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
-                items.forEach(item => {new Date(item.created_at).getTime()});
+                if(date_mode.value == "create") {
+                    items.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+                    items.forEach(item => {
+                        new Date(item.created_at).getTime();
+                    });
+                } else if(date_mode.value == "update") {
+                    items.sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime());
+                    items.forEach(item => {
+                        new Date(item.updated_at).getTime();
+                    });
+                } else if (date_mode.value === "deadline") {
+                    items.sort((a, b) => {
+                        // Si aucun des deux n'a de deadline, on ne change pas leur ordre
+                        if (!a.deadline && !b.deadline) return 0;
+
+                        // Si l'un des deux n'a pas de deadline, on le pousse à la fin (retourne 1 ou -1)
+                        if (!a.deadline) return 1;
+                        if (!b.deadline) return -1;
+
+                        // Si les deux ont une deadline, on fait le tri classique
+                        return new Date(b.deadline).getTime() - new Date(a.deadline).getTime();
+                    });
+                }
             }
             else if (sortBy === 'oldest') {
-                items.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
-                items.forEach(item => {new Date(item.created_at).getTime()});
+                if(date_mode.value == "create") {
+                    items.sort((a, b) => new Date(a.updated_at).getTime() - new Date(b.updated_at).getTime());
+                    items.forEach(item => {
+                        new Date(item.updated_at).getTime()
+                    });
+                } else if(date_mode.value == "update") {
+                    items.sort((a, b) => new Date(a.updated_at).getTime() - new Date(b.updated_at).getTime());
+                    items.forEach(item => {
+                        new Date(item.updated_at).getTime()
+                    });
+                } else if(date_mode.value == "deadline") {
+                    items.sort((a, b) => {
+                        // Si aucun des deux n'a de deadline, on ne change pas leur ordre
+                        if (!a.deadline && !b.deadline) return 0;
+
+                        // Si l'un des deux n'a pas de deadline, on le pousse à la fin (retourne 1 ou -1)
+                        if (!a.deadline) return 1;
+                        if (!b.deadline) return -1;
+
+                        // Si les deux ont une deadline, on fait le tri classique
+                        return new Date(a.deadline).getTime() - new Date(b.deadline).getTime();
+                    });
+                }
             }
 
             // --- NOUVELLE LOGIQUE POUR 'name' ---
             else if (sortBy === 'name') {
-                console.log('sort by: ', sortBy);
                 items.sort((a, b) => {
                     // NIVEAU 1 : Trier par type (folder > document > file)
                     const priorityA = getTypePriority(a.type);
