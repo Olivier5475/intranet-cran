@@ -99,7 +99,7 @@ const updateTooltip = (e: any) => {
                         left: tooltipPos.x + 'px',
                     }"
                 >
-                    Recherche dans le contenu
+                    Étendre la recherche aux contenus des documents <br> (Par défaut : Recherche dans les titres uniquement)
                 </div>
             </div>
 
