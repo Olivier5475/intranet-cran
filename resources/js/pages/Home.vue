@@ -38,20 +38,8 @@ const filteredChildren = useFilteredChildren(
     filters as Ref<FilterState | null>,
 )
 
-// Récupération réactive de l'état des barres latérales du Layout principal
-const sidebarActive = inject<Ref<boolean>>('sidebarActive', ref(true));
-const filterActive = inject<Ref<boolean>>('filterActive', ref(true));
-// const fastFolderCreation = ref(false);
-
-const gridColsClass = computed(() => {
-    if (sidebarActive.value && filterActive.value) {
-        return 'lg:grid-cols-6'; // 6 colonnes si tout est déplié
-    }
-    if (!sidebarActive.value && !filterActive.value) {
-        return 'lg:grid-cols-8'; // 8 colonnes si tout est fermé
-    }
-    return 'lg:grid-cols-7'; // 7 colonnes si un seul des deux est fermé
-});
+// SUPPRESSION DE LA LOGIQUE JAVASCRIPT DES COLONNES
+// (sidebarActive, filterActive et gridColsClass ont été retirés car le CSS gère tout)
 
 // const user = usePage().props.auth.user;
 // const canEdit = user.role == "admin";
@@ -68,8 +56,7 @@ const gridColsClass = computed(() => {
     </div>
 
     <div
-        class="mt-6 gap-4 grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 transition-all duration-300"
-        :class="gridColsClass"
+        class="mt-6 gap-4 grid grid-cols-[repeat(auto-fill,minmax(160px,1fr))] transition-all duration-300"
     >
         <HomeCard
             v-for="child in filteredChildren"
@@ -78,12 +65,6 @@ const gridColsClass = computed(() => {
             :folder_id="0"
             :favorites="favorites"
         />
-<!--        <CreateFolderCardWidget-->
-<!--            v-if="fastFolderCreation && canEdit"-->
-<!--            :parent="parents.at(-1)"-->
-<!--            v-model="fastFolderCreation"-->
-<!--            :folder_id="0"-->
-<!--        />-->
     </div>
 </template>
 
