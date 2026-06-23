@@ -96,7 +96,7 @@ onUnmounted(() => {
                 <aside
                     :class="[
                         sidebarActive
-                            ? 'w-full lg:w-[var(--sidebar-w)] flex-shrink-0 relative lg:sticky lg:top-4'
+                            ? 'w-full lg:w-[var(--sidebar-w)] flex-shrink-0 relative  lg:top-4'
                             : 'w-full order-first'
                     ]"
                 >
@@ -123,7 +123,7 @@ onUnmounted(() => {
                 <aside
                     :class="[
                         filterActive
-                            ? 'w-full lg:w-[var(--filter-w)] flex-shrink-0 relative lg:sticky lg:top-4'
+                            ? 'w-full lg:w-[var(--filter-w)] flex-shrink-0 relative lg:top-4'
                             : 'w-full order-first'
                     ]"
                 >

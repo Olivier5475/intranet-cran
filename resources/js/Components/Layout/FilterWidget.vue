@@ -96,7 +96,7 @@ const onAfterLeave = () => {
                             <div class="relative flex items-center">
                                 <input :id="grp.id.toString()" type="checkbox" v-model="filters.selectedGroupes" :value="grp.id" class="h-5 w-5 rounded-lg border-gray-300 dark:border-slate-700 text-sky-500 focus:ring-sky-500/20 dark:bg-slate-900 cursor-pointer" />
                             </div>
-                            <span class="ml-3 text-sm font-medium text-gray-600 dark:text-zinc-300 group-hover:text-sky-500 transition-colors truncate">
+                            <span class="ml-3 text-sm font-medium text-gray-600 dark:text-zinc-300 group-hover:text-sky-500 transition-colors break-words">
                                 {{ grp.name }} <span class="text-[10px] opacity-50">({{ grp.initials }})</span>
                                 <div class="rounded-full w-2 h-2 ml-2 inline-block" :style="{ backgroundColor: grp.color }" />
                             </span>
