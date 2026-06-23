@@ -43,8 +43,6 @@ const view_mod = ref(localStorage.getItem('view_mode') || "list");
 const filters = inject<DeepReadonly<Ref<FilterState>>>("activeFilters");
 
 // Récupération réactive de l'état des barres latérales du Layout principal
-const sidebarActive = inject<Ref<boolean>>('sidebarActive', ref(true));
-const filterActive = inject<Ref<boolean>>('filterActive', ref(true));
 
 const canEdit = useCanEdit(lastParent?.groupes as number[]);
 const fastFolderCreation = ref(false);
@@ -55,16 +53,6 @@ const filteredChildren = useFilteredChildren(
     filters as Ref<FilterState | null>,
 );
 
-// Calcul dynamique strict du nombre de colonnes de cartes
-const gridColsClass = computed(() => {
-    if (sidebarActive.value && filterActive.value) {
-        return 'lg:grid-cols-5'; // 6 colonnes si tout est déplié
-    }
-    if (!sidebarActive.value && !filterActive.value) {
-        return 'lg:grid-cols-8'; // 8 colonnes si tout est fermé
-    }
-    return 'lg:grid-cols-7'; // 7 colonnes si un seul des deux est fermé
-});
 
 // VIEW MOD :
 watch(view_mod, (newValue) => {
@@ -121,8 +109,7 @@ const date_mode = ref("create");
 
     <div
         v-show="view_mod == 'icon'"
-        class="mt-6 gap-3 grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 transition-all duration-300"
-        :class="gridColsClass"
+        class="mt-6 gap-4 grid grid-cols-[repeat(auto-fill,minmax(160px,1fr))] transition-all duration-300"
     >
         <ResourceCard
             v-for="child in filteredChildren"
@@ -131,6 +118,7 @@ const date_mode = ref("create");
             :folder_id="folder_id"
             :favorites="favorites"
         />
+
         <CreateFolderCardWidget
             v-if="fastFolderCreation && canEdit"
             :parent="parents.at(-1)"
