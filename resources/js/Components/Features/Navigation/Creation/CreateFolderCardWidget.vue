@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ref, onMounted } from 'vue'; // 1. Ajout des imports
 import { FolderIcon, ArrowTurnDownRightIcon } from '@heroicons/vue/24/outline';
 import { useForm } from '@inertiajs/vue3';
 import route from '@/routes/editor/folder';
@@ -19,6 +20,17 @@ const form = useForm({
 });
 const model = defineModel<boolean>();
 
+// 2. Création d'une référence pour l'input
+const inputRef = ref<HTMLInputElement | null>(null);
+
+// 3. Focus et scroll fluide dès l'apparition de la carte
+onMounted(() => {
+    if (inputRef.value) {
+        inputRef.value.focus();
+        inputRef.value.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+});
+
 const submit = () => {
     form.post(route.post.create.url());
     model.value = !model.value;
@@ -37,9 +49,9 @@ const submit = () => {
 
         <form @submit.prevent="submit" class="gap-2 flex w-full flex-col items-center">
             <input
+                ref="inputRef"
                 v-model="form.name"
                 placeholder="Nom du dossier..."
-                autofocus
                 class="text-xs font-semibold border-purple-500 focus:border-purple-400
                 dark:text-zinc-200 w-full border-b bg-transparent text-center focus:ring-0 rounded"
             />

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ref, onMounted } from 'vue'; // 1. Ajout des imports
 import { FolderIcon, ArrowTurnDownRightIcon} from '@heroicons/vue/24/outline';
 import { useForm } from '@inertiajs/vue3';
 import route from '@/routes/editor/folder';
@@ -19,6 +20,17 @@ const form = useForm({
 });
 const model = defineModel<boolean>();
 
+// 2. Création d'une référence pour l'input
+const inputRef = ref<HTMLInputElement | null>(null);
+
+// 3. Au montage du composant, on focus et on scroll
+onMounted(() => {
+    if (inputRef.value) {
+        inputRef.value.focus();
+        inputRef.value.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+});
+
 const submit = () => {
     form.post(route.post.create.url());
     model.value = !model.value;
@@ -36,6 +48,7 @@ const submit = () => {
             </div>
             <form @submit.prevent="submit" class="flex gap-2">
                 <input
+                    ref="inputRef"
                     v-model="form.name"
                     class="text-sm font-medium dark:bg-slate-700 w-full rounded-lg focus:ring-0
         hover:border-violet-300 hover:border-1 focus:border-violet-500 focus:border-2
