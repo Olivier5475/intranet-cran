@@ -19,7 +19,7 @@ defineProps<{
 
 <template>
     <nav
-        class="flex items-center space-x-1 text-sm font-medium p-1 overflow-x-auto no-scrollbar"
+        class="flex items-center space-x-1 text-sm font-medium p-1 overflow-x-auto"
     >
         <Link
             href="/public"
