@@ -6,9 +6,6 @@ import { home } from '@/routes';
 import TreeViewItem from '@/Components/Layout/TreeViewItem.vue';
 import { Folder } from '@/types/folder';
 import { ref } from 'vue';
-import document_route from '@/routes/editor/document';
-import file_route from '@/routes/editor/file';
-
 const page = usePage();
 const user = page.props.auth.user;
 

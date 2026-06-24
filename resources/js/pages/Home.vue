@@ -3,7 +3,7 @@ import SearchBarWidget from '@/Components/Features/SearchBarWidget.vue';
 import { Child } from '@/types/child';
 import { Folder } from '@/types/folder';
 // import CreateFolderCardWidget from '@/Components/Features/Navigation/Creation/CreateFolderCardWidget.vue';
-import { computed, DeepReadonly, inject, ref, Ref } from 'vue';
+import { computed, DeepReadonly, inject, ref, Ref, toRef } from 'vue';
 import { useFilteredChildren } from '@/Composables/useFiltres';
 import { FilterState } from '@/types/filtres';
 import HomeCard from '@/Components/Features/Home/HomeCard.vue';
@@ -36,6 +36,7 @@ const filters = inject<DeepReadonly<Ref<FilterState>>>("activeFilters");
 const filteredChildren = useFilteredChildren(
     combinedChildren,
     filters as Ref<FilterState | null>,
+    toRef("create")
 )
 
 // SUPPRESSION DE LA LOGIQUE JAVASCRIPT DES COLONNES

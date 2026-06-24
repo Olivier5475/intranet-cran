@@ -37,8 +37,10 @@ class Folder extends Model {
 
     public function allChildren(): HasMany
     {
-        // Utilise la même relation children mais est nommé différemment pour le chargement récursif
-        return $this->children()->with('allChildren');
+        // Récupère uniquement les sous-dossiers non archivés de manière récursive
+        return $this->children()
+            ->where('is_archived', false)
+            ->with('allChildren');
     }
     /**
      * Les fichiers simples dans ce dossier

@@ -15,7 +15,6 @@ class HandleInertiaRequests extends Middleware {
     public function __construct(
         private readonly FoldersServiceInterface   $foldersService,
         private readonly GroupesServiceInterface   $groupesService,
-        private readonly DocumentsServiceInterface $documentsService,
         private readonly UserServiceInterface      $userService
     ) {}
 
