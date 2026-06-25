@@ -61,14 +61,3 @@ defineProps<{
         </div>
     </nav>
 </template>
-
-<style scoped>
-/* Cache la scrollbar si le chemin est trop long sur mobile tout en permettant le défilement */
-.no-scrollbar::-webkit-scrollbar {
-    display: none;
-}
-.no-scrollbar {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-}
-</style>
