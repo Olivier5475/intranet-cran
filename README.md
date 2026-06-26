@@ -17,7 +17,7 @@ Avant de commencer, assurez-vous d'avoir installé les éléments suivants sur v
 ### 1. Cloner le dépôt
 ```bash
 git clone git@github.com:Olivier5475/intranet-cran.git
-cd intranet_laravel
+cd intranet-cran
 ```
 
 ### 2. Installation des dépendances
@@ -105,11 +105,26 @@ Le projet utilise l'architecture suivante pour la partie Vue :
 - `resources/js/Pages` : Les pages de l'application.
 - `resources/js/Components` : Les composants réutilisables (UI, Formulaires).
 - `resources/js/Composables` : La logique partagée (Drag&Drop, etc.).
-- `resources/js/routes` : Définition des routes partagées via Ziggy.
+- `resources/js/routes` : Définition des routes partagées via Wayfinder.
+- `resources/js/types` : Fichiers class pour le typage typescript.
+
+
+## 🏗️ Architecture du Backend (Flux de données)
+
+Pour garder le code propre et testable, nous utilisons le pattern Service/Repository. Voici le trajet d'une requête :
+
+1. **Routes & Middleware :** Capturent l'URL et vérifient les droits (Auth, rôles).
+2. **Requests (FormRequest) :** Valident strictement les données entrantes (ex: `SaveDocumentRequest`).
+3. **Controller :** Ne contient AUCUNE logique métier. Il appelle le Service, et retourne la vue Inertia ou la réponse JSON.
+4. **Service :** Le cœur de l'application. Contient la logique métier (calculs, vérifications complexes, envoi de mails).
+5. **DTO (Data Transfer Object) :** Transporte les données entre les couches proprement.
+6. **Repository :** La SEULE couche qui fait des requêtes SQL/Eloquent. Le Service lui demande des données, le Repository interroge le Model.
+7. **Model :** Définit les relations (HasMany, BelongsTo) et les casts.
+
 
 ## 📝 Commandes utiles
 
-- **Mettre à jour l'index de recherche :** `php artisan scout:import "App\Models\Document"`
+- **Mettre à jour l'index de recherche :** `php artisan scout:import "App\Models\Document"` *l'exemple marche avec d'autres entités
 - **Lancer les files d'attente :** `php artisan queue:work`
 - **Compiler pour la production :** `npm run build`
 - **Générer les fichiers de routes pour VueJS :** `php artisan wayfinder:generate`
