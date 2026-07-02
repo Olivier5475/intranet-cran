@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onUnmounted, provide } from 'vue';
 
-// --- IMPORTS DES COMPOSANTS (Vérifie bien tes chemins d'accès ici) ---
+// --- IMPORTS DES COMPOSANTS ---
 import MainNav from '@/Components/Layout/MainNav.vue';
 import SidebarWidget from '@/Components/Layout/SidebarWidget.vue';
 import FilterWidget from '@/Components/Layout/FilterWidget.vue';
@@ -15,16 +15,15 @@ defineProps<{
 // --- ÉTATS DES BARRES LATÉRALES ---
 const sidebarActive = ref(true);
 const filterActive = ref(true);
-const activeFilters = ref({}); // Stockage global de l'état des filtres
+const activeFilters = ref({});
 
-// 🚀 ENVOI DES ÉTATS AUX ENFANTS (Home, Navigation, etc.)
+// 🚀 ENVOI DES ÉTATS AUX ENFANTS
 provide('sidebarActive', sidebarActive);
 provide('filterActive', filterActive);
 provide('activeFilters', activeFilters);
 
 const handleFilterChange = (filters: any) => {
     activeFilters.value = filters;
-    console.log('Filtres mis à jour', filters);
 };
 
 // --- LOGIQUE DE REDIMENSIONNEMENT (DRAG & RESIZE) ---
@@ -96,8 +95,8 @@ onUnmounted(() => {
                 <aside
                     :class="[
                         sidebarActive
-                            ? 'w-full lg:w-[var(--sidebar-w)] flex-shrink-0 relative  lg:top-4'
-                            : 'w-full order-first'
+                            ? 'w-full lg:w-[var(--sidebar-w)] flex-shrink-0 relative lg:top-4'
+                            : (!filterActive ? 'w-full lg:w-[calc(50%-0.75rem)] order-first' : 'w-full order-first')
                     ]"
                 >
                     <SidebarWidget
@@ -126,7 +125,7 @@ onUnmounted(() => {
                     :class="[
                         filterActive
                             ? 'w-full lg:w-[var(--filter-w)] flex-shrink-0 relative lg:top-4'
-                            : 'w-full order-first'
+                            : (!sidebarActive ? 'w-full lg:w-[calc(50%-0.75rem)] order-first' : 'w-full order-first')
                     ]"
                 >
                     <div
