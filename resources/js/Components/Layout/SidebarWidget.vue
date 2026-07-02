@@ -78,7 +78,7 @@ const handleDrop = (e: DragEvent) => {
             leave-to-class="max-h-0 opacity-0 transform -translate-y-2"
         >
             <div v-if="isActive" class="dark:bg-sky-900/5 p-3 overflow-hidden">
-                <ul class="lg:min-h-[65svh] max-h-[calc(100vh-2rem)] overflow-y-auto no-scrollbar space-y-1">
+                <ul class="lg:min-h-[65svh] max-h-[calc(100vh-2rem)] overflow-y-auto space-y-1">
                     <Link
                         :href="home.url()"
                         class="flex items-center px-3 py-2.5 rounded-xl transition-all duration-200 group border border-transparent"
@@ -121,6 +121,4 @@ const handleDrop = (e: DragEvent) => {
 </template>
 
 <style scoped>
-.no-scrollbar::-webkit-scrollbar { display: none; }
-.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 </style>
