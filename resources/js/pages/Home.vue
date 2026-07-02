@@ -3,7 +3,7 @@ import SearchBarWidget from '@/Components/Features/SearchBarWidget.vue';
 import { Child } from '@/types/child';
 import { Folder } from '@/types/folder';
 // import CreateFolderCardWidget from '@/Components/Features/Navigation/Creation/CreateFolderCardWidget.vue';
-import { computed, DeepReadonly, inject, Ref, toRef } from 'vue';
+import { computed, DeepReadonly, inject, ref, Ref, toRef } from 'vue';
 import { useFilteredChildren } from '@/Composables/useFiltres';
 import { FilterState } from '@/types/filtres';
 import HomeCard from '@/Components/Features/Home/HomeCard.vue';
@@ -36,7 +36,9 @@ const filters = inject<DeepReadonly<Ref<FilterState>>>("activeFilters");
 const filteredChildren = useFilteredChildren(
     combinedChildren,
     filters as Ref<FilterState | null>,
-    toRef("create")
+    toRef("create"),
+    ref<'date'>('date'),
+    ref<'asc'>('asc')
 )
 
 // SUPPRESSION DE LA LOGIQUE JAVASCRIPT DES COLONNES
@@ -57,7 +59,7 @@ const filteredChildren = useFilteredChildren(
     </div>
 
     <div
-        class="mt-6 gap-4 grid grid-cols-[repeat(auto-fill,minmax(160px,1fr))] transition-all duration-300"
+        class="mt-6 gap-4 grid grid-cols-[repeat(auto-fill,minmax(130px,1fr))] transition-all duration-300"
     >
         <HomeCard
             v-for="child in filteredChildren"
