@@ -109,8 +109,10 @@ onUnmounted(() => {
                     <div
                         v-if="sidebarActive"
                         @mousedown.prevent="startDragSidebar"
-                        class="hidden lg:block absolute -right-3 top-0 bottom-0 w-2 cursor-col-resize hover:bg-sky-500 rounded transition-colors z-10"
-                    ></div>
+                        class="hidden lg:block absolute -right-6 top-0 bottom-0 w-4 cursor-col-resize z-10 group flex justify-center"
+                    >
+                        <div class="w-[2px] h-full rounded transition-colors group-hover:bg-sky-500"></div>
+                    </div>
                 </aside>
 
                 <main
@@ -130,8 +132,10 @@ onUnmounted(() => {
                     <div
                         v-if="filterActive"
                         @mousedown.prevent="startDragFilter"
-                        class="hidden lg:block absolute -left-3 top-0 bottom-0 w-2 cursor-col-resize hover:bg-sky-500 rounded transition-colors z-10"
-                    ></div>
+                        class="hidden lg:block absolute -left-3 top-0 bottom-0 w-4 cursor-col-resize z-10 group flex justify-center"
+                    >
+                        <div class="w-[2px] h-full rounded transition-colors group-hover:bg-sky-500"></div>
+                    </div>
 
                     <FilterWidget
                         :groupes="groupes"
