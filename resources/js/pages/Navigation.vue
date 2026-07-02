@@ -68,6 +68,7 @@ useShortcuts({
     action: () => (fastFolderCreation.value = !fastFolderCreation.value),
 });
 
+const hasAppelProjet = () => filteredChildren.value.some(child => child.type === "appelprojet");
 </script>
 
 <template>
@@ -144,7 +145,7 @@ useShortcuts({
             >
                 <option value="create">Date de création</option>
                 <option value="update">Dernière modification</option>
-                <option value="deadline">Deadline</option>
+                <option v-if="hasAppelProjet()" value="deadline">Deadline</option>
             </select>
             <p class="col-span-2 text-center">Groupes</p>
             <p class="col-span-1 text-right">Actions</p>
