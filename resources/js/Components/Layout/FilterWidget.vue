@@ -6,20 +6,13 @@ import { Groupe } from "@/types/groupe";
 const emit = defineEmits(["filters-updated"]);
 defineProps<{ groupes: Groupe[]; }>();
 
+// 🚀 Suppression de sortBy
 const filters = reactive({
     startDate: null,
     endDate: null,
     fileType: "all",
-    sortBy: "newest",
     selectedGroupes: [] as number[],
 });
-
-const sortPossibilities = {
-    pertinence: "Pertinence",
-    newest: "Le plus recent",
-    oldest: "Le plus ancien",
-    name: "Par nom",
-};
 
 const fileTypeList = [
     { id: "all", name: "Tous les types" },
@@ -43,19 +36,15 @@ const isExpanded = ref(isActive.value);
 
 const toggle = function () {
     if (isExpanded.value) {
-        // Fermeture : On masque d'abord le formulaire
         isExpanded.value = false;
     } else {
-        // Ouverture : ÉTAPE PREMIÈRE -> Placement correct dans la grille immédiat
         isActive.value = true;
-        // Puis dépliement fluide à sa place finale
         setTimeout(() => {
             isExpanded.value = true;
-        }, 20); // Un micro-délai pour laisser le DOM se caler à droite
+        }, 20);
     }
 };
 
-// Se déclenche à la fin du repliement (fermeture)
 const onAfterLeave = () => {
     isActive.value = false;
 };
@@ -122,16 +111,6 @@ const onAfterLeave = () => {
                         <select id="fileType" v-model="filters.fileType" class="dark:bg-slate-900/50 border-gray-200 dark:border-slate-800 rounded-xl pl-10 py-2.5 text-sm dark:text-zinc-200 focus:ring-sky-500/10 focus:border-sky-500 block w-full cursor-pointer bg-transparent focus:ring-4 transition-all">
                             <option v-for="type in fileTypeList" :key="type.id" :value="type.id" class="dark:bg-slate-900">{{ type.name }}</option>
                         </select>
-                    </div>
-                </div>
-
-                <div>
-                    <label class="font-black text-gray-400 dark:text-zinc-500 mb-3 ml-1 block text-[10px] tracking-[0.2em] uppercase">Trier par</label>
-                    <div class="space-y-1">
-                        <label v-for="(label, value) in sortPossibilities" :key="value" :class="['p-2 rounded-xl flex cursor-pointer items-center border border-transparent transition-all', filters.sortBy === value ? 'bg-sky-50 dark:bg-sky-900/20 border-sky-100 dark:border-sky-900/30 text-sky-600 dark:text-sky-400 font-bold' : 'hover:bg-gray-50 dark:hover:bg-slate-800 text-gray-600 dark:text-zinc-400']">
-                            <input :id="value" :value="value" v-model="filters.sortBy" type="radio" class="h-4 w-4 border-gray-300 text-sky-500 focus:ring-sky-500/20 dark:bg-slate-900 transition-all" />
-                            <span class="ml-3 text-sm font-semibold tracking-tight">{{ label }}</span>
-                        </label>
                     </div>
                 </div>
             </form>

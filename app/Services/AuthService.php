@@ -9,6 +9,7 @@ use App\Services\Interfaces\{MapDTOServiceInterface, UserServiceInterface};
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\{Auth, Log};
+//use Illuminate\Support\Facades\Http;
 use Illuminate\Validation\UnauthorizedException;
 use phpCAS;
 use Throwable;
@@ -204,6 +205,24 @@ readonly class AuthService implements UserServiceInterface
         $emails = array_map('strtolower', array_column($tab_listeindividu, 'email'));
         return in_array(strtolower($email), $emails, true);
     }
+
+//    public function emailExistIn12Plus(string $email): bool
+//    {
+//        try {
+//            $response = Http::asForm()
+//                ->timeout(10)
+//                ->withoutVerifying() // Garde l'équivalent de tes CURLOPT_SSL_VERIFY... à 0 si besoin
+//                ->post(config('services.12plus.url') . '/api/annuaire/check-email', [
+//                    'email' => $email
+//                ]);
+//
+//            // Retourne true si le statut HTTP est 2xx et que le body vaut "true"
+//            return $response->successful() && filter_var($response->body(), FILTER_VALIDATE_BOOLEAN);
+//
+//        } catch (\Throwable $e) {
+//            return false;
+//        }
+//    }
 
     /**
      * @inheritdoc

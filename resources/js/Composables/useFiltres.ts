@@ -4,150 +4,108 @@ import { FilterState } from '@/types/filtres';
 import { Child } from '@/types/child'
 import { filtre } from '@/Composables/useDocumentsTypeRegex';
 
-// --- HELPER 1 : Priorité des types ---
-// (Défini ici pour ne pas être recréé à chaque rendu)
 const getTypePriority = (type: string): number => {
     switch (type) {
-        case 'folder': return 1;   // Vient en premier
-        case 'document': return 2; // Vient en second
-        case 'file': return 3;     // Vient en troisième
-        default: return 99;        // Tout le reste à la fin
+        case 'folder': return 1;
+        case 'document': return 2;
+        case 'file': return 3;
+        default: return 99;
     }
 };
 
-// --- HELPER 2 : Extension de fichier ---
 const getExtension = (name: string): string => {
     const lastDot = name.lastIndexOf('.');
-    // S'il n'y a pas de point, ou si c'est le premier caractère (ex: .env)
-    if (lastDot <= 0) {
-        return ''; // Pas d'extension
-    }
+    if (lastDot <= 0) return '';
     return name.substring(lastDot + 1).toLowerCase();
 };
 
 export function useFilteredChildren(
     children: Ref<Child[]>,
     filters: Ref<FilterState | null>,
-    date_mode: Ref<string>
+    date_mode: Ref<string>,
+    sortColumn: Ref<'name' | 'type' | 'date'>, // 🚀 Nouveaux arguments
+    sortDirection: Ref<'asc' | 'desc'>
 ) {
     return computed(() => {
         const currentFilters = filters.value;
         let items = [...children.value];
 
-        if (!currentFilters) {
-            return items;
-        }
+        if (currentFilters) {
+            const { selectedGroupes, fileType, startDate, endDate } = currentFilters;
 
-        const { selectedGroupes, fileType, startDate, endDate, sortBy } = currentFilters;
-
-        // ... (votre logique de FILTRAGE existante reste ici) ...
-        // a) Filtre Groupes
-        if (selectedGroupes && selectedGroupes.length > 0) {
-            items = items.filter(child =>
-                child.groupes &&
-                child.groupes.some(grp => selectedGroupes.includes(grp))
-            );
-        }
-        // b) Filtre Type de fichier
-        if (fileType && fileType !== 'all') {
-            items = items.filter((child) => {
-                if(child.type === "file" && child.mimetype) {
-                    return filtre(child.mimetype, fileType);
-                }
-                return child.type === fileType;
-            });
-        }
-        // c) Filtre Date de début
-        if (startDate) {
-            items = items.filter(child => new Date(child.created_at) >= new Date(startDate));
-        }
-        // d) Filtre Date de fin
-        if (endDate) {
-            items = items.filter(child => new Date(child.created_at) <= new Date(endDate));
-        }
-
-
-        // --- e) TRI (LOGIQUE MISE À JOUR) ---
-        if (sortBy) {
-            if (sortBy === 'newest') {
-                if(date_mode.value == "create") {
-                    items.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
-                    items.forEach(item => {
-                        new Date(item.created_at).getTime();
-                    });
-                } else if(date_mode.value == "update") {
-                    items.sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime());
-                    items.forEach(item => {
-                        new Date(item.updated_at).getTime();
-                    });
-                } else if (date_mode.value === "deadline") {
-                    items.sort((a, b) => {
-                        // Si aucun des deux n'a de deadline, on ne change pas leur ordre
-                        if (!a.deadline && !b.deadline) return 0;
-
-                        // Si l'un des deux n'a pas de deadline, on le pousse à la fin (retourne 1 ou -1)
-                        if (!a.deadline) return 1;
-                        if (!b.deadline) return -1;
-
-                        // Si les deux ont une deadline, on fait le tri classique
-                        return new Date(b.deadline).getTime() - new Date(a.deadline).getTime();
-                    });
-                }
+            if (selectedGroupes && selectedGroupes.length > 0) {
+                items = items.filter(child =>
+                    child.groupes &&
+                    child.groupes.some(grp => selectedGroupes.includes(grp))
+                );
             }
-            else if (sortBy === 'oldest') {
-                if(date_mode.value == "create") {
-                    items.sort((a, b) => new Date(a.updated_at).getTime() - new Date(b.updated_at).getTime());
-                    items.forEach(item => {
-                        new Date(item.updated_at).getTime()
-                    });
-                } else if(date_mode.value == "update") {
-                    items.sort((a, b) => new Date(a.updated_at).getTime() - new Date(b.updated_at).getTime());
-                    items.forEach(item => {
-                        new Date(item.updated_at).getTime()
-                    });
-                } else if(date_mode.value == "deadline") {
-                    items.sort((a, b) => {
-                        // Si aucun des deux n'a de deadline, on ne change pas leur ordre
-                        if (!a.deadline && !b.deadline) return 0;
-
-                        // Si l'un des deux n'a pas de deadline, on le pousse à la fin (retourne 1 ou -1)
-                        if (!a.deadline) return 1;
-                        if (!b.deadline) return -1;
-
-                        // Si les deux ont une deadline, on fait le tri classique
-                        return new Date(a.deadline).getTime() - new Date(b.deadline).getTime();
-                    });
-                }
-            }
-
-            // --- NOUVELLE LOGIQUE POUR 'name' ---
-            else if (sortBy === 'name') {
-                items.sort((a, b) => {
-                    // NIVEAU 1 : Trier par type (folder > document > file)
-                    const priorityA = getTypePriority(a.type);
-                    const priorityB = getTypePriority(b.type);
-                    if (priorityA !== priorityB) {
-                        return priorityA - priorityB; // Tri numérique simple
+            if (fileType && fileType !== 'all') {
+                items = items.filter((child) => {
+                    if (child.type === "file" && child.mimetype) {
+                        return filtre(child.mimetype, fileType);
                     }
-
-                    // NIVEAU 2 : Les types sont identiques
-                    // Si ce sont des 'file', on trie par extension d'abord
-                    if (a.type === 'file') {
-                        const extA = getExtension(a.name);
-                        const extB = getExtension(b.name);
-                        const extCompare = extA.localeCompare(extB);
-
-                        if (extCompare !== 0) {
-                            return extCompare; // Les extensions sont différentes
-                        }
-                    }
-
-                    // NIVEAU 3 : Tri par nom
-                    // (Pour 'folder', 'document', ou 'file' avec la même extension)
-                    return a.name.localeCompare(b.name);
+                    return child.type === fileType;
                 });
             }
+            if (startDate) {
+                items = items.filter(child => new Date(child.created_at) >= new Date(startDate));
+            }
+            if (endDate) {
+                items = items.filter(child => new Date(child.created_at) <= new Date(endDate));
+            }
         }
+
+        // --- 🚀 TRI DYNAMIQUE (EXPLORATEUR DE FICHIERS) ---
+        const dir = sortDirection.value === 'asc' ? 1 : -1;
+
+        items.sort((a, b) => {
+            // Règle d'or : Les dossiers restent toujours en haut (comme sur Windows/Mac)
+            // Sauf si on trie spécifiquement par "Type"
+            const priorityA = getTypePriority(a.type);
+            const priorityB = getTypePriority(b.type);
+
+            if (sortColumn.value === 'name') {
+                if (priorityA !== priorityB) return priorityA - priorityB; // Garde les dossiers en haut
+
+                // Tri par extension pour les fichiers
+                if (a.type === 'file' && b.type === 'file') {
+                    const extCompare = getExtension(a.name).localeCompare(getExtension(b.name));
+                    if (extCompare !== 0) return extCompare * dir;
+                }
+                return a.name.localeCompare(b.name) * dir;
+            }
+
+            if (sortColumn.value === 'type') {
+                // Ici, on trie strictement par type, puis on ordonne par nom
+                if (priorityA !== priorityB) return (priorityA - priorityB) * dir;
+                return a.name.localeCompare(b.name);
+            }
+
+            if (sortColumn.value === 'date') {
+                let dateA = 0;
+                let dateB = 0;
+
+                if (date_mode.value === 'create') {
+                    dateA = new Date(a.created_at).getTime();
+                    dateB = new Date(b.created_at).getTime();
+                } else if (date_mode.value === 'update') {
+                    dateA = new Date(a.updated_at || a.created_at).getTime();
+                    dateB = new Date(b.updated_at || b.created_at).getTime();
+                } else if (date_mode.value === 'deadline') {
+                    // Pour les deadlines, ceux qui n'en ont pas vont à la fin
+                    if (!a.deadline && !b.deadline) return 0;
+                    if (!a.deadline) return 1;
+                    if (!b.deadline) return -1;
+                    dateA = new Date(a.deadline).getTime();
+                    dateB = new Date(b.deadline).getTime();
+                }
+
+                return (dateA - dateB) * dir;
+            }
+
+            return 0;
+        });
+
         return items;
     });
 }
