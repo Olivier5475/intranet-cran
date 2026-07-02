@@ -102,7 +102,7 @@ const restore = () => {
         </div>
         <header class="group bg-slate-50 dark:bg-slate-800/50 p-6 rounded-t-2xl border-slate-200 dark:border-slate-700 relative border-b flex flex-col items-center justify-center">
 
-            <h1 class="text-3xl font-black text-slate-800 dark:text-white tracking-tight text-center first-letter:uppercase max-w-[80%]">
+            <h1 class="text-xl font-black text-slate-800 dark:text-white tracking-tight text-center first-letter:uppercase max-w-[80%]">
                 {{ decodeEntities(document.name) }}
             </h1>
 
