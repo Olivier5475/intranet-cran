@@ -121,7 +121,7 @@ const hasAppelProjet = computed(() => filteredChildren.value.some(child => child
 
     <div
         v-show="view_mod == 'icon'"
-        class="mt-6 gap-4 grid grid-cols-[repeat(auto-fill,minmax(120px,1fr))] transition-all duration-300"
+        class="mt-6 gap-4 grid grid-cols-[repeat(auto-fill,minmax(150px,1fr))] transition-all duration-300"
     >
         <ResourceCard
             v-for="child in filteredChildren"

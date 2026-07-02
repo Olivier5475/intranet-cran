@@ -3,7 +3,7 @@ import { ref, computed, unref } from 'vue';
 import { Link } from '@inertiajs/vue3';
 import { ArrowDownTrayIcon, StarIcon as SolidStar } from '@heroicons/vue/24/solid';
 import { ClipboardDocumentIcon, ClipboardDocumentCheckIcon, StarIcon as OutlineStar } from "@heroicons/vue/24/outline";
-import { decodeEntities } from "@/Composables/useDecodeModule";
+import { decodeEntities, formatForDisplay } from '@/Composables/useDecodeModule';
 import { useResource } from "@/Composables/useResource";
 import ResourceIcon from "@/Components/Features/Navigation/Resource/ResourceIcon.vue";
 import EditorActionsWidget from '@/Components/Features/EditorActionsWidget.vue';
@@ -99,7 +99,7 @@ const isFavorite = computed(() => {
                 <ResourceIcon :child="child" :color="itemColor" class="h-full w-full mt-2" />
             </div>
             <span class="text-xs font-semibold line-clamp-2 min-h-[2rem] text-center break-words mt-1">
-                {{ decodeEntities(child.name) }}
+                {{ decodeEntities(child.name) }} <span v-if="child.deadline">(Fin : {{ formatForDisplay(child.deadline) }})</span>
             </span>
         </component>
 
