@@ -92,16 +92,16 @@ const copyToClipboard = async () => {
             <ResourceRenameForm v-model="child.name" :route-url="updateRoute" is-row @success="activeRename = false" />
         </div>
 
-        <div class="text-xs text-gray-500 dark:text-zinc-400 col-span-1 text-center">
+        <div class="text-xs font-bold text-gray-500 dark:text-zinc-400 col-span-1 text-center">
             <span class="px-2 py-1 bg-gray-100 dark:bg-slate-800 rounded-full">
                 {{ child.type === "folder" ? "Dossier" : child.type === "document" ? "Document" : "Fichier" }}
             </span>
         </div>
 
-        <p v-if="date_mode == 'create'" class="text-xs text-gray-400 col-span-3 text-center">{{ child.created_at }}</p>
+        <p v-if="date_mode == 'create'" class="text-xs font-bold text-gray-400 col-span-3 text-center">{{ child.created_at }}</p>
 
         <!--        AFFICHAGE DATE DERNIÈRE MODIFICATION          -->
-        <p v-else-if="date_mode == 'update'" class="text-xs text-gray-400 col-span-3 text-center">
+        <p v-else-if="date_mode == 'update'" class="text-xs font-bold text-gray-400 col-span-3 text-center">
             <span v-if="child.updated_at">
                 {{ child.updated_at }}
             </span>
@@ -111,7 +111,7 @@ const copyToClipboard = async () => {
         </p>
 
         <!--        AFFICHAGE DEADLINE          -->
-        <p v-else-if="date_mode == 'deadline'" class="text-xs text-gray-400 col-span-3 text-center">
+        <p v-else-if="date_mode == 'deadline'" class="text-xs font-bold text-gray-400 col-span-3 text-center">
             <span v-if="child.deadline">
                 {{ formatForDisplay(child.deadline) }}
             </span>
