@@ -113,7 +113,7 @@ const restore = () => {
             >
                 <CalendarDaysIcon class="w-4 h-4" :class="deadlineStyle.text" />
                 <span :class="deadlineStyle.text">
-                    Lien Projet • Clôture le {{ formattedDeadline }} ({{ deadlineStyle.label }})
+                    Clôture le {{ formattedDeadline }} ({{ deadlineStyle.label }})
                 </span>
             </div>
 
