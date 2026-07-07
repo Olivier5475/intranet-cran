@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { reactive, watch, ref } from "vue";
-import { AdjustmentsHorizontalIcon, CalendarIcon, DocumentIcon } from "@heroicons/vue/24/outline";
+import { AdjustmentsHorizontalIcon, CalendarIcon, DocumentIcon, ChevronDownIcon } from "@heroicons/vue/24/outline";
 import { Groupe } from "@/types/groupe";
 
 const emit = defineEmits(["filters-updated"]);
@@ -54,17 +54,16 @@ const onAfterLeave = () => {
     <section class="bg-white shadow-xl rounded-2xl border-gray-100 dark:border-slate-800 dark:bg-slate-900 overflow-hidden border transition-all duration-600">
         <div
             @click="toggle"
-            class="h-14 font-bold text-gray-700 dark:text-zinc-300 p-4 bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-800 border-gray-100 dark:border-slate-800 flex cursor-pointer items-center justify-between border-b transition-colors"
+            class="h-14 cursor-pointer font-bold text-gray-700 dark:text-zinc-300 p-4 flex items-center justify-between bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors border-b border-gray-100 dark:border-slate-800"
         >
             <div class="space-x-3 flex items-center">
                 <AdjustmentsHorizontalIcon class="h-5 w-5 text-sky-500" />
                 <span class="text-sm tracking-wider uppercase">Filtres</span>
             </div>
-            <div :class="['transition-transform duration-600', isExpanded ? 'rotate-180' : '']">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                </svg>
-            </div>
+
+            <ChevronDownIcon
+                :class="['w-5 h-5 text-gray-400 dark:text-zinc-500 transition-transform duration-300', isExpanded ? '-rotate-180' : '']"
+            />
         </div>
 
         <Transition

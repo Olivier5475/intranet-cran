@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Link, useForm, usePage } from '@inertiajs/vue3';
-import { ChevronDownIcon, ChevronRightIcon, HomeIcon, PlusIcon } from '@heroicons/vue/24/solid';
+import { ChevronDownIcon, HomeIcon, PlusIcon } from '@heroicons/vue/24/solid';
+import { QueueListIcon } from '@heroicons/vue/24/outline';
 import folder_route from '@/routes/editor/folder';
 import { home } from '@/routes';
 import TreeViewItem from '@/Components/Layout/TreeViewItem.vue';
@@ -8,7 +9,6 @@ import { Folder } from '@/types/folder';
 import { ref } from 'vue';
 const page = usePage();
 const user = page.props.auth.user;
-
 defineProps<{
     name: string;
     children?: Array<Folder>;
@@ -60,13 +60,14 @@ const handleDrop = (e: DragEvent) => {
             @click="isActive = !isActive"
             class="h-14 cursor-pointer font-bold text-gray-700 dark:text-zinc-300 p-4 flex items-center justify-between bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors border-b border-gray-100 dark:border-slate-800"
         >
-            <span class="flex items-center space-x-3">
-                <component
-                    :is="isActive ? ChevronDownIcon : ChevronRightIcon"
-                    class="w-5 h-5 text-sky-500 transition-transform duration-300"
-                />
+            <div class="space-x-3 flex items-center">
+                <QueueListIcon class="h-5 w-5 text-sky-500" />
                 <span class="text-sm uppercase tracking-wider">{{ name }}</span>
-            </span>
+            </div>
+
+            <ChevronDownIcon
+                :class="['w-5 h-5 text-gray-400 dark:text-zinc-500 transition-transform duration-300', isActive ? '-rotate-180' : '']"
+            />
         </h2>
 
         <Transition
