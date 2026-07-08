@@ -76,22 +76,6 @@ const onAfterLeave = () => {
             @after-leave="onAfterLeave"
         >
             <form v-if="isExpanded" class="p-5 dark:bg-sky-900/5 overflow-hidden flex flex-col gap-8 transition-all duration-600">
-
-                <div class="space-y-3">
-                    <label class="font-black text-gray-400 dark:text-zinc-500 mb-3 ml-1 block text-[10px] tracking-[0.2em] uppercase">Groupes</label>
-                    <div class="gap-2 grid grid-cols-1">
-                        <label v-for="grp in groupes" :key="grp.id" class="group p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/40 flex cursor-pointer items-center transition-all">
-                            <div class="relative flex items-center">
-                                <input :id="grp.id.toString()" type="checkbox" v-model="filters.selectedGroupes" :value="grp.id" class="h-5 w-5 rounded-lg border-gray-300 dark:border-slate-700 text-sky-500 focus:ring-sky-500/20 dark:bg-slate-900 cursor-pointer" />
-                            </div>
-                            <span class="ml-3 text-sm font-medium text-gray-600 dark:text-zinc-300 group-hover:text-sky-500 transition-colors break-words">
-                                {{ grp.name }} <span class="text-[10px] opacity-50">({{ grp.initials }})</span>
-                                <div class="rounded-full w-2 h-2 ml-2 inline-block" :style="{ backgroundColor: grp.color }" />
-                            </span>
-                        </label>
-                    </div>
-                </div>
-
                 <div class="space-y-4">
                     <label class="font-black text-gray-400 dark:text-zinc-500 ml-1 block text-[10px] tracking-[0.2em] uppercase">Période</label>
                     <div class="gap-3 grid grid-cols-1">
@@ -110,6 +94,21 @@ const onAfterLeave = () => {
                         <select id="fileType" v-model="filters.fileType" class="dark:bg-slate-900/50 border-gray-200 dark:border-slate-800 rounded-xl pl-10 py-2.5 text-sm dark:text-zinc-200 focus:ring-sky-500/10 focus:border-sky-500 block w-full cursor-pointer bg-transparent focus:ring-4 transition-all">
                             <option v-for="type in fileTypeList" :key="type.id" :value="type.id" class="dark:bg-slate-900">{{ type.name }}</option>
                         </select>
+                    </div>
+                </div>
+
+                <div class="space-y-3">
+                    <label class="font-black text-gray-400 dark:text-zinc-500 mb-3 ml-1 block text-[10px] tracking-[0.2em] uppercase">Groupes</label>
+                    <div class="gap-2 grid grid-cols-1">
+                        <label v-for="grp in groupes" :key="grp.id" class="group p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/40 flex cursor-pointer items-center transition-all">
+                            <div class="relative flex items-center">
+                                <input :id="grp.id.toString()" type="checkbox" v-model="filters.selectedGroupes" :value="grp.id" class="h-5 w-5 rounded-lg border-gray-300 dark:border-slate-700 text-sky-500 focus:ring-sky-500/20 dark:bg-slate-900 cursor-pointer" />
+                            </div>
+                            <span class="ml-3 text-sm font-medium text-gray-600 dark:text-zinc-300 group-hover:text-sky-500 transition-colors break-words">
+                                {{ grp.name }} <span class="text-[10px] opacity-50">({{ grp.initials }})</span>
+                                <div class="rounded-full w-2 h-2 ml-2 inline-block" :style="{ backgroundColor: grp.color }" />
+                            </span>
+                        </label>
                     </div>
                 </div>
             </form>
