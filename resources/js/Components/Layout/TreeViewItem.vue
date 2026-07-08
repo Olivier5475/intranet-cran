@@ -136,7 +136,7 @@ const hasMoreItems = computed(() => {
                     </button>
                     <div v-if="(isMenuExpend || toggleMenu) && canEdit" class="right-0 top-5 w-32 rounded-lg shadow-xl bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 py-1 absolute z-20">
                         <Link :href="folder_route.update.url(child.id)" class="px-4 py-2 text-xs hover:bg-gray-100 text-yellow-600 block">Modifier</Link>
-                        <button @click="isActiveValidation = true" class="px-4 py-2 text-xs hover:bg-red-50 text-red-500 block w-full text-left">Archiver</button>
+                        <button @click="isActiveValidation = true" class="px-4 py-2 text-xs hover:bg-red-50 text-red-500 block w-full text-left">Supprimer</button>
                     </div>
                 </div>
             </div>
