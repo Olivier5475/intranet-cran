@@ -147,8 +147,8 @@ const hasAppelProjet = computed(() => filteredChildren.value.some(child => child
 
             <button @click="toggleSort('name')" class="col-span-5 flex items-center justify-start gap-1 hover:text-sky-500 transition-colors uppercase font-semibold text-left">
                 Nom
-                <ChevronUpIcon v-if="sortColumn === 'name' && sortDirection === 'asc'" class="w-4 h-4" />
-                <ChevronDownIcon v-else-if="sortColumn === 'name' && sortDirection === 'desc'" class="w-4 h-4" />
+                <span v-if="sortColumn === 'name' && sortDirection === 'asc'">(A-Z)</span>
+                <span v-else-if="sortColumn === 'name' && sortDirection === 'desc'">(Z-A)</span>
                 <ChevronUpDownIcon v-else class="w-4 h-4 opacity-30" />
             </button>
 
@@ -161,7 +161,7 @@ const hasAppelProjet = computed(() => filteredChildren.value.some(child => child
 
             <div class="col-span-3 flex items-center justify-center gap-1">
                 <select
-                    class="dark:bg-sky-900 w-2/3 text-center p-0 pr-1 bg-transparent border-transparent text-xs font-bold uppercase hover:text-sky-300 focus:ring-0 cursor-pointer transition-colors"
+                    class="appearance-none bg-none dark:bg-sky-900 w-1/3 text-center p-0 pr-1 bg-transparent border-transparent text-xs font-bold uppercase hover:text-sky-300 focus:ring-0 cursor-pointer transition-colors"
                     v-model="date_mode"
                     @change="handleDateChange"
                 >
@@ -170,9 +170,8 @@ const hasAppelProjet = computed(() => filteredChildren.value.some(child => child
                     <option v-if="hasAppelProjet" value="deadline">Deadline</option>
                 </select>
                 <button @click="toggleSort('date')" class="hover:text-sky-500 hover:bg-gray-200 dark:hover:bg-slate-700 p-1 rounded-full transition-colors">
-                    <ChevronUpIcon v-if="sortColumn === 'date' && sortDirection === 'asc'" class="w-4 h-4" />
-                    <ChevronDownIcon v-else-if="sortColumn === 'date' && sortDirection === 'desc'" class="w-4 h-4" />
-                    <ChevronUpDownIcon v-else class="w-4 h-4 opacity-30" />
+                    <span v-if="sortColumn === 'date' && sortDirection === 'asc'">(Croissant)</span>
+                    <span v-else-if="sortColumn === 'date' && sortDirection === 'desc'">(Décroissant)</span>
                 </button>
             </div>
 
