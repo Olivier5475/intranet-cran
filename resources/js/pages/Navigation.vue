@@ -110,11 +110,13 @@ const hasAppelProjet = computed(() => filteredChildren.value.some(child => child
 
     <div class="flex">
         <SearchBarWidget class="mt-4" :currentSearch="currentSearch" placeholder="Rechercher un fichier, un document..." />
+
         <Link
+            class="mr-auto mt-4 text-sky-600"
             :href="isArchived ? navigate_route.folder(folder_id) : navigate_route.archived(folder_id)"
             :title="isArchived ? 'Retourner au dossier' : 'Voir les archives'"
-            class="mx-auto mt-4 text-sky-600"
         >
+            <p class="text-xs">Archives</p>
             <component :is="isArchived ? ArrowUturnLeftIcon : ArchiveBoxIcon" class="w-10" />
         </Link>
     </div>
