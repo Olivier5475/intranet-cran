@@ -146,4 +146,10 @@ interface UserServiceInterface
      * @throws Throwable En cas d'erreur lors de la récupération en base ou du mapping des DTOs.
      */
     public function getFavorites(): Collection;
+
+    /**
+     * Récupère tous les éditeurs sous forme d'une Collection DTO minimaliste
+     * @return Collection
+     */
+    public function getEditors(): Collection;
 }

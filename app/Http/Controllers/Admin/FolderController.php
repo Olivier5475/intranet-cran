@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SaveFolderRequest;
 use App\Services\Interfaces\FoldersServiceInterface;
+use App\Services\Interfaces\UserServiceInterface;
 use App\Exception\{FolderNotFoundException, PersistenceException};
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
@@ -13,7 +14,8 @@ use Throwable;
 class FolderController extends Controller
 {
     public function __construct(
-        private readonly FoldersServiceInterface $foldersService
+        private readonly FoldersServiceInterface $foldersService,
+        private readonly UserServiceInterface $userService
     ) {}
 
     // --- VUES (GET) ---
@@ -29,14 +31,20 @@ class FolderController extends Controller
             }
         }
 
-        return Inertia::render('Admin/FolderForm', ["parent_id" => $parent_id]);
+        return Inertia::render('Admin/FolderForm', [
+            "parent_id" => $parent_id,
+            "editors" => $this->userService->getEditors()
+        ]);
     }
 
     public function edit(int $id)
     {
         try {
             $folder = $this->foldersService->read($id);
-            return Inertia::render('Admin/FolderForm', ["folder" => $folder]);
+            return Inertia::render('Admin/FolderForm', [
+                "folder" => $folder,
+                "editors" => $this->userService->getEditors()
+            ]);
         } catch (FolderNotFoundException) {
             return redirect()->back()->with("error", "Ce dossier n'existe pas.");
         }

@@ -242,4 +242,20 @@ readonly class MapDTOService implements MapDTOServiceInterface
             type: $document["type"] ?? "document",
         );
     }
+
+    public function mapToMinimalUserDtos($users) : Collection
+    {
+        $userDtos = new Collection();
+        foreach ($users as $user) {
+            $userDtos->push(new AuthDTO(
+                email: null,
+                nom: $user['nom'],
+                prenom: $user['prenom'],
+                groupes: $this->getGrpsIds($user),
+                role: null,
+                id: null
+            ));
+        }
+        return $userDtos;
+    }
 }

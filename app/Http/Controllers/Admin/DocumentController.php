@@ -14,6 +14,7 @@ class DocumentController extends Controller {
 
     public function __construct(
         private readonly DocumentsServiceInterface $documentsService,
+        private readonly UserServiceInterface $userService
     ){}
 
     // --- VUES (GET) ---
@@ -21,13 +22,19 @@ class DocumentController extends Controller {
     public function create(int $parent_id) {
         // La vérification de droit est maintenant gérée par le Middleware ou la Request,
         // mais on peut garder une sécurité ici si tu préfères.
-        return Inertia::render('Admin/DocumentForm', ["parent_id" => $parent_id]);
+        return Inertia::render('Admin/DocumentForm', [
+            "parent_id" => $parent_id,
+            "editors" => $this->userService->getEditors()
+        ]);
     }
 
     public function edit(int $id) {
         try {
             $document = $this->documentsService->read($id);
-            return Inertia::render('Admin/DocumentForm', ["document" => $document]);
+            return Inertia::render('Admin/DocumentForm', [
+                "document" => $document,
+                "editors" => $this->userService->getEditors()
+            ]);
         } catch (Throwable $t) {
             return redirect()->back()->with('error', 'Impossible de charger le document.');
         }

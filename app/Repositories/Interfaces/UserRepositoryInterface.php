@@ -105,4 +105,11 @@ interface UserRepositoryInterface
      * @return Collection Une collection d'objets favoris.
      */
     public function getFavorites(): Collection;
+
+    /**
+     * Récupère le nom, le prénom et les groupes de tous les éditeurs
+     *
+     * @return Collection
+     */
+    public function getEditors(): Collection;
 }

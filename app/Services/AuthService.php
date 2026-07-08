@@ -301,4 +301,10 @@ readonly class AuthService implements UserServiceInterface
             throw $e;
         }
     }
+
+    public function getEditors(): Collection {
+        return $this->mapDTOService->mapToMinimalUserDtos(
+            $this->userRepository->getEditors()
+        );
+    }
 }

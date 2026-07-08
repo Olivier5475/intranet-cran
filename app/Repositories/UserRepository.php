@@ -201,4 +201,10 @@ class UserRepository implements UserRepositoryInterface
             ->latest() // Optionnel : trie par les ajouts les plus récents en premier
             ->get();
     }
+
+    public function getEditors(): Collection {
+        return User::where('role', 'editeur')
+        ->with('groupes:id,name,color')
+        ->get(['id', 'nom', 'prenom']);
+    }
 }

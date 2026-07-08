@@ -16,6 +16,7 @@ import WarningPermission from "@/Components/UI/WarningPermission.vue";
 import GroupeSelectorWidget from "@/Components/Forms/GroupeSelectorWidget.vue";
 import NameInputWidget from '@/Components/Forms/NameInputWidget.vue';
 import ColorPickerWidget from '@/Components/Forms/ColorPickerWidget.vue';
+import { User } from '@/types';
 
 const props = defineProps<{
     parent_id?: number;
@@ -25,6 +26,7 @@ const props = defineProps<{
         color: string;
         groupes: number[];
     };
+    editors: User[];
     groupes: Groupe[];
 }>();
 
@@ -106,6 +108,7 @@ const showExternalWarning = computed(() => {
             <div class="pt-6 dark:border-zinc-800 border-t">
                 <GroupeSelectorWidget
                     v-model="form.groupes"
+                    :editors="editors"
                     :all-groupes="groupes"
                 />
             </div>

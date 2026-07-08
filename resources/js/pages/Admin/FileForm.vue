@@ -17,12 +17,14 @@ import WarningPermission from "@/Components/UI/WarningPermission.vue";
 import GroupeSelectorWidget from "@/Components/Forms/GroupeSelectorWidget.vue";
 import FileUploadZone from '@/Components/Forms/FileUploadZone.vue';
 import NameInputWidget from '@/Components/Forms/NameInputWidget.vue';
+import { User } from '@/types';
 
 
 const props = defineProps<{
     parent_id?: number;
     file?: FileEntry;
     groupes: Groupe[];
+    editors: User[];
 }>();
 
 const form = useForm({
@@ -104,6 +106,7 @@ const showExternalWarning = computed(() => {
                 <GroupeSelectorWidget
                     v-model="form.groupes"
                     :all-groupes="groupes"
+                    :editors="editors"
                 />
             </div>
 

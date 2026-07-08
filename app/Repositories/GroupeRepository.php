@@ -2,7 +2,6 @@
 
 namespace App\Repositories;
 
-use App\Models\User;
 use App\Exception\{GroupeNotFoundException, PersistenceException, UserNotFoundException};
 use App\Models\Groupe;
 use App\Repositories\Interfaces\GroupeRepositoryInterface;

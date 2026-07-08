@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SaveFileRequest;
-use App\Services\Interfaces\{FilesServiceInterface, FoldersServiceInterface};
+use App\Services\Interfaces\{FilesServiceInterface, FoldersServiceInterface, UserServiceInterface};
 use App\Exception\{AlreadyExistsException, FileNotFoundException, PersistenceException, DiskWriteException};
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
@@ -14,19 +14,24 @@ class FileController extends Controller {
 
     public function __construct(
         private readonly FilesServiceInterface $filesService,
+        private readonly UserServiceInterface $userService
     ){}
 
     // --- VUES (GET) ---
 
     public function create(int $parent_id) {
         // La sécurité est déjà gérée par le middleware ou peut être ajoutée ici
-        return Inertia::render('Admin/FileForm', ["parent_id" => $parent_id]);
+        return Inertia::render('Admin/FileForm', [
+            "parent_id" => $parent_id,
+            "editors" => $this->userService->getEditors()
+        ]);
     }
 
     public function edit(int $id) {
         try {
             return Inertia::render('Admin/FileForm', [
-                "file" => $this->filesService->read($id)
+                "file" => $this->filesService->read($id),
+                "editors" => $this->userService->getEditors()
             ]);
         } catch (Throwable $t) {
             return redirect()->back()->with('error', 'Impossible de charger le fichier.');

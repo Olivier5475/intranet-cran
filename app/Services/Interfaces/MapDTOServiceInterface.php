@@ -113,4 +113,11 @@ interface MapDTOServiceInterface
      */
     public function getGrpsIds(mixed $model): array;
 
+
+    /**
+     * @param $users
+     * @return Collection
+     */
+    public function mapToMinimalUserDtos($users) : Collection;
+
 }
