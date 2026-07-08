@@ -92,9 +92,16 @@ const copyToClipboard = async () => {
             <ResourceRenameForm v-model="child.name" :route-url="updateRoute" is-row @success="activeRename = false" />
         </div>
 
-        <div class="text-xs font-bold text-gray-500 dark:text-zinc-400 col-span-1 text-center">
-            <span class="px-2 py-1 bg-gray-100 dark:bg-slate-800 rounded-full">
-                {{ child.type === "folder" ? "Dossier" : child.type === "document" ? "Document" : "Fichier" }}
+        <div class="text-xs font-semibold text-gray-500 dark:text-zinc-400 col-span-1 text-center">
+            <span class="inline-block py-1 px-3 leading-normal bg-gray-100 dark:bg-slate-800 rounded-2xl">
+                {{ child.type === "folder"
+                        ? "Dossier"
+                        : child.type === "document"
+                            ? "Document"
+                            : child.type === "appelprojet"
+                                ? "Appel à Projet"
+                                : "Fichier"
+                }}
             </span>
         </div>
 
