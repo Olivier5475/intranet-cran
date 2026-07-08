@@ -14,8 +14,8 @@ class IsAdmin
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
     public function handle(Request $request, Closure $next): Response {
-        if (!auth()->check() || auth()->user()->role != "admin" || auth()->user()->role != "superadmin") {
-            abort(403, "Accès refusé : vous n'êtes pas administrateur.");
+        if (!auth()->check() && auth()->user()->role != "admin" && auth()->user()->role != "superadmin") {
+            abort(403, "Accès refusé : vous n'êtes pas administrateur");
         }
         return $next($request);
     }
