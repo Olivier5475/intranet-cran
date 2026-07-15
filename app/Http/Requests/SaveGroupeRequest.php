@@ -18,7 +18,7 @@ class SaveGroupeRequest extends FormRequest
             'initials' => ['required', 'string', 'max:255'],
             'name'     => ['required', 'string', 'max:255'],
             'color'    => ['required', 'string', 'max:255'],
-            'parent'    => ['required', 'int'],
+            'parent'    => ['nullable', 'int'],
         ];
     }
 }

@@ -89,18 +89,26 @@ const submit = () => {
             <ColorPickerWidget v-model="form.color" />
         </div>
 
-        <select
-            class="w-full bg-zinc-50 dark:bg-zinc-800/50 p-4 rounded-2xl border border-zinc-100 dark:border-zinc-700"
-            v-model="form.parent"
-        >
-            <option
-                v-for="grp in availableGroupes"
-                :key="grp.id"
-                :value="grp.id"
+        <div>
+            <label
+                class="text-[11px] font-black uppercase tracking-widest text-zinc-400 ml-1"
             >
-                {{ grp.name }}
-            </option>
-        </select>
+
+            </label>
+            <select
+                class="w-full bg-zinc-50 dark:bg-zinc-800/50 p-4 rounded-2xl border border-zinc-100 dark:border-zinc-700"
+                v-model="form.parent"
+            >
+                <option :value="null">- - - - AUCUN - - - -</option>
+                <option
+                    v-for="grp in availableGroupes"
+                    :key="grp.id"
+                    :value="grp.id"
+                >
+                    {{ grp.name }}
+                </option>
+            </select>
+        </div>
         <div
             class="bg-zinc-50 dark:bg-zinc-800/50 p-4 rounded-2xl border border-zinc-100 dark:border-zinc-700"
         >
