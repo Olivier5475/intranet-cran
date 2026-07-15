@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { reactive, watch, ref } from "vue";
+import { reactive, watch, ref, computed } from 'vue';
 import { AdjustmentsHorizontalIcon, CalendarIcon, DocumentIcon, ChevronDownIcon } from "@heroicons/vue/24/outline";
 import { Groupe } from "@/types/groupe";
 
 const emit = defineEmits(["filters-updated"]);
-defineProps<{ groupes: Groupe[]; }>();
+const props = defineProps<{ groupes: Groupe[]; }>();
 
 // 🚀 Suppression de sortBy
 const filters = reactive({
@@ -48,6 +48,11 @@ const toggle = function () {
 const onAfterLeave = () => {
     isActive.value = false;
 };
+
+const racineGroupes = computed(() => {
+    if (!props.groupes) return props.groupes;
+    return props.groupes.filter(grp => grp.parent == null);
+})
 </script>
 
 <template>
@@ -100,7 +105,7 @@ const onAfterLeave = () => {
                 <div class="space-y-3">
                     <label class="font-black text-gray-400 dark:text-zinc-500 mb-3 ml-1 block text-[10px] tracking-[0.2em] uppercase">Groupes</label>
                     <div class="gap-2 grid grid-cols-1">
-                        <label v-for="grp in groupes" :key="grp.id" class="group p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/40 flex cursor-pointer items-center transition-all">
+                        <label v-for="grp in racineGroupes" :key="grp.id" class="group p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/40 flex cursor-pointer items-center transition-all">
                             <div class="relative flex items-center">
                                 <input :id="grp.id.toString()" type="checkbox" v-model="filters.selectedGroupes" :value="grp.id" class="h-5 w-5 rounded-lg border-gray-300 dark:border-slate-700 text-sky-500 focus:ring-sky-500/20 dark:bg-slate-900 cursor-pointer" />
                             </div>

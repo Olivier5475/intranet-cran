@@ -12,5 +12,7 @@ readonly class GroupeDTO {
         public string $initials,
         public string $color,
         public ?Collection $users = null,
+        public ?array $children = null,
+        public ?int $parent = null,
     ) {}
 }

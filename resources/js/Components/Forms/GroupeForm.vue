@@ -1,7 +1,7 @@
 <script setup lang="ts">
 // 1. Vue & Core
 import { useForm } from "@inertiajs/vue3";
-import { ref } from "vue";
+import { computed, ref } from 'vue';
 
 // 2. Routes
 import grps_route from "@/routes/admin/groupes";
@@ -10,6 +10,7 @@ import NameInputWidget from '@/Components/Forms/NameInputWidget.vue';
 import ColorPickerWidget from '@/Components/Forms/ColorPickerWidget.vue';
 
 const props = defineProps<{
+    groupes: Groupe[]
     groupe: Groupe | null;
 }>();
 
@@ -19,8 +20,13 @@ const form = useForm({
     name: props.groupe?.name ?? "",
     initials: props.groupe?.initials ?? "",
     color: props.groupe?.color ?? "#ffffff",
+    parent: props.groupe?.parent ?? null,
 });
 
+const availableGroupes = computed(() => {
+    if (!props.groupe) return props.groupes; // Si création, tout est disponible
+    return props.groupes.filter(grp => grp.id !== props.groupe?.id);
+});
 const userInteractedWith = ref(!!props.groupe);
 
 const updateInitials = () => {
@@ -47,7 +53,7 @@ const submit = () => {
 </script>
 
 <template>
-    <form @submit.prevent="submit" class="space-y-8">
+    <form @submit.prevent="submit" class="space-y-4">
         <div class="grid grid-cols-1 md:grid-cols-5 gap-6">
             <NameInputWidget
                 v-model="form.name"
@@ -83,6 +89,18 @@ const submit = () => {
             <ColorPickerWidget v-model="form.color" />
         </div>
 
+        <select
+            class="w-full bg-zinc-50 dark:bg-zinc-800/50 p-4 rounded-2xl border border-zinc-100 dark:border-zinc-700"
+            v-model="form.parent"
+        >
+            <option
+                v-for="grp in availableGroupes"
+                :key="grp.id"
+                :value="grp.id"
+            >
+                {{ grp.name }}
+            </option>
+        </select>
         <div
             class="bg-zinc-50 dark:bg-zinc-800/50 p-4 rounded-2xl border border-zinc-100 dark:border-zinc-700"
         >

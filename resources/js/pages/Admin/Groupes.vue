@@ -1,10 +1,10 @@
 <script setup lang="ts">
 // 1. Vue & Core
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { Link, router } from '@inertiajs/vue3';
 
 // 2. Librairies tierces (Icônes)
-import { PlusIcon, TrashIcon, PencilSquareIcon, BuildingOfficeIcon } from '@heroicons/vue/24/outline';
+import { PlusIcon, TrashIcon, PencilSquareIcon, BuildingOfficeIcon, ChevronDownIcon } from '@heroicons/vue/24/outline';
 
 // 3. Types & Routes
 import { Groupe } from '@/types/groupe';
@@ -14,12 +14,30 @@ import grp_routes from '@/routes/admin/groupes';
 import GroupeForm from '@/Components/Forms/GroupeForm.vue';
 import Modal from '@/Components/UI/Modal.vue';
 
-defineProps<{
+const props = defineProps<{
     groupes: Groupe[];
 }>();
 
 const showModal = ref(false);
 const selectedGrp = ref<Groupe | null>(null);
+
+// Gestion de l'ouverture des sous-groupes
+const expandedGrps = ref<number[]>([]);
+
+const toggleExpand = (id: number) => {
+    const index = expandedGrps.value.indexOf(id);
+    if (index > -1) {
+        expandedGrps.value.splice(index, 1);
+    } else {
+        expandedGrps.value.push(id);
+    }
+};
+
+// Fonction pour récupérer les objets Groupes à partir de leurs IDs
+const getChildren = (childrenIds: number[] | undefined) => {
+    if(childrenIds == undefined) return;
+    return props.groupes.filter(g => childrenIds.includes(g.id));
+};
 
 const openCreate = () => {
     selectedGrp.value = null;
@@ -34,6 +52,11 @@ const deleteGrp = (id: number) => {
         router.delete(grp_routes.delete.url(id));
     }
 };
+
+const racineGroupes = computed(() => {
+    if (!props.groupes) return props.groupes;
+    return props.groupes.filter(grp => grp.parent == null);
+})
 </script>
 
 <template>
@@ -65,47 +88,95 @@ const deleteGrp = (id: number) => {
         </div>
 
         <div v-else class="gap-4 grid">
-            <div
-                v-for="grp in groupes"
-                :key="grp.id"
-                class="group bg-white dark:bg-zinc-900 p-5 rounded-2xl border-zinc-100 dark:border-zinc-800 hover:shadow-xl hover:border-sky-200 dark:hover:border-sky-900/50 flex items-center justify-between border transition-all duration-200"
-            >
-                <Link class="gap-5 flex items-center" :href="grp_routes.users(grp.id)">
-                    <div
-                        class="w-14 h-14 bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 rounded-2xl font-black text-lg tracking-tighter border-zinc-200 dark:border-zinc-700 group-hover:bg-sky-500 group-hover:text-white group-hover:border-sky-400 flex items-center justify-center border transition-colors"
-                    >
-                        {{ grp.initials }}
-                    </div>
+            <!-- Boucle principale sur les groupes racines -->
+            <div v-for="grp in racineGroupes" :key="grp.id" class="flex flex-col gap-3">
 
-                    <div>
-                        <h3 class="font-bold text-lg dark:text-white group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors">
-                            {{ grp.name }}
-                        </h3>
-                        <p class="text-xs text-zinc-400 tracking-widest font-semibold mt-0.5 uppercase">Entité active</p>
-                    </div>
-                </Link>
+                <!-- Carte du groupe Parent -->
+                <div
+                    class="group bg-white dark:bg-zinc-900 p-5 rounded-2xl border-zinc-100 dark:border-zinc-800 hover:shadow-xl hover:border-sky-200 dark:hover:border-sky-900/50 flex items-center justify-between border transition-all duration-200"
+                >
+                    <Link class="gap-5 flex items-center" :href="grp_routes.users(grp.id)">
+                        <div
+                            class="w-14 h-14 bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 rounded-2xl font-black text-lg tracking-tighter border-zinc-200 dark:border-zinc-700 group-hover:bg-sky-500 group-hover:text-white group-hover:border-sky-400 flex items-center justify-center border transition-colors"
+                        >
+                            {{ grp.initials }}
+                        </div>
 
-                <div class="gap-2 flex items-center">
-                    <button
-                        @click="openEdit(grp)"
-                        class="p-2.5 hover:bg-sky-50 dark:hover:bg-sky-900/30 rounded-xl text-zinc-400 hover:text-sky-600 transition-all"
-                        title="Modifier"
-                    >
-                        <PencilSquareIcon class="w-6 h-6" />
-                    </button>
-                    <button
-                        @click="deleteGrp(grp.id)"
-                        class="p-2.5 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-xl text-zinc-400 hover:text-red-500 transition-all"
-                        title="Supprimer"
-                    >
-                        <TrashIcon class="w-6 h-6" />
-                    </button>
+                        <div>
+                            <h3 class="font-bold text-lg dark:text-white group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors">
+                                {{ grp.name }}
+                            </h3>
+                            <p class="text-xs text-zinc-400 tracking-widest font-semibold mt-0.5 uppercase">Entité active</p>
+                        </div>
+                    </Link>
+
+                    <div class="gap-2 flex items-center">
+                        <!-- Bouton pour ouvrir les sous-groupes (s'il y en a) -->
+                        <button
+                            v-if="grp.children && grp.children.length > 0"
+                            @click="toggleExpand(grp.id)"
+                            class="px-3 py-2 bg-sky-50 dark:bg-sky-900/20 text-sky-600 dark:text-sky-400 rounded-xl font-bold text-sm flex items-center gap-2 hover:bg-sky-100 transition-colors"
+                        >
+                            {{ grp.children.length }} sous-groupe(s)
+                            <ChevronDownIcon
+                                class="w-4 h-4 transition-transform duration-200"
+                                :class="expandedGrps.includes(grp.id) ? 'rotate-180' : ''"
+                            />
+                        </button>
+
+                        <button
+                            @click="openEdit(grp)"
+                            class="p-2.5 hover:bg-sky-50 dark:hover:bg-sky-900/30 rounded-xl text-zinc-400 hover:text-sky-600 transition-all"
+                            title="Modifier"
+                        >
+                            <PencilSquareIcon class="w-6 h-6" />
+                        </button>
+                        <button
+                            @click="deleteGrp(grp.id)"
+                            class="p-2.5 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-xl text-zinc-400 hover:text-red-500 transition-all"
+                            title="Supprimer"
+                        >
+                            <TrashIcon class="w-6 h-6" />
+                        </button>
+                    </div>
                 </div>
+
+                <!-- Menu déroulant des sous-groupes (Enfants) -->
+                <div v-if="expandedGrps.includes(grp.id)" class="pl-12 flex flex-col gap-3">
+                    <div
+                        v-for="child in getChildren(grp.children)"
+                        :key="child.id"
+                        class="bg-zinc-50 dark:bg-zinc-800/50 p-4 rounded-xl border border-zinc-100 dark:border-zinc-700/50 flex items-center justify-between"
+                    >
+                        <Link class="gap-4 flex items-center" :href="grp_routes.users(child.id)">
+                            <div class="w-10 h-10 bg-white dark:bg-zinc-700 text-zinc-500 rounded-lg font-bold text-sm border-zinc-200 flex items-center justify-center border">
+                                {{ child.initials }}
+                            </div>
+                            <h4 class="font-bold text-zinc-700 dark:text-zinc-300 hover:text-sky-600 transition-colors">
+                                {{ child.name }}
+                            </h4>
+                        </Link>
+
+                        <div class="gap-2 flex items-center">
+                            <button @click="openEdit(child)" class="p-2 hover:bg-white dark:hover:bg-zinc-700 rounded-lg text-zinc-400 hover:text-sky-600">
+                                <PencilSquareIcon class="w-5 h-5" />
+                            </button>
+                            <button @click="deleteGrp(child.id)" class="p-2 hover:bg-white dark:hover:bg-zinc-700 rounded-lg text-zinc-400 hover:text-red-500">
+                                <TrashIcon class="w-5 h-5" />
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
 
         <Modal :show="showModal" :title="selectedGrp ? 'Modifier le groupe' : 'Créer un groupe'" @close="showModal = false">
-            <GroupeForm :groupe="selectedGrp" @success="showModal = false" />
+            <GroupeForm
+                :groupes="groupes"
+                :groupe="selectedGrp"
+                @success="showModal = false"
+            />
         </Modal>
     </div>
 </template>

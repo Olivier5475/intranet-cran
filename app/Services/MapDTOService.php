@@ -177,6 +177,8 @@ readonly class MapDTOService implements MapDTOServiceInterface
             initials: $groupe->initials,
             color: $groupe->color,
             users: $this->getGrpUsers($groupe),
+            parent: $groupe->parent_id,
+            children: $this->getGrpsIds($groupe),
         );
     }
 
@@ -201,7 +203,16 @@ readonly class MapDTOService implements MapDTOServiceInterface
     public function getGrpsIds(mixed $model): array
     {
         // Si c'est un modèle Eloquent (File, Document, Folder, User)
-        if ($model instanceof \Illuminate\Database\Eloquent\Model) {
+        if ($model instanceof Groupe) {
+            // Crucial : On vérifie si la relation est déjà chargée
+            if ($model->relationLoaded('children')) {
+                return $model->children->pluck('id')->toArray();
+            }
+            // Si pas chargée, on ne fait RIEN (retourne vide) pour éviter le N+1
+            return [];
+        }
+        // Si c'est un modèle Eloquent (File, Document, Folder, User)
+        else if ($model instanceof \Illuminate\Database\Eloquent\Model) {
             // Crucial : On vérifie si la relation est déjà chargée
             if ($model->relationLoaded('groupes')) {
                 return $model->groupes->pluck('id')->toArray();
